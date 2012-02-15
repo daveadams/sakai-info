@@ -10,11 +10,16 @@
 #
 
 require 'rake/testtask'
-
 Rake::TestTask.new do |t|
   t.libs << 'test'
 end
 
-desc "Run tests"
-task :default => :test
+require 'lib/sakai-info/version'
+task :build => :test do
+  system "gem build sakai-info.gemspec"
+end
+
+# task :release => :build do
+#   system "gem push sakai-info-#{SakaiInfo::VERSION}"
+# end
 
