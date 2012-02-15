@@ -9,7 +9,7 @@
 # This software is public domain.
 #
 
-class SakaiInfo
+module SakaiInfo
   class Config
   end
 
