@@ -17,6 +17,8 @@ module SakaiInfo
   class InvalidConfigException < ScholarException; end
 
   class Config
+    attr_reader :config
+
     # validate that configuration is complete and well-formed
     def self.validate_config(config)
       return false if config.nil? or not config.is_a? Hash
@@ -60,7 +62,7 @@ module SakaiInfo
         elsif config.is_a? String and File.exist?(config)
           # try to parse as a filename first
           if File.exist?(config)
-            YAML::load_file(config)
+            @config = YAML::load_file(config)
           end
         else
           # otherwise try to parse it generically
@@ -70,7 +72,7 @@ module SakaiInfo
         raise InvalidConfigException.new("Unable to parse configuration: #{e}")
       end
 
-      if not self.validate_config(@config)
+      if not Config::validate_config(@config)
         raise InvalidConfigException.new("Config provided is either incomplete or poorly formed.")
       end
     end
