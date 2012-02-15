@@ -16,7 +16,9 @@ Gem::Specification.new do |s|
   s.summary = "Command line tools and libraries for exploring a Sakai database."
   s.authors = ["David Adams"]
   s.email = "daveadams@gmail.com"
-  s.files = ["lib/sakai-info.rb", "bin/sakai-info"]
   s.homepage = "https://github.com/daveadams/sakai-info"
+
+  s.files = ["lib/sakai-info.rb", "bin/sakai-info"]
+  s.executables << "sakai-info"
 end
 
