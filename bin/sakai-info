@@ -11,4 +11,6 @@
 # This software is public domain.
 #
 
+require 'sakai-info'
+
 puts "Hello, Sakai."
