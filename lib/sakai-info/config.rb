@@ -2,7 +2,7 @@
 #   SakaiInfo::Config library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-15 daveadams@gmail.com
+# Last updated 2012-02-16 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,7 +10,8 @@
 #
 
 module SakaiInfo
-  class InvalidConfigException < ScholarException; end
+  class InvalidConfigException < SakaiException; end
+
   class Config
     attr_reader :config
 
