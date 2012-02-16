@@ -37,6 +37,11 @@ namespace :gem do
   # end
 end
 
+desc "Find and print all TODO annotations"
+task :todo do
+  system "for FILE in $(grep -rl TODO: * --exclude=Rakefile); do echo $FILE; cat -n $FILE |grep TODO: |sed 's/^ *\\([0-9]\\+\\).*TODO:/  \\1- TODO:/' ; echo; done |sed '$d'"
+end
+
 # standard unit tests
 require 'rake/testtask'
 Rake::TestTask.new do |t|
