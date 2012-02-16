@@ -11,6 +11,8 @@
 
 require 'yaml'
 require 'json'
+require 'rexml/document'
+require 'base64'
 
 module SakaiInfo
   # base exception class for distinguishing SakaiInfo exceptions
