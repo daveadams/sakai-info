@@ -26,6 +26,11 @@ namespace :gem do
     system "sudo gem install #{GEM_FILENAME}"
   end
 
+  desc "Remove #{GEM_NAME} gem from your local rubygems library"
+  task :uninstall do
+    system "sudo gem uninstall #{GEM_NAME}"
+  end
+
   # desc "Upload built gem to RubyForge"
   # task :release => :build do
   #   system "gem push #{GEM_FULLNAME}"
