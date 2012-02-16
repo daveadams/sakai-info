@@ -35,6 +35,6 @@ sakai-info-x.x.x.gem. Install it locally with:
 
 License
 -------
-This work is dedicated to the public domain. No copyright is reserved. See
+This work is dedicated to the public domain. No rights are reserved. See
 LICENSE for more information.
 

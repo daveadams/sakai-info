@@ -2,11 +2,11 @@
 #   Gem definition file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-15 daveadams@gmail.com
+# Last updated 2012-02-16 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
-# This software is public domain.
+# This software is public domain. See LICENSE for more information.
 #
 
 require 'lib/sakai-info/version'
@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.email = "daveadams@gmail.com"
   spec.homepage = "https://github.com/daveadams/sakai-info"
 
-  spec.files = Dir["lib/**/*.rb"] + ["bin/sakai-info"] + %w(README.md)
+  spec.files = Dir["lib/**/*.rb"] + ["bin/sakai-info"] + %w(README.md LICENSE)
   spec.executables = ["sakai-info"]
 end
 
