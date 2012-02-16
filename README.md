@@ -1,5 +1,3 @@
-Last updated: 2012-02-16
-
 sakai-info
 ==========
 
@@ -11,8 +9,8 @@ is included in the tool or the libraries.
 
 Meta
 ----
-author: David Adams (daveadams@gmail.com)
-
+author: David Adams (daveadams@gmail.com)  
+last updated: 2012-02-16  
 github url: https://github.com/daveadams/sakai-info
 
 Caveat
