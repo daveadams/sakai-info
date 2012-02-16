@@ -10,18 +10,13 @@
 #
 
 require 'yaml'
+require 'json'
 
 module SakaiInfo
   class ScholarException < Exception; end
   class InvalidDateException < ScholarException; end
 
   class DB
-  end
-
-  class SakaiObject
-  end
-
-  class SakaiXMLEntity < SakaiObject
   end
 end
 
@@ -32,6 +27,7 @@ class String
   end
 end
 
-# TODO: include other libs here
+# all other libs are included here
 require 'sakai-info/config'
-
+require 'sakai-info/sakai_object'
+# require 'sakai-info/sakal_xml_entity'
