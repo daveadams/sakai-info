@@ -37,7 +37,14 @@ class String
   end
 end
 
-# all other libs are included here
+# baseline config and connectivity
 require 'sakai-info/config'
+require 'sakai-info/db'
+
+# base objects
 require 'sakai-info/sakai_object'
 require 'sakai-info/sakai_xml_entity'
+
+# sakai object classes
+require 'sakai-info/announcement'
+
