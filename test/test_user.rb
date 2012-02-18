@@ -59,6 +59,9 @@ class UserTest < Test::Unit::TestCase
   def test_serialization
     u = fetch_user_object
     assert_equal({"sakai_object_type" => SakaiInfo::User}, u.serialize(:object_type))
+    # TODO: add real serialization tests for User
   end
+
+  # TODO: add lookup tests for User
 end
 
