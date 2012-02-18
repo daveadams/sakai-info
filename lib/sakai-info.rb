@@ -46,5 +46,14 @@ require 'sakai-info/sakai_object'
 require 'sakai-info/sakai_xml_entity'
 
 # sakai object classes
+require 'sakai-info/user'
+require 'sakai-info/site'
 require 'sakai-info/announcement'
+require 'sakai-info/assignment'
+require 'sakai-info/authz'
+require 'sakai-info/content'
+require 'sakai-info/gradebook'
+require 'sakai-info/group'
+require 'sakai-info/message'
+require 'sakai-info/samigo'
 

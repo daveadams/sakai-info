@@ -26,7 +26,7 @@ module SakaiInfo
           REXML::Document.new(row[1].read).write(xml, 2)
         end
         if nextid.nil?
-          raise ObjectNotFoundException(AnnouncementChannel, id)
+          raise ObjectNotFoundException.new(AnnouncementChannel, id)
         end
         new_announcement = AnnouncementChannel.new(id, nextid, xml)
         @@cache[id] = new_announcement
@@ -105,7 +105,7 @@ module SakaiInfo
           REXML::Document.new(row[5].read).write(xml, 2)
         end
         if date.nil?
-          raise ObjectNotFoundException(Announcement, id)
+          raise ObjectNotFoundException.new(Announcement, id)
         end
         @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
       end
@@ -137,9 +137,7 @@ module SakaiInfo
         id = row[0]
         draft = row[1]
         pubview = row[2]
-        # TODO: re-instate original code when User object is available
-        owner = row[3]
-        #owner = User.find(row[3])
+        owner = User.find(row[3])
         date = row[4]
         REXML::Document.new(row[5].read).write(xml, 2)
 
