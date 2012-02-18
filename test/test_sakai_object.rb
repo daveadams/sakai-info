@@ -2,7 +2,7 @@
 #   Tests for SakaiInfo::SakaiObject
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -14,6 +14,7 @@ require 'sakai-info'
 
 module SakaiInfo
   class TestSakaiObjectSubclass < SakaiObject
+    # TODO: define other serializations to test combining across the inheritance tree
   end
 end
 
@@ -25,6 +26,9 @@ class SakaiObjectTest < Test::Unit::TestCase
     assert_respond_to(so, :id)
     assert_respond_to(so, :default_serialization)
     assert_respond_to(so, :object_type_serialization)
+    assert_respond_to(so, :serialize)
+    assert_respond_to(so, :to_yaml)
+    assert_respond_to(so, :to_json)
   end
 
   # test basic serialization methods
