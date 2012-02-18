@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -12,6 +12,10 @@
 module SakaiInfo
   # this class forms the basis of all other Sakai object abstractions
   class SakaiObject
+    # most objects will have unique IDs
+    # (perhaps the rest should generate their own?)
+    attr_reader :id
+
     def serialize(*q)
       q.flatten!
 
@@ -33,10 +37,14 @@ module SakaiInfo
       serialization
     end
 
-    def default_serialization
+    def object_type_serialization
       {
         "sakai_object_type" => self.class
       }
+    end
+
+    def default_serialization
+      object_type_serialization
     end
 
     def to_yaml

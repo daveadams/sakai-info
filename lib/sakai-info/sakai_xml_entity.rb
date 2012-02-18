@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiXMLEntity
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -37,7 +37,7 @@ module SakaiInfo
   # This class extends SakaiObject and implements some additional
   # serialization methods to reflect the common elements of XML entities.
   class SakaiXMLEntity < SakaiObject
-    attr_reader :id, :xml, :xmldoc, :attributes, :properties
+    attr_reader :xml, :xmldoc, :attributes, :properties
 
     private
     # this method parses the universal XML field for all entities

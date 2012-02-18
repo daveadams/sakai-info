@@ -25,11 +25,15 @@ class SakaiObjectTest < Test::Unit::TestCase
     # specifying non-existent serializations should raise no NameErrors
     assert_nothing_raised do
       # many ways of asking for the same thing
-      # the default serialization should include the object classname
+      # the default and object_type serializations should include the object classname
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.default_serialization)
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize)
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:default))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize("default"))
+
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.object_type_serialization)
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:object_type))
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize("object_type"))
 
       # requesting any other serializations without :default should result in empty hashes
       # since no other serializations are defined at the base level
