@@ -18,6 +18,15 @@ module SakaiInfo
 end
 
 class SakaiObjectTest < Test::Unit::TestCase
+  # test basic object construction
+  def test_object
+    so = SakaiInfo::SakaiObject.new
+
+    assert_respond_to(so, :id)
+    assert_respond_to(so, :default_serialization)
+    assert_respond_to(so, :object_type_serialization)
+  end
+
   # test basic serialization methods
   def test_serialization
     so = SakaiInfo::SakaiObject.new
