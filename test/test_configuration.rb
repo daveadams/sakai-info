@@ -1,5 +1,5 @@
-# test_config.rb
-#   Tests for SakaiInfo::Config
+# test_configuration.rb
+#   Tests for SakaiInfo::Configuration
 #
 # Created 2012-02-15 daveadams@gmail.com
 # Last updated 2012-02-19 daveadams@gmail.com
@@ -13,14 +13,14 @@ require 'test/unit'
 require 'sakai-info'
 require 'tempfile'
 
-# inject an accessor into SakaiInfo::Config so tests will run
+# inject an accessor into SakaiInfo::Configuration so tests will run
 module SakaiInfo
-  class Config
+  class Configuration
     attr_reader :config
   end
 end
 
-class ConfigTest < Test::Unit::TestCase
+class ConfigurationTest < Test::Unit::TestCase
   # TODO: add tests for MultipleConfigExceptions
   InvalidConfigs =
     [nil, {},
@@ -80,81 +80,81 @@ class ConfigTest < Test::Unit::TestCase
        "password" => "12345", "host" => "oracle.db", "port" => 65535}
     ]
 
-  # test SakaiInfo::Config.validate_config
+  # test SakaiInfo::Configuration.validate_config
   def test_validation
     # check invalid configurations
     InvalidConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::InvalidConfigException) do
-        SakaiInfo::Config.validate_config(config_to_test)
+        SakaiInfo::Configuration.validate_config(config_to_test)
       end
     end
 
     # check 'unsupported' configurations
     UnsupportedConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::UnsupportedConfigException) do
-        SakaiInfo::Config.validate_config(config_to_test)
+        SakaiInfo::Configuration.validate_config(config_to_test)
       end
     end
 
     # check well-formed configurations
     GoodConfigs.each do |config_to_test|
       assert_nothing_raised do
-        assert_equal(true, SakaiInfo::Config.validate_config(config_to_test))
+        assert_equal(true, SakaiInfo::Configuration.validate_config(config_to_test))
       end
     end
   end
 
-  # test SakaiInfo::Config.new with hashes
+  # test SakaiInfo::Configuration.new with hashes
   def test_hash_loading
     # check invalid configurations
     InvalidConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::InvalidConfigException) do
-        SakaiInfo::Config.new(config_to_test)
+        SakaiInfo::Configuration.new(config_to_test)
       end
     end
 
     # check unsupported configurations
     UnsupportedConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::UnsupportedConfigException) do
-        SakaiInfo::Config.new(config_to_test)
+        SakaiInfo::Configuration.new(config_to_test)
       end
     end
 
     # check good configurations
     GoodConfigs.each do |config_to_test|
       assert_nothing_raised do
-        config = SakaiInfo::Config.new(config_to_test)
+        config = SakaiInfo::Configuration.new(config_to_test)
         assert_equal(config.config, config_to_test)
       end
     end
   end
 
-  # test SakaiInfo::Config.new with strings
+  # test SakaiInfo::Configuration.new with strings
   def test_string_loading
     # check invalid configurations
     InvalidConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::InvalidConfigException) do
-        SakaiInfo::Config.new(config_to_test.to_yaml)
+        SakaiInfo::Configuration.new(config_to_test.to_yaml)
       end
     end
 
     # check unsupported configurations
     UnsupportedConfigs.each do |config_to_test|
       assert_raise(SakaiInfo::UnsupportedConfigException) do
-        SakaiInfo::Config.new(config_to_test.to_yaml)
+        SakaiInfo::Configuration.new(config_to_test.to_yaml)
       end
     end
 
     # check good configurations
     GoodConfigs.each do |config_to_test|
       assert_nothing_raised do
-        config = SakaiInfo::Config.new(config_to_test.to_yaml)
+        config = SakaiInfo::Configuration.new(config_to_test.to_yaml)
         assert_equal(config.config, config_to_test)
       end
     end
   end
 
-  # test SakaiInfo::Config.new with files
+  # test SakaiInfo::Configuration.new with files
   def test_file_loading
     # check invalid configurations
     InvalidConfigs.each do |config_to_test|
@@ -164,13 +164,13 @@ class ConfigTest < Test::Unit::TestCase
 
       # check passing just the filename
       assert_raise(SakaiInfo::InvalidConfigException) do
-        SakaiInfo::Config.new(tempfile.path)
+        SakaiInfo::Configuration.new(tempfile.path)
       end
 
       # check passing an open file
       File.open(tempfile.path) do |f|
         assert_raise(SakaiInfo::InvalidConfigException) do
-          SakaiInfo::Config.new(f)
+          SakaiInfo::Configuration.new(f)
         end
       end
 
@@ -185,13 +185,13 @@ class ConfigTest < Test::Unit::TestCase
 
       # check passing just the filename
       assert_raise(SakaiInfo::UnsupportedConfigException) do
-        SakaiInfo::Config.new(tempfile.path)
+        SakaiInfo::Configuration.new(tempfile.path)
       end
 
       # check passing an open file
       File.open(tempfile.path) do |f|
         assert_raise(SakaiInfo::UnsupportedConfigException) do
-          SakaiInfo::Config.new(f)
+          SakaiInfo::Configuration.new(f)
         end
       end
 
@@ -206,14 +206,14 @@ class ConfigTest < Test::Unit::TestCase
 
       # check passing just the filename
       assert_nothing_raised do
-        config = SakaiInfo::Config.new(tempfile.path)
+        config = SakaiInfo::Configuration.new(tempfile.path)
         assert_equal(config.config, config_to_test)
       end
 
       # check passing an open file
       File.open(tempfile.path) do |f|
         assert_nothing_raised do
-          config = SakaiInfo::Config.new(f)
+          config = SakaiInfo::Configuration.new(f)
           assert_equal(config.config, config_to_test)
         end
       end

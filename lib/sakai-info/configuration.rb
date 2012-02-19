@@ -1,5 +1,5 @@
-# sakai-info/config.rb
-#   SakaiInfo::Config library
+# sakai-info/configuration.rb
+#   SakaiInfo::Configuration library
 #
 # Created 2012-02-15 daveadams@gmail.com
 # Last updated 2012-02-19 daveadams@gmail.com
@@ -83,7 +83,7 @@ module SakaiInfo
   #    driver's tnsnames.ora file, or specify the host and port as the
   #    test instance example above does
   #
-  class Config
+  class Configuration
     @@config = nil
 
     # validate just a single database connection configuration hash
@@ -262,20 +262,20 @@ module SakaiInfo
 
     # load configuration as a class variable (and return it as well)
     def self.load_config(alternate_config_file = nil)
-      if Config.configured?
+      if Configuration.configured?
         raise AlreadyConfiguredException
       end
 
-      unless(config_file = alternate_config_file || Config.config_file_path)
+      unless(config_file = alternate_config_file || Configuration.config_file_path)
         raise NoConfigFoundException
       end
 
-      @@config = Config.new(config_file)
+      @@config = Configuration.new(config_file)
     end
 
     # return specified database connection configuration
     def self.get_instance(instance_name = nil)
-      Config.load_config unless Config.configured?
+      Configuration.load_config unless Configuration.configured?
 
       if instance_name.nil?
         @@config.default_instance

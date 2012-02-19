@@ -12,7 +12,7 @@
 module SakaiInfo
   class DB
     def self.connect(instance_name = :default)
-      Config.get_instance(instance_name).connect
+      Configuration.get_instance(instance_name).connect
     end
   end
 end
