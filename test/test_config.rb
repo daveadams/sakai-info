@@ -22,28 +22,29 @@ end
 
 class ConfigTest < Test::Unit::TestCase
   # TODO: add tests for MultipleConfigExceptions
+  # TODO: add bad port nums to InvalidConfigs
   InvalidConfigs =
     [nil, {},
+     {"dbtype" => "mysql", "service" => "sakai", "username" => "sakai",
+       "password" => "12345"},
      {"dbtype" => "oracle", "dbname" => "sakai", "username" => "sakai",
        "host" => "sakai.db", "port" => 3306, "password" => "12345"}
     ]
-  # TODO: when MySQL is supported, add this mysql config to the InvalidConfigs
-  #     {"dbtype" => "mysql", "service" => "sakai", "username" => "sakai",
-  #     "password" => "12345"},
 
-  # TODO: when MySQL is supported, move its config from UnsupportedConfigs to GoodConfigs
   UnsupportedConfigs =
     [{"dbtype" => "mssql", "dbname" => "sakai", "username" => "sakai",
        "host" => "sakai.db", "port" => 3306, "password" => "12345"},
      {"dbtype" => "db2", "service" => "sakai", "username" => "sakai",
-       "password" => "12345"},
-     {"dbtype" => "mysql", "dbname" => "sakai", "username" => "sakai",
-       "host" => "sakai.db", "port" => 3306, "password" => "12345"}
+       "password" => "12345"}
     ]
 
   # TODO: add examples of valid multiple config to GoodConfigs listing
+  # TODO: add all variations on oracle config to GoodConfigs listing
+  # TODO: add port min and max--and missing--tests to GoodConfigs
   GoodConfigs =
-    [{"dbtype" => "oracle", "service" => "sakai", "username" => "sakai",
+    [{"dbtype" => "mysql", "dbname" => "sakai", "username" => "sakai",
+       "host" => "sakai.db", "port" => 3306, "password" => "12345"},
+     {"dbtype" => "oracle", "service" => "sakai", "username" => "sakai",
        "password" => "12345"}
     ]
 
