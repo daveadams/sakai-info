@@ -33,7 +33,6 @@ module SakaiInfo
       ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
 
       # include Oracle driver
-      # TODO: handle this better, so that tests will pass
       require 'oci8'
 
       @username = config["username"]
