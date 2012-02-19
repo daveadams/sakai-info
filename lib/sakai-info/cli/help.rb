@@ -12,10 +12,8 @@
 module SakaiInfo
   class CLI
     class Help
-      def self.help(topic = nil)
-        case topic
-        when nil then
-          STDERR.puts <<EOF
+      STRINGS = {
+        :default => <<EOF,
 sakai-info #{VERSION}
 
 Available commands:
@@ -25,8 +23,8 @@ Available commands:
 
 Type 'sakai-info help <command>' for help on a specific command.
 EOF
-        when "help" then
-          STDERR.puts <<EOF
+
+        "help" => <<EOF,
 sakai-info help
 
   Prints usage information for other sakai-info commands, or without an
@@ -34,16 +32,16 @@ sakai-info help
 
   Usage: sakai-info help [<command>]
 EOF
-        when "version" then
-          STDERR.puts <<EOF
+
+        "version" => <<EOF,
 sakai-info version
 
   Prints the current version of sakai-info.
 
   Usage: sakai-info version
 EOF
-        when "validate" then
-          STDERR.puts <<EOF
+
+        "validate" => <<EOF,
 sakai-info validate
 
   Reads and validates the current configuration format. To test the actual
@@ -51,8 +49,8 @@ sakai-info validate
 
   Usage: sakai-info validate
 EOF
-        when "test" then
-          STDERR.puts <<EOF
+
+        "test" => <<EOF,
 sakai-info test
 
   [NOT YET IMPLEMENTED]
@@ -62,10 +60,16 @@ sakai-info test
 
   Usage: sakai-info test [<instance>]
 EOF
+      }
+
+      def self.help(topic = :default, io = STDOUT)
+        topic ||= :default
+        if STRINGS.has_key? topic
+          io.puts STRINGS[topic]
         else
           STDERR.puts "ERROR: help topic '#{topic}' was unrecognized"
           STDERR.puts
-          CLI.help
+          CLI.help(:default, STDERR)
           exit 1
         end
       end
