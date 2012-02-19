@@ -84,6 +84,8 @@ module SakaiInfo
   #    test instance example above does
   #
   class Config
+    @@config = nil
+
     # validate just a single database connection configuration hash
     def self.validate_single_connection_config(config)
       if config.nil?
