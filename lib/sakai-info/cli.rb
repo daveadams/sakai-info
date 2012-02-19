@@ -13,10 +13,6 @@ require 'sakai-info/cli/help'
 
 module SakaiInfo
   class CLI
-    def self.help(topic = nil)
-      CLI::Help.help(topic)
-    end
-
     def self.validate_config
       return true if Configuration.configured?
 

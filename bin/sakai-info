@@ -21,9 +21,9 @@ if ARGV.length > 0
   case ARGV[0]
   when "help" then
     if ARGV.length > 1
-      CLI.help ARGV[1]
+      CLI::Help.help ARGV[1]
     else
-      CLI.help
+      CLI::Help.help
     end
     exit
   when "version" then
