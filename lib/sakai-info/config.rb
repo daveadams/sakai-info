@@ -2,7 +2,7 @@
 #   SakaiInfo::Config library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-19 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,6 +10,9 @@
 #
 
 module SakaiInfo
+  class NoConfigFoundException < SakaiException; end
+  class AlreadyConfiguredException < SakaiException; end
+  class InvalidInstanceNameException < SakaiException; end
   class InvalidConfigException < SakaiException; end
   class UnsupportedConfigException < InvalidConfigException; end
   class MultipleConfigException < InvalidConfigException
@@ -49,12 +52,14 @@ module SakaiInfo
   #         instances:
   #           production:
   #             dbtype: oracle
-  #             dbsid: PROD
+  #             service: PROD
   #             username: sakai
   #             password: prodpass
   #           test:
   #             dbtype: oracle
-  #             dbsid: TEST
+  #             service: TEST
+  #             host: testdb.host
+  #             port: 1521
   #             username: sakai
   #             password: testpass
   #           dev:
@@ -74,14 +79,11 @@ module SakaiInfo
   #
   #
   # NOTES:
-  #  - TODO: For this release MySQL connections are not supported
-  #  - Oracle connections assume the use of tnsnames.ora file that
-  #    can be found by the Ruby oci8 driver. The dbsid property
-  #    is intended to be the service name as defined in tnsnames.ora.
+  #  - Oracle connections should use either an alias defined in the
+  #    driver's tnsnames.ora file, or specify the host and port as the
+  #    test instance example above does
   #
   class Config
-    attr_reader :config
-
     # validate just a single database connection configuration hash
     def self.validate_single_connection_config(config)
       if config.nil?
@@ -100,15 +102,7 @@ module SakaiInfo
       # force lowercase to simplify comparisons
       dbtype = config["dbtype"].downcase
 
-      # TODO: when MySQL support is added, remove special MySQL warning
-      # give a hopeful message for MySQL
-      if dbtype == "mysql"
-        raise UnsupportedConfigException.new("MySQL is not yet supported, but will be soon.")
-      end
-
-      # TODO: when MySQL support is added, add mysql to supported list
-      # if not %w(oracle mysql).include? dbtype
-      if not %w(oracle).include? dbtype
+      if not %w(oracle mysql).include? dbtype
         raise UnsupportedConfigException.new("Database type '#{dbtype}' is not supported.")
       end
 
@@ -120,26 +114,26 @@ module SakaiInfo
           end
         end
       elsif dbtype == "mysql"
-        %(host username password dbname).each do |required_key|
+        %w(host username password dbname).each do |required_key|
           if config[required_key].nil? or config[required_key] == ""
             raise InvalidConfigException.new("MySQL config requires values for 'host', 'username', 'password', and 'dbname'.")
-          end
-        end
-
-        # 'port' is optional (defaults to 3306), but if it exists it must be a valid port number
-        if not config["port"].nil?
-          begin
-            port = config["port"].to_i
-            if port < 1 or port > 65535
-              raise
-            end
-          rescue
-            raise InvalidConfigException.new("Config value 'port' must be a valid TCP port number.")
           end
         end
       else
         # we should never have made it here
         raise UnsupportedConfigException.new("Database type '#{dbtype}' is not supported.")
+      end
+
+      # for both types, 'port' is optional but if it exists it must be a valid TCP port
+      if not config["port"].nil?
+        begin
+          port = config["port"].to_i
+          if port < 1 or port > 65535
+            raise
+          end
+        rescue
+          raise InvalidConfigException.new("Config value 'port' must be a valid TCP port number.")
+        end
       end
 
       # if we made it here the config is complete and well-formed
@@ -220,8 +214,71 @@ module SakaiInfo
         raise InvalidConfigException.new("Unable to parse configuration: #{e}")
       end
 
+      # check that the configuration specified is well formed
       if not Config::validate_config(@config)
         raise InvalidConfigException.new("Config provided is either incomplete or poorly formed.")
+      end
+
+      # create instance objects
+      @instances = {}
+      if not @config["instances"].nil?
+        @config["instances"].keys.each do |instance_name|
+          @instances[instance_name] = Instance.create(@config["instances"][instance_name])
+          if instance_name == @config["default"]
+            @instances[:default] = @instances[instance_name]
+          end
+        end
+      else
+        @instances[:default] = Instance.create(@config)
+      end
+    end
+
+    # instance accessibility
+    def get_instance(instance_name)
+      @instances[instance_name] or raise InvalidInstanceNameException
+    end
+
+    def default_instance
+      @instances[:default]
+    end
+
+    DEFAULT_CONFIG_FILE = "~/.sakai-info"
+    # check to see if configuration file exists
+    # by default ~/.sakai-info
+    def self.config_file_path
+      if File.readable? DEFAULT_CONFIG_FILE
+        DEFAULT_CONFIG_FILE
+      else
+        nil
+      end
+    end
+
+    # are we already configured?
+    def self.configured?
+      not @@config.nil?
+    end
+
+    # load configuration as a class variable (and return it as well)
+    def self.load_config(alternate_config_file = nil)
+      if Config.configured?
+        raise AlreadyConfiguredException
+      end
+
+      unless(config_file = alternate_config_file || Config.config_file_path)
+        raise NoConfigFoundException
+      end
+
+      @@config = Config.new(config_file)
+    end
+
+    # return specified database connection configuration
+    def self.get_instance(instance_name = nil)
+      Config.load_config unless Config.configured?
+
+      if instance_name.nil?
+        @@config.default_instance
+      else
+        @@config.get_instance(instance_name)
       end
     end
   end
