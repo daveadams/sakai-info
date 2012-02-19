@@ -2,7 +2,7 @@
 #   rake definitions
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-02-19 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -23,7 +23,7 @@ namespace :gem do
 
   desc "Install #{GEM_FILENAME} in your local rubygems library"
   task :install => :build do
-    system "sudo gem install #{GEM_FILENAME}"
+    system "sudo gem install #{GEM_FILENAME} --no-rdoc --no-ri"
   end
 
   desc "Remove #{GEM_NAME} gem from your local rubygems library"
