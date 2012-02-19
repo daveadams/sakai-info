@@ -53,19 +53,68 @@ For this release, only Oracle databases are supported. MySQL support is planned
 as soon as possible. Support for SQLite or some other lightweight database may
 be implemented for unit testing purposes.
 
+System Requirements
+-------------------
+
+For Oracle support, the `ruby-oci8` gem is required.
+
+So far, testing has occurred using Ruby 1.9.1p376 and Ruby 1.9.2p290, with
+version 2.0.6 of the `ruby-oci8` gem, on Ubuntu 10.04, against Oracle 11g
+R2 versions 11.2.0.1 and 11.2.0.3, using the Oracle Instant Client version
+11.2.0.3.
+
 Configuration
 -------------
 
 To run, *sakai-info* needs to be able to connect to your Sakai database server.
 It is possible to specify multiple instances to choose from at runtime.
 
-TODO: document configuration options
+In this release, *sakai-info* expects a to find the config in a file located at
+`$HOME/.sakai-info`. The file must be in YAML format and can contain one or
+more Sakai database connection definitions. To define a single database
+connection, specify the file like this:
+
+    dbtype: oracle
+    username: sakai
+    password: <password>
+    service: SAKAIPROD
+    host: oracle.db
+    port: 1521
+
+The `port` value is optional, with a default of 1521. If your Oracle setup uses
+a `tnsnames.ora` file, then both `host` and `port` can be excluded, and
+`service` will be used to find the corresponding `tnsnames.ora` entry.
+
+Multiple instances may be specified by using the following format:
+
+    default: production
+    instances:
+      production:
+        dbtype: oracle
+        username: sakai
+        password: <password>
+        service: SAKAIPROD
+        host: oracle.db
+        port: 1521
+     test:
+       dbtype: oracle
+       username: sakai
+       password: <password>
+       service: SAKAITEST
+
+The `default` key identifies which of the connections under `instances` you
+wish to be used in the absence of any explicit specification. Other instances
+will be referenced by the corresponding YAML key (eg, `production` and `test`
+in the example above).
 
 Command Line Usage
 ------------------
 
-After installing the gem, the `sakai-info` program should be found in your PATH.
-As of the current release, this program is only a placeholder.
+After installing the gem, the `sakai-info` program should be found in your
+PATH. For this release, very limited functionality is included. For usage
+details, run:
+
+    $ sakai-info help
 
 Library Usage
 -------------
