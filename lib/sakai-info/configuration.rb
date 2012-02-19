@@ -244,7 +244,7 @@ module SakaiInfo
       @instances[:default]
     end
 
-    DEFAULT_CONFIG_FILE = "~/.sakai-info"
+    DEFAULT_CONFIG_FILE = File.expand_path("~/.sakai-info")
     # check to see if configuration file exists
     # by default ~/.sakai-info
     def self.config_file_path

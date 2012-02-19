@@ -29,6 +29,16 @@ if ARGV.length > 0
   when "version" then
     puts VERSION
     exit
+  when "validate" then
+    if CLI.validate_config
+      puts "Configuration OK"
+      exit
+    else
+      exit 1
+    end
+  when "test" then
+    STDERR.puts "PENDING: test mode unimplemented"
+    exit 1
   else
     STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
     STDERR.puts "Run 'sakai-info help' for a list of commands."
@@ -40,15 +50,4 @@ else
   exit 1
 end
 
-begin
-  Configuration.load_config
-rescue AlreadyConfiguredException
-  # not sure how we would be yet, but if we are, then continue
-rescue NoConfigFoundException
-  STDERR.puts "No configuration file was found at #{Configuration::DEFAULT_CONFIG_FILE}"
-  exit 1
-rescue InvalidConfigException => e
-  STDERR.puts "Configuration was invalid:"
-  STDERR.puts e.message
-end
 
