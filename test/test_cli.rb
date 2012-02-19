@@ -1,4 +1,4 @@
-# test_user.rb
+# test_cli.rb
 #   Tests for SakaiInfo::CLI
 #
 # Created 2012-02-19 daveadams@gmail.com
