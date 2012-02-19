@@ -11,7 +11,7 @@ tool or the libraries.
 
 Meta
 ----
-last updated: 2012-02-18  
+last updated: 2012-02-18 9
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
@@ -29,7 +29,11 @@ Use `rake` to test and build the gem:
     $ rake gem:build
     
 The resulting gem will be saved to the working directory as
-`sakai-info-0.0.0.gem`.
+`sakai-info-0.1.0.gem`.
+
+Cleanup built gems using:
+
+    $ rake clean
 
 Installing
 ----------

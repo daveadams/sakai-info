@@ -42,6 +42,11 @@ task :todo do
   system "for FILE in $(grep -rl TODO: * --exclude=Rakefile); do echo $FILE; cat -n $FILE |grep TODO: |sed 's/^ *\\([0-9]\\+\\).*TODO:/  \\1- TODO:/' ; echo; done |sed '$d'"
 end
 
+desc "Delete built gemfiles"
+task :clean do
+  system "rm sakai-info-*.gem"
+end
+
 # standard unit tests
 require 'rake/testtask'
 Rake::TestTask.new do |t|
