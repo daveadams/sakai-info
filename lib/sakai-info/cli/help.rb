@@ -16,7 +16,11 @@ module SakaiInfo
         :default => <<EOF,
 sakai-info #{VERSION}
 
-Available commands:
+Object commands:
+  user         Print information about a user or users
+  site         Print information about a site or sites
+
+Misc commands:
   validate     Validates configuration
   help         Prints general help
   version      Prints version
@@ -59,6 +63,26 @@ sakai-info test
   an argument, it will test only the named instance.
 
   Usage: sakai-info test [<instance>]
+EOF
+
+        "user" => <<EOF,
+sakai-info user
+
+  In this release, this command prints the total number of records in the
+  SAKAI_USER table. In future releases, subcommands will be available to
+  perform more tasks.
+
+  Usage: sakai-info user [<subcommand>]
+EOF
+
+        "site" => <<EOF,
+sakai-info site
+
+  In this release, this command prints the total number of records in the
+  SAKAI_SITE table. In future releases, subcommands will be available to
+  perform more tasks.
+
+  Usage: sakai-info site [<subcommand>]
 EOF
       }
 

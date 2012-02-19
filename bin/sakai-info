@@ -17,8 +17,11 @@ include SakaiInfo
 
 require 'sakai-info/cli'
 
+ObjectModes = %w(site user)
+
 if ARGV.length > 0
   case ARGV[0]
+
   when "help" then
     if ARGV.length > 1
       CLI::Help.help ARGV[1]
@@ -26,9 +29,11 @@ if ARGV.length > 0
       CLI::Help.help
     end
     exit
+
   when "version" then
     puts VERSION
     exit
+
   when "validate" then
     if CLI.validate_config
       puts "Configuration OK"
@@ -36,13 +41,23 @@ if ARGV.length > 0
     else
       exit 1
     end
+
   when "test" then
     STDERR.puts "PENDING: test mode unimplemented"
     exit 1
+
   else
-    STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
-    STDERR.puts "Run 'sakai-info help' for a list of commands."
-    exit 1
+    # test to see if it's an accepted object mode
+    if ObjectModes.include? ARGV[0]
+      mode = ARGV[0]
+      ARGV.shift
+      # continue on
+
+    else
+      STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
+      STDERR.puts "Run 'sakai-info help' for a list of commands."
+      exit 1
+    end
   end
 else
   STDERR.puts "ERROR: No command was given."
@@ -50,4 +65,15 @@ else
   exit 1
 end
 
+exit 1 if not CLI.validate_config
+
+if mode == "user"
+  print "Total users: "; STDOUT.flush
+  puts User.count
+
+elsif mode == "site"
+  print "Total sites: "; STDOUT.flush
+  puts Site.count
+
+end
 
