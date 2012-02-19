@@ -4,7 +4,7 @@
 #   Base command line tool
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-15 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -14,3 +14,5 @@
 require 'sakai-info'
 
 puts "Hello, Sakai."
+
+# TODO: write this program
