@@ -217,7 +217,7 @@ module SakaiInfo
       end
 
       # check that the configuration specified is well formed
-      if not Config::validate_config(@config)
+      if not Configuration.validate_config(@config)
         raise InvalidConfigException.new("Config provided is either incomplete or poorly formed.")
       end
 

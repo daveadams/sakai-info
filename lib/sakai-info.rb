@@ -40,7 +40,7 @@ end
 # baseline config and connectivity
 require 'sakai-info/instance'
 require 'sakai-info/db'
-require 'sakai-info/config'
+require 'sakai-info/configuration'
 
 # base objects
 require 'sakai-info/sakai_object'
