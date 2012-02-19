@@ -11,7 +11,7 @@ tool or the libraries.
 
 Meta
 ----
-last updated: 2012-02-18 9
+last updated: 2012-02-19  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
