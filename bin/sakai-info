@@ -15,6 +15,31 @@
 require 'sakai-info'
 include SakaiInfo
 
+require 'sakai-info/cli'
+
+if ARGV.length > 0
+  case ARGV[0]
+  when "help" then
+    if ARGV.length > 1
+      CLI.help ARGV[1]
+    else
+      CLI.help
+    end
+    exit
+  when "version" then
+    puts VERSION
+    exit
+  else
+    STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
+    STDERR.puts "Run 'sakai-info help' for a list of commands."
+    exit 1
+  end
+else
+  STDERR.puts "ERROR: No command was given."
+  STDERR.puts "Run 'sakai-info help' for a list of commands."
+  exit 1
+end
+
 begin
   Configuration.load_config
 rescue AlreadyConfiguredException
