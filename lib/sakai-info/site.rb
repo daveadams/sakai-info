@@ -202,6 +202,17 @@ module SakaiInfo
     end
 
     # finders/counters
+    @@total_site_count = nil
+    def self.count
+      if @@total_site_count.nil?
+        @@total_site_count = 0
+        DB.connect.exec("select count(*) from sakai_site") do |row|
+          @@total_site_count = row[0].to_i
+        end
+      end
+      @@total_site_count
+    end
+
     def self.count_by_user_id(user_id)
       user_count = 0
       DB.connect.exec("select count(*) from sakai_site_user " +
