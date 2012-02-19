@@ -2,7 +2,7 @@
 #   Tests for SakaiInfo::Config
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-15 daveadams@gmail.com
+# Last updated 2012-02-19 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -12,6 +12,13 @@
 require 'test/unit'
 require 'sakai-info'
 require 'tempfile'
+
+# inject an accessor into SakaiInfo::Config so tests will run
+module SakaiInfo
+  class Config
+    attr_reader :config
+  end
+end
 
 class ConfigTest < Test::Unit::TestCase
   # TODO: add tests for MultipleConfigExceptions
