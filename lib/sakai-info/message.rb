@@ -2,7 +2,7 @@
 #   SakaiInfo::Message library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -116,18 +116,6 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title
       }
-    end
-  end
-
-  # TODO: move injected methods for Forums into Site
-  # inject forum methods into Site class
-  class Site
-    def forum_count
-      @forum_count ||= Forum.count_by_site_id(@id)
-    end
-
-    def forums
-      @forums ||= Forum.find_by_site_id(@id)
     end
   end
 end

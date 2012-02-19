@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -295,42 +295,6 @@ module SakaiInfo
 
     def size_on_disk
       0
-    end
-  end
-
-  # TODO: move injected methods from Content into Site
-  # inject into Site class
-  class Site
-    def total_disk_usage
-      resource_storage.size_on_disk + attachment_storage.size_on_disk + melete_storage.size_on_disk + dropbox_storage.size_on_disk
-    end
-
-    # for disk usage reporting
-    def disk_usage_csv
-      "#{@id},#{@type},#{resource_storage.size_on_disk},#{attachment_storage.size_on_disk},#{melete_storage.size_on_disk},#{dropbox_storage.size_on_disk},#{total_disk_usage}"
-    end
-
-    def resource_storage
-      resource_collection_id = "/group/#{@id}/"
-      if @type == "myworkspace" or @type == "guestworkspace"
-        resource_collection_id = "/user/#{@id.sub(/^~/,'')}"
-      end
-      @resource_storage ||= ContentCollection.find!(resource_collection_id)
-    end
-
-    def attachment_storage
-      attachment_collection_id = "/attachment/#{@id}/"
-      @attachment_storage ||= ContentCollection.find!(attachment_collection_id)
-    end
-
-    def melete_storage
-      melete_collection_id = "/private/meleteDocs/#{@id}/"
-      @melete_storage ||= ContentCollection.find!(melete_collection_id)
-    end
-
-    def dropbox_storage
-      dropbox_collection_id = "/group-user/#{@id}/"
-      @dropbox_storage ||= ContentCollection.find!(dropbox_collection_id)
     end
   end
 end

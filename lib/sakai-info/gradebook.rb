@@ -2,7 +2,7 @@
 #   SakaiInfo::Gradebook library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -171,16 +171,6 @@ module SakaiInfo
         result.delete("due_date")
       end
       result
-    end
-  end
-
-  # TODO: move injected method for Gradebook into Site
-  # inject gradebook getter into Site class
-  class Site
-    def gradebook
-      @gradebook ||= Gradebook.find_by_site_id(@id)
-    rescue ObjectNotFoundException
-      nil
     end
   end
 end

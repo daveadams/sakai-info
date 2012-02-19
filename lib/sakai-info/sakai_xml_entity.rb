@@ -73,16 +73,12 @@ module SakaiInfo
     public
     # standard property for all entities
     def created_by
-      # TODO: when user is available, re-enable this code
-      # @created_by ||= User.find(@properties["CHEF:creator"])
-      @properties["CHEF:creator"]
+      @created_by ||= User.find(@properties["CHEF:creator"])
     end
 
     # standard property for all entities
     def modified_by
-      # TODO: when user is available, re-enable this code
-      # @modified_by ||= User.find(@properties["CHEF:modifiedby"])
-      @properties["CHEF:modifiedby"]
+      @modified_by ||= User.find(@properties["CHEF:modifiedby"])
     end
 
     # standard property for all entities

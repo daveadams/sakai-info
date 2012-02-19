@@ -2,7 +2,7 @@
 #   SakaiInfo::Samigo library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-18 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -214,26 +214,6 @@ module SakaiInfo
         "title" => self.title,
         "item_count" => self.item_count
       }
-    end
-  end
-
-  # TODO: move injected methods from Samigo to Site
-  # inject ourselves into Site class
-  class Site
-    def published_quiz_count
-      @published_quiz_count ||= PublishedQuiz.count_by_site_id(@id)
-    end
-
-    def pending_quiz_count
-      @pending_quiz_count ||= PendingQuiz.count_by_site_id(@id)
-    end
-
-    def published_quizzes
-      @published_quizzes ||= PublishedQuiz.find_by_site_id(@id)
-    end
-
-    def pending_quizzes
-      @pending_quizzes ||= PendingQuiz.find_by_site_id(@id)
     end
   end
 end

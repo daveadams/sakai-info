@@ -107,6 +107,7 @@ module SakaiInfo
       @assignment_count ||= Assignment.count_by_site_id(@id)
     end
 
+    # authz/realm properties
     def realm
       @authz_realm ||= AuthzRealm.find_by_site_id(@id)
     end
@@ -115,6 +116,7 @@ module SakaiInfo
       @join_role ||= AuthzRole.find_by_name(@join_role_string)
     end
 
+    # group properties
     def group_count
       @group_count ||= Group.count_by_site_id(@id)
     end
@@ -123,6 +125,7 @@ module SakaiInfo
       @groups ||= Group.find_by_site_id(@id)
     end
 
+    # announcement properties
     def announcements
       @announcements ||= AnnouncementChannel.find_by_site_id(@id).announcements
     end
@@ -131,6 +134,74 @@ module SakaiInfo
       @announcement_count ||= AnnouncementChannel.find_by_site_id(@id).announcement_count
     end
 
+    # samigo quiz properties
+    def published_quiz_count
+      @published_quiz_count ||= PublishedQuiz.count_by_site_id(@id)
+    end
+
+    def pending_quiz_count
+      @pending_quiz_count ||= PendingQuiz.count_by_site_id(@id)
+    end
+
+    def published_quizzes
+      @published_quizzes ||= PublishedQuiz.find_by_site_id(@id)
+    end
+
+    def pending_quizzes
+      @pending_quizzes ||= PendingQuiz.find_by_site_id(@id)
+    end
+
+    # gradebook properties
+    def gradebook
+      @gradebook ||= Gradebook.find_by_site_id(@id)
+    rescue ObjectNotFoundException
+      # not all sites have a gradebook, don't panic
+      nil
+    end
+
+    # forum properties
+    def forum_count
+      @forum_count ||= Forum.count_by_site_id(@id)
+    end
+
+    def forums
+      @forums ||= Forum.find_by_site_id(@id)
+    end
+
+    # content properties
+    def resource_storage
+      resource_collection_id = "/group/#{@id}/"
+      if @type == "myworkspace" or @type == "guestworkspace"
+        resource_collection_id = "/user/#{@id.sub(/^~/,'')}"
+      end
+      @resource_storage ||= ContentCollection.find!(resource_collection_id)
+    end
+
+    def attachment_storage
+      attachment_collection_id = "/attachment/#{@id}/"
+      @attachment_storage ||= ContentCollection.find!(attachment_collection_id)
+    end
+
+    def melete_storage
+      melete_collection_id = "/private/meleteDocs/#{@id}/"
+      @melete_storage ||= ContentCollection.find!(melete_collection_id)
+    end
+
+    def dropbox_storage
+      dropbox_collection_id = "/group-user/#{@id}/"
+      @dropbox_storage ||= ContentCollection.find!(dropbox_collection_id)
+    end
+
+    def total_disk_usage
+      resource_storage.size_on_disk + attachment_storage.size_on_disk + melete_storage.size_on_disk + dropbox_storage.size_on_disk
+    end
+
+    # generate a CSV line for disk usage reporting
+    def disk_usage_csv
+      "#{@id},#{@type},#{resource_storage.size_on_disk},#{attachment_storage.size_on_disk},#{melete_storage.size_on_disk},#{dropbox_storage.size_on_disk},#{total_disk_usage}"
+    end
+
+    # finders/counters
     def self.count_by_user_id(user_id)
       user_count = 0
       DB.connect.exec("select count(*) from sakai_site_user " +
