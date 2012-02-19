@@ -10,6 +10,8 @@
 #
 
 module SakaiInfo
+  class ConnectionFailureException < SakaiException; end
+
   class Instance
     def self.create(config)
       case config["dbtype"].downcase
@@ -27,6 +29,12 @@ module SakaiInfo
     DEFAULT_PORT = 1521
 
     def initialize(config)
+      # fix NLS_LANG if necessary
+      ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
+
+      # include Oracle driver
+      require 'oci8'
+
       @username = config["username"]
       @password = config["password"]
       if config["host"].nil? or config["host"] == ""
