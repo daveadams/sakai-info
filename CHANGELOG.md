@@ -1,12 +1,10 @@
-sakai-info Change History
-=========================
+# sakai-info Change History #
 
-0.0.0
------
+## 0.1.0 ##
 
-*Released 2012-02-??*
+*Released 2012-02-19*
 
 * Initial release
 * Oracle-only support
-* Limited CLI functionality
+* Extremely limited CLI functionality
 
