@@ -1,14 +1,28 @@
-sakai-info Roadmap
-==================
+# sakai-info Roadmap
 
-*Last updated 2012-02-18 by daveadams@gmail.com*
+*Last updated 2012-02-19*
 
-The most important things to get to after the initial release are:
+### 0.2
 
+* Figure out at runtime what databases can be accessed
 * MySQL support
-* Command-line access to all object types, properties, and relationships
-  understood by the library.
-* Full RDoc documentation of the library classes, properties, and methods
+* Round out basic user and site search in the CLI
+* Progress towards building a set of fixtures to use for serious unit testing
+
+### 0.3
+
+* CLI access to quizzes, tools, assignments
+
+### 0.4
+
+* Pluggable architecture for future additions or just plugins
+
+### 0.5
+
+* Test fixtures and basic unit tests for all represented objects
+* RDoc coverage for every class
+
+------
 
 Other things on the wishlist for future releases:
 
@@ -25,13 +39,11 @@ Other things on the wishlist for future releases:
 * Generalized reporting capabilities
   * Storage utilization per-site
   * Session and event statistics
-  * Metrics on various elements, eg:
-    * Typical quiz duration
-    * Quiz/assignment completion rates
-    * Forum post rates, post length
-    * etc
-
-The ultimate dream:
-
-* A web interface for searching and exploring the database
+* Metrics on various elements
+  * Typical quiz duration
+  * Quiz/assignment completion rates
+  * Forum post rates, post length
+* Additional tools
+  * httpd log analysis helper
+  * RPC client for Sakai-monitoring servlet
 

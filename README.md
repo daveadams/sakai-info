@@ -29,7 +29,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
     
 The resulting gem will be saved to the working directory as
-`sakai-info-0.1.0.gem`.
+`sakai-info-0.2.0.gem`.
 
 Cleanup built gems using:
 
