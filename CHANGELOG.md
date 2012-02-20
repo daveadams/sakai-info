@@ -1,8 +1,6 @@
-sakai-info Change History
-=========================
+# sakai-info Change History #
 
-0.2.0
------
+## 0.2.0 ##
 
 *Released {release-date}*
 
@@ -12,8 +10,7 @@ sakai-info Change History
 * More robust unit testing
 * First tentative unit test fixtures
 
-0.1.0
------
+## 0.1.0 ##
 
 *Released 2012-02-19*
 
