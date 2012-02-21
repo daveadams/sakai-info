@@ -42,7 +42,6 @@ module SakaiInfo
     end
 
     attr_reader :driver
-
     def initialize(config)
       dbtype = config["dbtype"].downcase
       if @@drivers.has_key? dbtype
@@ -50,6 +49,10 @@ module SakaiInfo
       else
         raise UnsupportedConfigException.new("Database type '#{dbtype}' is not supported.")
       end
+    end
+
+    def connect
+      @driver.connect
     end
   end
 
