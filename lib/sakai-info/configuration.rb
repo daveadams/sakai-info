@@ -225,13 +225,13 @@ module SakaiInfo
       @instances = {}
       if not @config["instances"].nil?
         @config["instances"].keys.each do |instance_name|
-          @instances[instance_name] = Instance.create(@config["instances"][instance_name])
+          @instances[instance_name] = Database.new(@config["instances"][instance_name])
           if instance_name == @config["default"]
             @instances[:default] = @instances[instance_name]
           end
         end
       else
-        @instances[:default] = Instance.create(@config)
+        @instances[:default] = Database.new(@config)
       end
     end
 

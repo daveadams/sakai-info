@@ -40,8 +40,7 @@ class String
 end
 
 # baseline config and connectivity
-require 'sakai-info/instance'
-require 'sakai-info/db'
+require 'sakai-info/database'
 require 'sakai-info/configuration'
 
 # base objects
