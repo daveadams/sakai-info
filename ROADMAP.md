@@ -1,21 +1,16 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-02-19*
+*Last updated 2012-02-23*
 
 ### 0.2 ###
 
-* Figure out at runtime what databases can be accessed
-* MySQL support
+* MySQL support (via Sequel)
 * Round out basic user and site search in the CLI
 * Progress towards building a set of fixtures to use for serious unit testing
 
 ### 0.3 ###
 
 * CLI access to quizzes, tools, assignments
-
-### 0.4 ###
-
-* Pluggable architecture for future additions or just plugins
 
 ### 0.5 ###
 

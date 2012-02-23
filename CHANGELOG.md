@@ -4,11 +4,8 @@
 
 *Released {release-date}*
 
-* Added (probably somewhat flaky) MySQL support
-* Changed CLI tool name to 'sin'
-* Added find/print functionality to sin for user and site object modes
-* More robust unit testing
-* First tentative unit test fixtures
+* Sequel now used as the database driver
+* Simplified configuration file format
 
 ## 0.1.0 ##
 
