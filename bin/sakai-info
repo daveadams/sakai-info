@@ -35,7 +35,7 @@ if ARGV.length > 0
     exit
 
   when "validate" then
-    if CLI.validate_config
+    if DB.load_config
       puts "Configuration OK"
       exit
     else
@@ -52,6 +52,7 @@ if ARGV.length > 0
       mode = ARGV[0]
       ARGV.shift
       # continue on
+      DB.load_config
 
     else
       STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
@@ -64,8 +65,6 @@ else
   STDERR.puts "Run 'sakai-info help' for a list of commands."
   exit 1
 end
-
-exit 1 if not CLI.validate_config
 
 if mode == "user"
   print "Total users: "; STDOUT.flush

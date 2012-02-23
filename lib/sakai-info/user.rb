@@ -113,15 +113,8 @@ module SakaiInfo
     end
 
     # finders/counters
-    @@total_user_count = nil
     def self.count
-      if @@total_user_count.nil?
-        @@total_user_count = 0
-        DB.connect.exec("select count(*) from sakai_user") do |row|
-          @@total_user_count = row[0].to_i
-        end
-      end
-      @@total_user_count
+      DB.connect[:sakai_user].count
     end
 
     def self.count_by_realm_id_and_role_id(realm_id, role_id)
