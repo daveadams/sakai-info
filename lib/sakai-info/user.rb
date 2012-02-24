@@ -186,13 +186,13 @@ module SakaiInfo
       }
     end
 
-    def membership_serialization
+    def sites_serialization
       {
         "sites" => self.membership.collect { |sm| sm.serialize(:user_summary) }
       }
     end
 
-    def question_pools_serialization
+    def pools_serialization
       if self.question_pool_count > 0
         {
           "question_pools" => self.question_pools.collect { |qp| qp.serialize(:user_summary) }
@@ -200,6 +200,10 @@ module SakaiInfo
       else
         {}
       end
+    end
+
+    def self.all_serializations
+      [:default, :sites, :pools]
     end
   end
 
