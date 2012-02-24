@@ -2,7 +2,7 @@
 #   Direct tests for bin/sakai-info
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-19 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -49,7 +49,7 @@ class BinTest < Test::Unit::TestCase
       assert_equal(0, wait_thread.value.exitstatus)
     end
 
-    %w(help version validate test).each do |topic|
+    %w(help version test).each do |topic|
       Open3.popen3(CLI_ENV, "#{COMMAND} help #{topic}") do |stdin, stdout, stderr, wait_thread|
         # stdout should match string from CLI::Help
         assert_equal(SakaiInfo::CLI::Help::STRINGS[topic], stdout.readlines.join)
@@ -78,10 +78,6 @@ class BinTest < Test::Unit::TestCase
   end
 
   # TODO: test other sakai-info commands
-
-  # $ sakai-info validate
-  def test_validate
-  end
 
   # $ sakai-info test
   def test_test
