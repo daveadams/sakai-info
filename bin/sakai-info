@@ -19,69 +19,87 @@ require 'sakai-info/cli'
 
 ObjectModes = %w(site user)
 
-if ARGV.length > 0
-  case ARGV[0]
+flags = []
+command = []
+db_name = nil
 
-  when "help" then
-    if ARGV.length > 1
-      CLI::Help.help ARGV[1]
+while arg = ARGV.shift
+  if arg =~ /^-/
+    if arg == "-D"
+      db_name = ARGV.shift
+    elsif arg =~ /^--database=/
+      db_name = arg.split("=")[1]
     else
-      CLI::Help.help
+      flags << arg
     end
-    exit
-
-  when "version" then
-    puts VERSION
-    exit
-
-  when "validate" then
-    if DB.load_config
-      puts "Configuration OK"
-      exit
-    else
-      exit 1
-    end
-
-  when "test" then
-    STDERR.puts "PENDING: test mode unimplemented"
-    exit 1
-
   else
-    # test to see if it's an accepted object mode
-    if ObjectModes.include? ARGV[0]
-      mode = ARGV[0]
-      ARGV.shift
-      # continue on
-      DB.load_config
-
-    else
-      STDERR.puts "ERROR: Command '#{ARGV[0]}' was not recognized."
-      STDERR.puts "Run 'sakai-info help' for a list of commands."
-      exit 1
-    end
+    command << arg
   end
-else
+end
+
+if command.length < 1
   STDERR.puts "ERROR: No command was given."
-  STDERR.puts "Run 'sakai-info help' for a list of commands."
+  STDERR.puts "Run '#{File.basename($0)} help' for a list of commands."
   exit 1
 end
 
+case command[0]
+when "help" then
+  if not command[1].nil?
+    CLI::Help.help command[1]
+  else
+    CLI::Help.help
+  end
+  exit
+
+when "version" then
+  puts VERSION
+  exit
+
+when "validate" then
+  if DB.load_config
+    puts "Configuration OK"
+    exit
+  end
+
+when "test" then
+  STDERR.puts "PENDING: test mode unimplemented"
+  exit 1
+
+else
+  # test to see if it's an accepted object mode
+  if ObjectModes.include? command[0]
+    mode = command.shift
+
+  else
+    STDERR.puts "ERROR: Command '#{command[0]}' was not recognized."
+    STDERR.puts "Run '#{File.basename($0)} help' for a list of commands."
+    exit 1
+  end
+end
+
+# load database config and set instance to the instance given on the command line
+DB.load_config
+if not db_name.nil?
+  DB.default_database = db_name
+end
+
+puts flags.inspect
+
 if mode == "user"
-  case ARGV[0]
+  case command[0]
   when "count" then
     puts User.count
-  when "sites" then
-    puts User.find(ARGV[1]).to_yaml(:default, :membership)
   else
-    puts User.find(ARGV[0]).to_yaml
+    puts User.find(command[0]).to_yaml
   end
 
 elsif mode == "site"
-  case ARGV[0]
+  case command[0]
   when "count" then
     puts Site.count
   else
-    puts Site.find(ARGV[0]).to_yaml
+    puts Site.find(command[0]).to_yaml
   end
 end
 

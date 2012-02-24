@@ -31,6 +31,7 @@ module SakaiInfo
 
   class DB
     DEFAULT_CONFIG_FILE = File.expand_path("~/.sakai-info")
+    @@default_database_name = nil
     @@config = nil
 
     def self.configure(config)
@@ -67,12 +68,20 @@ module SakaiInfo
       if @@databases[database_name].nil?
         @@databases[database_name] =
           Database.new(if database_name == :default
-                         @@config[@@config.keys.first]
+                         if @@default_database_name.nil?
+                           @@config[@@config.keys.first]
+                         else
+                           @@config[@@default_database_name]
+                         end
                        else
                          @@config[database_name]
                        end)
       end
       @@databases[database_name].connect
+    end
+
+    def self.default_database=(database_name)
+      @@default_database_name = database_name
     end
   end
 
