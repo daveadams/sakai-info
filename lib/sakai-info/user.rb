@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-23 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -17,27 +17,26 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        user_id = eid = nil
-        DB.connect.exec("select user_id, eid from sakai_user_id_map " +
-                        "where user_id=:user_id or eid=:eid", id, id) do |row|
-          user_id = row[0]
-          eid = row[1]
-        end
-        if user_id.nil? or eid.nil?
+        ids = DB.connect.fetch("select user_id, eid " +
+                               "from sakai_user_id_map " +
+                               "where user_id=? or eid=?",
+                               id, id).first
+        if ids.nil?
           raise ObjectNotFoundException.new(User, id)
         end
 
-        DB.connect.exec("select first_name, last_name, type, " +
-                        "to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                        "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') " +
-                        "from sakai_user where user_id=:userid", user_id) do |row|
-          first_name, last_name, type, created_at, modified_at = *row
-          first_name ||= ""
-          last_name ||= ""
-          @@cache[eid] =
-            @@cache[user_id] =
-            User.new(user_id, eid, (first_name+' '+last_name), type, created_at, modified_at)
+        row = DB.connect.fetch("select first_name, last_name, type, " +
+                               "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+                               "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at " +
+                               "from sakai_user where user_id=?", ids[:user_id]).first
+        if row.nil?
+          raise ObjectNotFoundException.new(User, id)
         end
+        @@cache[ids[:eid]] =
+          @@cache[ids[:user_id]] =
+          User.new(ids[:user_id], ids[:eid],
+                   ((row[:first_name] || "") + " " + (row[:last_name] || "")).strip,
+                   row[:type], row[:created_at], row[:modified_at])
       end
       @@cache[id]
     end
@@ -191,9 +190,9 @@ module SakaiInfo
     def self.get(user_id, property_name)
       db = DB.connect
       value = nil
-      db.exec("select value from sakai_user_property " +
-              "where user_id=:user_id and name=:name", user_id, property_name) do |row|
-        value = row[0].read
+      db.fetch("select value from sakai_user_property " +
+               "where user_id=? and name=?", user_id, property_name) do |row|
+        value = row[:value].read
       end
       return value
     end
@@ -201,10 +200,10 @@ module SakaiInfo
     def self.find_by_user_id(user_id)
       db = DB.connect
       properties = {}
-      db.exec("select name, value from sakai_user_property " +
-              "where user_id=:user_id", user_id) do |row|
-        name = row[0]
-        value = row[1].read
+      db.fetch("select name, value from sakai_user_property " +
+               "where user_id=?", user_id) do |row|
+        name = row[:name]
+        value = row[:value].read
         properties[name] = value
       end
       return properties

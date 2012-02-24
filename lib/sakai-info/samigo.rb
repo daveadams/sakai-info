@@ -171,22 +171,12 @@ module SakaiInfo
     end
 
     def self.count_by_user_id(user_id)
-      count = 0
-      DB.connect.exec("select count(*) from sam_questionpool_t " +
-                      "where ownerid=:userid", user_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sam_questionpool_t].filter(:ownerid => user_id).count
     end
 
     def item_count
-      if @item_count.nil?
-        DB.connect.exec("select count(*) from sam_questionpoolitem_t " +
-                        "where questionpoolid=:id", @id) do |row|
-          @item_count = row[0].to_i
-        end
-      end
-      @item_count
+      @item_count ||=
+        DB.connect[:sam_questionpoolitem_t].filter(:questionpoolid => @id).count
     end
 
     # serialization

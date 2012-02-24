@@ -67,8 +67,13 @@ else
 end
 
 if mode == "user"
-  print "Total users: "; STDOUT.flush
-  puts User.count
+  case ARGV[0]
+  when "count" then
+    print "Total users: "; STDOUT.flush
+    puts User.count
+  else
+    puts User.find(ARGV[0]).to_yaml
+  end
 
 elsif mode == "site"
   print "Total sites: "; STDOUT.flush

@@ -207,21 +207,11 @@ module SakaiInfo
     end
 
     def self.count_by_user_id(user_id)
-      user_count = 0
-      DB.connect.exec("select count(*) from sakai_site_user " +
-                      "where user_id=:user_id", user_id) do |row|
-        user_count = row[0].to_i
-      end
-      user_count
+      DB.connect[:sakai_site_user].filter(:user_id => user_id).count
     end
 
     def self.count_by_type(type)
-      type_count = 0
-      DB.connect.exec("select count(*) from sakai_site " +
-                      "where type=:type", type) do |row|
-        type_count = row[0].to_i
-      end
-      type_count
+      DB.connect[:sakai_site].filter(:type => type).count
     end
 
     def self.count_by_semester(term_eid)
