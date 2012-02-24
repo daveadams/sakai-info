@@ -436,18 +436,13 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        title = order = layout = site = nil
-        DB.connect.exec("select title, site_order, layout, site_id " +
-                        "from sakai_site_page where page_id = :page_id", id) do |row|
-          title = row[0]
-          order = row[1].to_i
-          layout = row[2]
-          site = Site.find(row[3])
-        end
-        if title.nil?
+        row = DB.connect[:sakai_site_page].where(:page_id => id).first
+        if row.nil?
           raise ObjectNotFoundException(Page, id)
         end
-        @@cache[id] = Page.new(id, title, order, layout, site)
+
+        site = Site.find(row[:site_id])
+        @@cache[id] = Page.new(id, row[:title], row[:order].to_i, row[:layout], site)
       end
       @@cache[id]
     end
@@ -455,10 +450,10 @@ module SakaiInfo
     def self.find_by_site_id(site_id)
       results = []
       site = Site.find(site_id)
-      DB.connect.exec("select page_id, title, site_order, layout " +
-                      "from sakai_site_page where site_id = :site_id " +
-                      "order by site_order", site_id) do |row|
-        @@cache[row[0]] = Page.new(row[0], row[1], row[2].to_i, row[3], site)
+      DB.connect[:sakai_site_page].where(:site_id => site_id).order(:site_order) do |row|
+        @@cache[row[:page_id]] =
+          Page.new(row[:page_id], row[:title], row[:site_order].to_i,
+                   row[:layout], site)
         results << @@cache[row[0]]
       end
       results
@@ -503,21 +498,19 @@ module SakaiInfo
 
   class PageProperty
     def self.get(page_id, property_name)
-      value = nil
-      DB.connect.exec("select value from sakai_site_page_property " +
-                      "where page_id=:page_id and name=:name", page_id, property_name) do |row|
-        value = row[0].read
+      row = DB.connect[:sakai_page_property].
+        filter(:page_id => page_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_page_id(page_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_page_property " +
-                      "where page_id=:page_id", page_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+      DB.connect[:sakai_page_property].where(:page_id => page_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
@@ -529,18 +522,15 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        tool_id = title = registration = page_order = layout_hints = page = nil
-        DB.connect.exec("select tool_id, title, registration, page_order, " +
-                        "layout_hints, page_id " +
-                        "from sakai_site_tool where tool_id = :tool_id", id) do |row|
-          tool_id, title, registration, page_order_s, layout_hints, page_id = *row
-          page_order = page_order_s.to_i
-          page = Page.find(page_id)
-        end
-        if tool_id.nil?
+        row = DB.connect[:sakai_site_tool].where(:tool_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Tool, id)
         end
-        @@cache[id] = Tool.new(tool_id, title, registration, page_order, layout_hints, page)
+
+        page = Page.find(row[:page_id])
+        @@cache[id] =
+          Tool.new(id, row[:title], row[:registration], row[:page_order].to_i,
+                   row[:layout_hints], page)
       end
       @@cache[id]
     end
@@ -548,10 +538,10 @@ module SakaiInfo
     def self.find_by_page_id(page_id)
       results = []
       page = Page.find(page_id)
-      DB.connect.exec("select tool_id, title, registration, page_order, layout_hints " +
-                      "from sakai_site_tool where page_id = :page_id " +
-                      "order by page_order", page_id) do |row|
-        @@cache[row[0]] = Tool.new(row[0], row[1], row[2], row[3].to_i, row[4], page)
+      DB.connect[:sakai_site_tool].where(:page_id => page_id).order(:page_order) do |row|
+        @@cache[row[:tool_id]] =
+          Tool.new(row[:tool_id], row[:title], row[:registration], row[:page_order].to_i,
+                   row[:layout_hints], page)
         results << @@cache[row[0]]
       end
       results
@@ -603,22 +593,19 @@ module SakaiInfo
 
   class ToolProperty
     def self.get(tool_id, property_name)
-      value = nil
-      DB.connect.exec("select value from sakai_site_tool_property " +
-                      "where tool_id=:tool_id and name=:name",
-                      tool_id, property_name) do |row|
-        value = row[0].read
+      row = DB.connect[:sakai_tool_property].
+        filter(:tool_id => tool_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_tool_id(tool_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_tool_property " +
-                      "where tool_id=:tool_id", tool_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+      DB.connect[:sakai_tool_property].where(:tool_id => tool_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
