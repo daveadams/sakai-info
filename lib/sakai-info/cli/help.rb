@@ -65,18 +65,34 @@ EOF
         "user" => <<EOF,
 sakai-info user
 
-  Usage: sakai-info [<options>] user [<subcommand>]
+  Usage: sakai-info [<options>] user <id>
 
-  Prints information about a user or users based on the subcommand given.
+  Prints information about the user ID or EID specified. Additional options
+  may be passed to include additional information:
+
+    --sites    Print site membership information
+    --pools    Print list of owned question pools
+    --all      Print all possible details
 EOF
 
         "site" => <<EOF,
 sakai-info site
 
-  Usage: sakai-info [<options>] site [<subcommand>] [<id> ...]
+  Usage: sakai-info [<options>] site <id>
 
-  Prints information about a site or sites based on the subcommands and IDs
-  given.
+  Prints information about the site ID specified. Additional options may be
+  passed to include additional information:
+
+    --users        Print membership information
+    --pages        Print page list with tools
+    --groups       Print group information
+    --quizzes      Print information about quizzes
+    --disk         Print disk usage
+    --assignments  Print assignment info
+    --gradebook    Print gradebook item info
+    --realm        Print site realm details
+    --forums       Print forum details
+    --all          Print all possible details
 EOF
       }
 
