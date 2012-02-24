@@ -54,5 +54,12 @@ module SakaiInfo
     def to_json(*q)
       serialize(q).to_json
     end
+
+    # support for CLI -- returns an array of symbols that can be
+    # passed back to #serialize, #to_yaml, or #to_json
+    # should be reimplemented in all object classes
+    def self.all_serializations
+      [:default]
+    end
   end
 end
