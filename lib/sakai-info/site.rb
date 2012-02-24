@@ -332,7 +332,7 @@ module SakaiInfo
       result
     end
 
-    def disk_serialization
+    def disk_unformatted_serialization
       {
         "disk_usage" => {
           "resources" => self.resource_storage.size_on_disk,
@@ -347,8 +347,8 @@ module SakaiInfo
       }
     end
 
-    def disk_formatted_serialization
-      result = disk_serialization["disk_usage"]
+    def disk_serialization
+      result = disk_unformatted_serialization["disk_usage"]
       result.keys.each do |key|
         result[key] = format_filesize(result[key])
       end
@@ -387,7 +387,7 @@ module SakaiInfo
       end
     end
 
-    def realm_roles_serialization
+    def realm_serialization
       {
         "realm_roles" => self.realm.realm_roles.collect { |rr| rr.serialize(:summary) }
       }
@@ -401,6 +401,13 @@ module SakaiInfo
       else
         {}
       end
+    end
+
+    def self.all_serializations
+      [
+       :default, :users, :pages, :groups, :quizzes, :disk, :assignments,
+       :announcements, :gradebook, :realm, :forums
+      ]
     end
   end
 
@@ -450,11 +457,12 @@ module SakaiInfo
     def self.find_by_site_id(site_id)
       results = []
       site = Site.find(site_id)
-      DB.connect[:sakai_site_page].where(:site_id => site_id).order(:site_order) do |row|
+      DB.connect[:sakai_site_page].
+        where(:site_id => site_id).order(:site_order).all.each do |row|
         @@cache[row[:page_id]] =
           Page.new(row[:page_id], row[:title], row[:site_order].to_i,
                    row[:layout], site)
-        results << @@cache[row[0]]
+        results << @@cache[row[:page_id]]
       end
       results
     end
@@ -498,7 +506,7 @@ module SakaiInfo
 
   class PageProperty
     def self.get(page_id, property_name)
-      row = DB.connect[:sakai_page_property].
+      row = DB.connect[:sakai_site_page_property].
         filter(:page_id => page_id, :name => property_name).first
       if row.nil?
         nil
@@ -509,7 +517,7 @@ module SakaiInfo
 
     def self.find_by_page_id(page_id)
       properties = {}
-      DB.connect[:sakai_page_property].where(:page_id => page_id).all.each do |row|
+      DB.connect[:sakai_site_page_property].where(:page_id => page_id).all.each do |row|
         properties[row[:name]] = row[:value].read
       end
       return properties
@@ -538,11 +546,12 @@ module SakaiInfo
     def self.find_by_page_id(page_id)
       results = []
       page = Page.find(page_id)
-      DB.connect[:sakai_site_tool].where(:page_id => page_id).order(:page_order) do |row|
+      DB.connect[:sakai_site_tool].
+        where(:page_id => page_id).order(:page_order).all.each do |row|
         @@cache[row[:tool_id]] =
           Tool.new(row[:tool_id], row[:title], row[:registration], row[:page_order].to_i,
                    row[:layout_hints], page)
-        results << @@cache[row[0]]
+        results << @@cache[row[:tool_id]]
       end
       results
     end
@@ -593,7 +602,7 @@ module SakaiInfo
 
   class ToolProperty
     def self.get(tool_id, property_name)
-      row = DB.connect[:sakai_tool_property].
+      row = DB.connect[:sakai_site_tool_property].
         filter(:tool_id => tool_id, :name => property_name).first
       if row.nil?
         nil
@@ -604,7 +613,7 @@ module SakaiInfo
 
     def self.find_by_tool_id(tool_id)
       properties = {}
-      DB.connect[:sakai_tool_property].where(:tool_id => tool_id).all.each do |row|
+      DB.connect[:sakai_site_tool_property].where(:tool_id => tool_id).all.each do |row|
         properties[row[:name]] = row[:value].read
       end
       return properties
