@@ -198,73 +198,16 @@ module SakaiInfo
     end
 
     def self.count_by_user_id(user_id)
-      DB.connect[:sakai_site_user].filter(:user_id => user_id).count
+      DB.connect[:sakai_site_user].where(:user_id => user_id).count
     end
 
     def self.count_by_type(type)
-      DB.connect[:sakai_site].filter(:type => type).count
+      DB.connect[:sakai_site].where(:type => type).count
     end
 
-    def self.count_by_semester(term_eid)
-      prop_name = "term_eid"
-      sem_count = 0
-      DB.connect.exec("select count(*) from sakai_site_property " +
-                      "where name=:name and to_char(value)=:term_eid",
-                      prop_name, term_eid) do |row|
-        sem_count = row[0].to_i
-      end
-      sem_count
-    end
-
-    def self.find_all_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_all_workspace_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where site_id like '~%'") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_all_non_workspace_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where site_id not like '~%'") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_ids_by_type(type)
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where type=:type", type) do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_by_type(type)
-      sites = []
-      DB.connect.exec("select site_id, title, type, " +
-                      "createdby, to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                      "modifiedby, to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS'), " +
-                      "joinable, join_role " +
-                      "from sakai_site where type = :type", type) do |row|
-        joinable = false
-        site_id, title, type, created_by_user_id, created_at,
-        modified_by_user_id, modified_at, joinable_n, join_role = *row
-        if joinable_n.to_i == 1
-          joinable = true
-        end
-        @@cache[site_id] = Site.new(site_id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable, join_role)
-        sites << @@cache[site_id]
-      end
-      sites
+    def self.count_by_property(name, value)
+      DB.connect[:sakai_site_property].
+        where(:name => name, :to_char.sql_function(:value) => value).count
     end
 
     def self.find_ids_by_property(property_name, property_value)
@@ -272,7 +215,44 @@ module SakaiInfo
     end
 
     def self.find_ids_by_semester(term_eid)
-      find_ids_by_property("term_eid", term_eid)
+      Site.find_ids_by_property("term_eid", term_eid)
+    end
+
+    def self.find_all_ids
+      DB.connect[:sakai_site].select(:site_id).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_all_workspace_ids
+      DB.connect[:sakai_site].select(:site_id).
+        where(:site_id.like("~%")).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_all_non_workspace_ids
+      DB.connect[:sakai_site].select(:site_id).
+        where(~:site_id.like("~%")).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_ids_by_type(type)
+      DB.connect[:sakai_site].select(:site_id).
+        where(:type => type).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_by_type(type)
+      sites = []
+      DB.connect.fetch("select site_id, title, type, " +
+                       "createdby, modifiedby, " +
+                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
+                       "joinable, join_role " +
+                       "from sakai_site where type = ?", type) do |row|
+        joinable = false
+        if joinable_n.to_i == 1
+          joinable = true
+        end
+        @@cache[row[:site_id]] = Site.new(row[:site_id], row[:title], row[:type], row[:createdby], row[:created_at], row[:modifiedby], row[:modified_at], joinable, row[:join_role])
+        sites << @@cache[row[:site_id]]
+      end
+      sites
     end
 
     # serialization methods
@@ -426,35 +406,27 @@ module SakaiInfo
 
   class SiteProperty
     def self.get(site_id, property_name)
-      value = nil
-      DB.connect.fetch("select value from sakai_site_property " +
-                       "where site_id=? and name=?",
-                       site_id, property_name) do |row|
-        value = row[:value].read
+      row = DB.connect[:sakai_site_property].
+        where(:site_id => site_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_site_id(site_id)
       properties = {}
-      DB.connect.fetch("select name, value from sakai_site_property " +
-                       "where site_id=?", site_id) do |row|
-        name = row[:name]
-        value = row[:value].read
-        properties[name] = value
+      DB.connect[:sakai_site_property].where(:site_id => site_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
 
     def self.find_site_ids_by_property(name, value)
-      ids = []
-      DB.connect.exec("select distinct(site_id) from sakai_site_property " +
-                      "where name=:name " +
-                      "and to_char(value)=:value",
-                      name, value) do |row|
-        ids << row[0]
-      end
-      ids
+      DB.connect[:sakai_site_property].
+        where(:name => name, :to_char.sql_function(:value) => value).
+        all.collect{|r| r[:site_id]}
     end
   end
 
