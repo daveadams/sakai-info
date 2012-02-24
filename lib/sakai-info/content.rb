@@ -107,7 +107,6 @@ module SakaiInfo
           raise ObjectNotFoundException.new(ContentResource, id)
         end
         @@cache[id] = ContentResource.new(row[:resource_id], row[:in_collection], row[:file_path], row[:resource_uuid], row[:file_size].to_i, row[:context], row[:resource_type_id])
-        if @@cache[id].nil?
       end
       @@cache[id]
     end
@@ -197,7 +196,7 @@ module SakaiInfo
 
     def size_on_disk
       @size_on_disk ||=
-        DB.connect[:content_resource].select{:sum{:file_size}.as(:total_size)}.
+        DB.connect[:content_resource].select{sum(:file_size).as(:total_size)}.
         where(:resource_id.like('#{@id}%')).first[:total_size].to_i
     end
 
