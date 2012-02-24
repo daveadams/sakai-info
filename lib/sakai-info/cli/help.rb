@@ -16,7 +16,7 @@ module SakaiInfo
         :default => <<EOF,
 sakai-info #{VERSION}
 
-  Usage: sakai-info [<options>] <command> [<subcommand>]
+  Usage: sakai-info <command> [<id>] [<options>]
 
   Object commands:
     user         Print information about a user or users
@@ -56,7 +56,7 @@ EOF
         "test" => <<EOF,
 sakai-info test
 
-  Usage: sakai-info [<options>] test
+  Usage: sakai-info test [<options>]
 
   Reads configuration and tests connecting to each database specified, or if
   a specific database is specified it will test only that connection.
@@ -65,7 +65,7 @@ EOF
         "user" => <<EOF,
 sakai-info user
 
-  Usage: sakai-info [<options>] user <id>
+  Usage: sakai-info user <id> [<options>]
 
   Prints information about the user ID or EID specified. Additional options
   may be passed to include additional information:
@@ -78,7 +78,7 @@ EOF
         "site" => <<EOF,
 sakai-info site
 
-  Usage: sakai-info [<options>] site <id>
+  Usage: sakai-info site <id> [<options>]
 
   Prints information about the site ID specified. Additional options may be
   passed to include additional information:
