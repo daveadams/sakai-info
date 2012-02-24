@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -39,10 +39,8 @@ module SakaiInfo
 
     def binary
       if @binary.nil?
-        DB.connect.exec("select binary_entity from #{@table_name} " +
-                        "where #{@id_column} = :id", id) do |row|
-          @binary = row[0].read
-        end
+        row = DB.connect[@table_name.to_sym].filter(@id_column.to_sym => @id).first
+        @binary = row[:binary_entity].read
       end
       @binary
     end
@@ -104,15 +102,12 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        DB.connect.exec("select resource_id, in_collection, file_path, " +
-                        "resource_uuid, file_size, context, resource_type_id " +
-                        "from content_resource " +
-                        "where resource_id=:id", id) do |row|
-          @@cache[id] = ContentResource.new(row[0], row[1], row[2], row[3], row[4].to_i, row[5], row[6])
-        end
-        if @@cache[id].nil?
+        row = DB.connect[:content_resource].filter(:resource_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(ContentResource, id)
         end
+        @@cache[id] = ContentResource.new(row[:resource_id], row[:in_collection], row[:file_path], row[:resource_uuid], row[:file_size].to_i, row[:context], row[:resource_type_id])
+        if @@cache[id].nil?
       end
       @@cache[id]
     end
@@ -136,23 +131,18 @@ module SakaiInfo
 
     def self.find_by_parent(parent_id)
       resources = []
-      DB.connect.exec("select resource_id, in_collection, file_path, " +
-                      "resource_uuid, file_size, context, resource_type_id " +
-                      "from content_resource " +
-                      "where in_collection=:parent_id", parent_id) do |row|
-        @@cache[row[0]] = ContentResource.new(row[0], row[1], row[2], row[3], row[4].to_i, row[5], row[6])
+      DB.connect[:content_resource].filter(:in_collection => parent_id) do |row|
+        @@cache[row[:resource_id]] =
+          ContentResource.new(row[:resource_id], row[:in_collection], row[:file_path],
+                                row[:resource_uuid], row[:file_size].to_i, row[:context],
+                                row[:resource_type_id])
         resources << @@cache[row[0]]
       end
       resources
     end
 
     def self.count_by_parent(parent_id)
-      count = 0
-      DB.connect.exec("select count(*) from content_resource " +
-                      "where in_collection=:parent_id", parent_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:content_resource].filter(:in_collection => parent_id).count
     end
   end
 
@@ -172,13 +162,11 @@ module SakaiInfo
       end
 
       if @@cache[id].nil?
-        DB.connect.exec("select collection_id, in_collection from content_collection " +
-                        "where collection_id=:id", id) do |row|
-          @@cache[id] = ContentCollection.new(row[0], row[1])
-        end
-        if @@cache[id].nil?
+        row = DB.connect[:content_collection].filter(:collection_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(ContentCollection, id)
         end
+        @@cache[id] = ContentCollection.new(row[:collection_id], row[:in_collection])
       end
       @@cache[id]
     end
@@ -194,31 +182,23 @@ module SakaiInfo
 
     def self.find_portfolio_interaction_collections
       collections = []
-      DB.connect.exec("select collection_id, in_collection from content_collection " +
-                      "where collection_id like '%/portfolio-interaction/'") do |row|
-        @@cache[row[0]] = ContentCollection.new(row[0], row[1])
-        collections << @@cache[row[0]]
+      DB.connect[:content_collection].
+        where(:collection_id.like('%/portfolio-interaction/')) do |row|
+        @@cache[row[:collection_id]] =
+          ContentCollection.new(row[:collection_id], row[:in_collection])
+        collections << @@cache[row[:collection_id]]
       end
       collections
     end
 
     def self.count_by_parent(parent_id)
-      count = 0
-      DB.connect.exec("select count(*) from content_collection " +
-                      "where in_collection=:parent_id", parent_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:content_collection].filter(:in_collection => parent_id).count
     end
 
     def size_on_disk
-      if @size_on_disk.nil?
-        DB.connect.exec("select sum(file_size) from content_resource " +
-                        "where resource_id like :collmatch", (@id + "%")) do |row|
-          @size_on_disk = row[0].to_i
-        end
-      end
-      @size_on_disk
+      @size_on_disk ||=
+        DB.connect[:content_resource].select{:sum{:file_size}.as(:total_size)}.
+        where(:resource_id.like('#{@id}%')).first[:total_size].to_i
     end
 
     def children
@@ -278,10 +258,10 @@ module SakaiInfo
 
     def self.find_by_parent(parent_id)
       collections = []
-      DB.connect.exec("select collection_id, in_collection from content_collection " +
-                      "where in_collection = :parent_id", parent_id) do |row|
-        @@cache[row[0]] = ContentCollection.new(row[0], row[1])
-        collections << @@cache[row[0]]
+      DB.connect[:content_collection].filter(:in_collection => parent_id) do |row|
+        @@cache[row[:collection_id]] =
+          ContentCollection.new(row[:collection_id], row[:in_collection])
+        collections << @@cache[row[:collection_id]]
       end
       collections
     end
