@@ -42,9 +42,9 @@ module SakaiInfo
         @@cache_by_site_id[site_id] = []
         site = Site.find(site_id)
 
-        DB.connect[:sakai_site_group].filter(:site_id => site_id) do |row|
-          @@cache[id] = Group.new(row[:group_id], site, row[:title])
-          @@cache_by_site_id[site_id] << @@cache[id]
+        DB.connect[:sakai_site_group].filter(:site_id => site_id).all.each do |row|
+          @@cache[row[:group_id]] = Group.new(row[:group_id], site, row[:title])
+          @@cache_by_site_id[site_id] << @@cache[row[:group_id]]
         end
       end
       @@cache_by_site_id[site_id]
@@ -87,19 +87,22 @@ module SakaiInfo
   end
 
   class GroupProperty
-    attr_reader :name, :value
-
-    def initialize(name, value)
-      @name = name
-      @value = value
+    def self.get(group_id, property_name)
+      row = DB.connect[:sakai_site_group_property].
+        filter(:group_id => group_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
+      end
     end
 
     def self.find_by_group_id(group_id)
-      properties = []
-      DB.connect[:sakai_site_group_property].filter(:group_id => group_id) do |row|
-        properties << GroupProperty.new(row[:name], row[:value].read)
+      properties = {}
+      DB.connect[:sakai_site_group_property].where(:group_id => group_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
-      properties
+      return properties
     end
   end
 end
