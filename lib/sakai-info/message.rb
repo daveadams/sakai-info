@@ -2,7 +2,7 @@
 #   SakaiInfo::Message library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -75,15 +75,10 @@ module SakaiInfo
     @@cache = {}
 
     def self.count_by_site_id(site_id)
-      count = 0
-      DB.connect.exec("select count(*) from mfr_open_forum_t " +
-                      "where surrogatekey = (select id from mfr_area_t " +
-                      "where type_uuid = :type_uuid " +
-                      "and context_id = :site_id)",
-                      MessageTypeUUID::FORUM_POST, site_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect.fetch("select count(*) as count from mfr_open_forum_t " +
+                       "where surrogatekey = (select id from mfr_area_t " +
+                       "where type_uuid = ? and context_id = ?)",
+                       MessageTypeUUID::FORUM_POST, site_id).first[:count].to_i
     end
 
     @@cache_by_site_id = {}
