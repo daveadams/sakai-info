@@ -16,73 +16,67 @@ module SakaiInfo
         :default => <<EOF,
 sakai-info #{VERSION}
 
-Object commands:
-  user         Print information about a user or users
-  site         Print information about a site or sites
+  Usage: sakai-info [<options>] <command> [<subcommand>]
 
-Misc commands:
-  validate     Validates configuration
-  help         Prints general help
-  version      Prints version
+  Object commands:
+    user         Print information about a user or users
+    site         Print information about a site or sites
 
-Type 'sakai-info help <command>' for help on a specific command.
+  Misc commands:
+    test         Tests configured database connections
+    help         Prints general help
+    version      Prints version
+
+  Options that apply to most commands:
+    -D <name>
+    --database=<name>
+        Connect to database instance <name> as defined in ~/.sakai-info instead
+        of the default (which is typically the first entry)
+
+  Type 'sakai-info help <command>' for help on a specific command.
 EOF
 
         "help" => <<EOF,
 sakai-info help
 
+  Usage: sakai-info help [<command>]
+
   Prints usage information for other sakai-info commands, or without an
   argument it prints a list of possible commands.
-
-  Usage: sakai-info help [<command>]
 EOF
 
         "version" => <<EOF,
 sakai-info version
 
-  Prints the current version of sakai-info.
-
   Usage: sakai-info version
-EOF
 
-        "validate" => <<EOF,
-sakai-info validate
-
-  Reads and validates the current configuration format. To test the actual
-  database connections, use 'sakai-info test'.
-
-  Usage: sakai-info validate
+  Prints the current version of sakai-info.
 EOF
 
         "test" => <<EOF,
 sakai-info test
 
-  [NOT YET IMPLEMENTED]
+  Usage: sakai-info [<options>] test
 
-  Reads configuration and tests connecting to each database specified, or with
-  an argument, it will test only the named instance.
-
-  Usage: sakai-info test [<instance>]
+  Reads configuration and tests connecting to each database specified, or if
+  a specific database is specified it will test only that connection.
 EOF
 
         "user" => <<EOF,
 sakai-info user
 
-  In this release, this command prints the total number of records in the
-  SAKAI_USER table. In future releases, subcommands will be available to
-  perform more tasks.
+  Usage: sakai-info [<options>] user [<subcommand>]
 
-  Usage: sakai-info user [<subcommand>]
+  Prints information about a user or users based on the subcommand given.
 EOF
 
         "site" => <<EOF,
 sakai-info site
 
-  In this release, this command prints the total number of records in the
-  SAKAI_SITE table. In future releases, subcommands will be available to
-  perform more tasks.
+  Usage: sakai-info [<options>] site [<subcommand>] [<id> ...]
 
-  Usage: sakai-info site [<subcommand>]
+  Prints information about a site or sites based on the subcommands and IDs
+  given.
 EOF
       }
 

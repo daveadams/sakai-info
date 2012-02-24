@@ -60,6 +60,10 @@ module SakaiInfo
       end
     end
 
+    def self.databases
+      @@config
+    end
+
     @@databases = {}
     def self.connect(database_name = :default)
       if @@config.nil?

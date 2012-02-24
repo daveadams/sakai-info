@@ -20,7 +20,7 @@ require 'sakai-info/cli'
 ObjectModes = %w(site user)
 
 flags = []
-command = []
+args = []
 db_name = nil
 
 while arg = ARGV.shift
@@ -33,20 +33,20 @@ while arg = ARGV.shift
       flags << arg
     end
   else
-    command << arg
+    args << arg
   end
 end
 
-if command.length < 1
+if args.length < 1
   STDERR.puts "ERROR: No command was given."
   STDERR.puts "Run '#{File.basename($0)} help' for a list of commands."
   exit 1
 end
 
-case command[0]
+case args[0]
 when "help" then
-  if not command[1].nil?
-    CLI::Help.help command[1]
+  if not args[1].nil?
+    CLI::Help.help args[1]
   else
     CLI::Help.help
   end
@@ -56,23 +56,51 @@ when "version" then
   puts VERSION
   exit
 
-when "validate" then
-  if DB.load_config
-    puts "Configuration OK"
+when "test" then
+  DB.load_config
+  success = 0
+  failure = 0
+  dbs = nil
+
+  if db_name.nil?
+    dbs = DB.databases
+  else
+    dbs = { db_name => DB.databases[db_name] }
+  end
+
+  dbs.each do |nickname, connection_string|
+    begin
+      print "Trying #{nickname}... "; STDOUT.flush
+      db = Sequel.connect(connection_string)
+      if db.test_connection
+        puts "OK"
+        success += 1
+      else
+        puts "FAIL"
+        failure += 1
+      end
+    rescue => e
+      puts "FAIL"
+      puts "  #{e}"
+      failure += 1
+    end
+  end
+
+  if failure > 0
+    puts "WARNING: Some connections failed"
+    exit 1
+  else
+    puts "OK: All connection tests succeeded"
     exit
   end
 
-when "test" then
-  STDERR.puts "PENDING: test mode unimplemented"
-  exit 1
-
 else
   # test to see if it's an accepted object mode
-  if ObjectModes.include? command[0]
-    mode = command.shift
+  if ObjectModes.include? args[0]
+    mode = args.shift
 
   else
-    STDERR.puts "ERROR: Command '#{command[0]}' was not recognized."
+    STDERR.puts "ERROR: Command '#{args[0]}' was not recognized."
     STDERR.puts "Run '#{File.basename($0)} help' for a list of commands."
     exit 1
   end
@@ -87,19 +115,19 @@ end
 puts flags.inspect
 
 if mode == "user"
-  case command[0]
+  case args[0]
   when "count" then
     puts User.count
   else
-    puts User.find(command[0]).to_yaml
+    puts User.find(args[0]).to_yaml
   end
 
 elsif mode == "site"
-  case command[0]
+  case args[0]
   when "count" then
     puts Site.count
   else
-    puts Site.find(command[0]).to_yaml
+    puts Site.find(args[0]).to_yaml
   end
 end
 
