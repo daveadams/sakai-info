@@ -69,15 +69,19 @@ end
 if mode == "user"
   case ARGV[0]
   when "count" then
-    print "Total users: "; STDOUT.flush
     puts User.count
+  when "sites" then
+    puts User.find(ARGV[1]).to_yaml(:default, :membership)
   else
     puts User.find(ARGV[0]).to_yaml
   end
 
 elsif mode == "site"
-  print "Total sites: "; STDOUT.flush
-  puts Site.count
-
+  case ARGV[0]
+  when "count" then
+    puts Site.count
+  else
+    puts Site.find(ARGV[0]).to_yaml(:summary)
+  end
 end
 
