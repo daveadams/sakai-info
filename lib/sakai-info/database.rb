@@ -2,7 +2,7 @@
 #   SakaiInfo::Database library
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-23 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -61,6 +61,9 @@ module SakaiInfo
 
     @@databases = {}
     def self.connect(database_name = :default)
+      if @@config.nil?
+        DB.load_config
+      end
       if @@databases[database_name].nil?
         @@databases[database_name] =
           Database.new(if database_name == :default
