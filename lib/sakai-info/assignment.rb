@@ -16,16 +16,13 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        site = nil
         xml = ""
-        DB.connect.exec("select context, xml from assignment_assignment " +
-                      "where assignment_id = :id", id) do |row|
-          site = Site.find(row[0])
-          REXML::Document.new(row[1].read).write(xml, 2)
-        end
-        if site.nil?
+        row = DB.connect[:assignment_assigment].filter(:assignment_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Assignment, id)
         end
+        site = Site.find(row[:context])
+        REXML::Document.new(row[:xml].read).write(xml, 2)
         @@cache[id] = Assignment.new(id, site, xml)
       end
       @@cache[id]
@@ -42,12 +39,11 @@ module SakaiInfo
     # set lookup
     def self.find_by_site_id(site_id)
       assignments = []
-      DB.connect.exec("select assignment_id, context, xml from assignment_assignment " +
-                      "where context = :site_id", site_id) do |row|
-        id = row[0]
-        site = Site.find(row[1])
+      site = Site.find(site_id)
+      DB.connect[:assignment_assignment].filter(:context => site_id) do |row|
+        id = row[:assignment_id]
         xml = ""
-        REXML::Document.new(row[2].read).write(xml, 2)
+        REXML::Document.new(row[:xml].read).write(xml, 2)
         assignments << Assignment.new(id, site, xml)
       end
       return assignments
@@ -110,19 +106,17 @@ module SakaiInfo
       if @@cache[id].nil?
         assignment = submitter = submitted_at = submitted = graded = nil
         xml = ""
-        DB.connect.exec("select context, xml, submitter_id, " +
-                        "submitted, graded from assignment_submission " +
-                        "where submission_id = :id", id) do |row|
-          assignment = Assignment.find(row[0])
-          xml = ""
-          REXML::Document.new(row[1].read).write(xml, 2)
-          submitter = User.find(row[2])
-          submitted = (row[3] == "true")
-          graded = (row[4] == "true")
-        end
-        if assignment.nil?
+        row = DB.connect[:assignment_submission].filter(:submission_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(AssignmentSubmission, id)
         end
+
+        assignment = Assignment.find(row[:context])
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        submitter = User.find(row[:submitter_id])
+        submitted = (row[:submitted] == "true")
+        graded = (row[:graded] == "true")
+
         @@cache[id] = AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
       end
       @@cache[id]
@@ -142,54 +136,40 @@ module SakaiInfo
 
     def self.find_by_assignment_id(assignment_id)
       submissions = []
-      DB.connect.exec("select submission_id, context, xml, submitter_id, " +
-                      "submitted, graded from assignment_submission " +
-                      "where context = :assignment_id", assignment_id) do |row|
-        id = row[0]
-        assignment = Assignment.find(row[1])
+      assignment = Assignment.find(assignment_id)
+      DB.connect[:assignment_submission].filter(:context => assignment_id) do |row|
+        id = row[:submission_id]
         xml = ""
-        REXML::Document.new(row[2].read).write(xml, 2)
-        submitter = User.find(row[3])
-        submitted = (row[4] == "true")
-        graded = (row[5] == "true")
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        submitter = User.find(row[:submitter_id])
+        submitted = (row[:submitted] == "true")
+        graded = (row[:graded] == "true")
         submissions << AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
       end
       return submissions
     end
 
     def self.count_by_assignment_id(assignment_id)
-      submission_count = 0
-      DB.connect.exec("select count(*) from assignment_submission " +
-                      "where context = :assignment_id", assignment_id) do |row|
-        submission_count = row[0].to_i
-      end
-      return submission_count
+      DB.connect[:assignment_submission].filter(:context => assignment_id).count
     end
 
     def self.find_by_user_id(user_id)
       submissions = []
-      DB.connect.exec("select submission_id, context, xml, submitter_id, " +
-                      "submitted, graded from assignment_submission " +
-                      "where submitter_id = :user_id", user_id) do |row|
-        id = row[0]
-        assignment = Assignment.find(row[1])
+      submitter = User.find(user_id)
+      DB.connect[:assignment_submission].filter(:submitter_id => user_id) do |row|
+        id = row[:submission_id]
+        assignment = Assignment.find(row[:context])
         xml = ""
-        REXML::Document.new(row[2].read).write(xml, 2)
-        submitter = User.find(row[3])
-        submitted = (row[4] == "true")
-        graded = (row[5] == "true")
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        submitted = (row[:submitted] == "true")
+        graded = (row[:graded] == "true")
         submissions << AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
       end
       return submissions
     end
 
     def self.count_by_user_id(user_id)
-      submission_count = 0
-      DB.connect.exec("select count(*) from assignment_submission " +
-                      "where submitter_id = :user_id", user_id) do |row|
-        submission_count = row[0].to_i
-      end
-      return submission_count
+      DB.connect[:assignment_submission].filter(:submitter_id => user_id).count
     end
 
     # yaml/json serialization
@@ -231,41 +211,31 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        context = nil
-        xml = ""
-        DB.connect.exec("select context, xml from assignment_content " +
-                      "where content_id = :id", id) do |row|
-          context = row[0]
-          REXML::Document.new(row[1].read).write(xml, 2)
-        end
-        if context.nil?
+        row = DB.connect[:assignment_content].filter(:content_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(AssignmentContent, id)
         end
-        @@cache[id] = AssignmentContent.new(id, context, xml)
+        xml = ""
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        @@cache[id] = AssignmentContent.new(id, row[:context], xml)
       end
       @@cache[id]
     end
 
     def self.find_by_user_id(user_id)
       contents = []
-      DB.connect.exec("select content_id, context, xml from assignment_content " +
-                      "where context = :user_id", user_id) do |row|
-        id = row[0]
-        context = row[1]
+      DB.connect[:assignment_content].filter(:context => user_id) do |row|
+        id = row[:content_id]
+        context = row[:context]
         xml = ""
-        REXML::Document.new(row[2].read).write(xml, 2)
+        REXML::Document.new(row[:xml].read).write(xml, 2)
         contents << AssignmentContent.new(id, context, xml)
       end
       return contents
     end
 
     def self.count_by_user_id(user_id)
-      content_count = 0
-      DB.connect.exec("select count(*) from assignment_content " +
-                      "where context = :user_id", user_id) do |row|
-        content_count = row[0].to_i
-      end
-      content_count
+      DB.connect[:assignment_content].filter(:context => user_id).count
     end
 
     # getters
