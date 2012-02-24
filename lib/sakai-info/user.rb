@@ -17,28 +17,48 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        ids = DB.connect.fetch("select user_id, eid " +
-                               "from sakai_user_id_map " +
-                               "where user_id=? or eid=?",
-                               id, id).first
-        if ids.nil?
+        eid = User.get_eid(id)
+        user_id = User.get_user_id(id)
+        if eid.nil? or user_id.nil?
           raise ObjectNotFoundException.new(User, id)
         end
 
         row = DB.connect.fetch("select first_name, last_name, type, " +
                                "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
                                "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at " +
-                               "from sakai_user where user_id=?", ids[:user_id]).first
+                               "from sakai_user where user_id=?", user_id).first
         if row.nil?
           raise ObjectNotFoundException.new(User, id)
         end
-        @@cache[ids[:eid]] =
-          @@cache[ids[:user_id]] =
-          User.new(ids[:user_id], ids[:eid],
+        @@cache[eid] =
+          @@cache[user_id] =
+          User.new(user_id, eid,
                    ((row[:first_name] || "") + " " + (row[:last_name] || "")).strip,
                    row[:type], row[:created_at], row[:modified_at])
       end
       @@cache[id]
+    end
+
+    @@id_cache = {}
+    def self.get_ids(id)
+      @@id_cache[id] ||=
+        DB.connect[:sakai_user_id_map].where({:user_id => id, :eid => id}.sql_or).first
+    end
+
+    def self.get_eid(id)
+      if ids = User.get_ids(id)
+        ids[:eid]
+      else
+        nil
+      end
+    end
+
+    def self.get_user_id(id)
+      if ids = User.get_ids(id)
+        ids[:user_id]
+      else
+        nil
+      end
     end
 
     def initialize(id, eid, name, type, created_at, modified_at)
@@ -101,11 +121,10 @@ module SakaiInfo
 
     def preferences_xml
       if @preferences_xml.nil?
-        db = DB.connect
         @preferences_xml = ""
-        db.exec("select xml from sakai_preferences " +
-                "where preferences_id=:userid", @user_id) do |row|
-          REXML::Document.new(row[0].read).write(@preferences_xml, 2)
+        row = DB.connect[:sakai_preferences].filter(:preferences_id => @user_id).first
+        if not row.nil?
+          REXML::Document.new(row[:xml].read).write(@preferences_xml, 2)
         end
       end
       @preferences_xml
@@ -117,33 +136,31 @@ module SakaiInfo
     end
 
     def self.count_by_realm_id_and_role_id(realm_id, role_id)
-      count = 0
-      DB.connect.exec("select count(*) from sakai_realm_rl_gr " +
-                      "where realm_key = :realm_id " +
-                      "and role_key = :role_id", realm_id, role_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sakai_realm_rl_gr].
+        filter(:realm_key => realm_id, :role_key => role_id).count
     end
 
     def self.find_by_realm_id_and_role_id(realm_id, role_id)
-      users = []
-      DB.connect.exec("select first_name, last_name, type, " +
-                      "to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                      "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') " +
-                      "from sakai_user where user_id in " +
-                      "(select user_id from sakai_realm_rl_gr " +
-                      "where realm_key = :realm_id " +
-                      "and role_key = :role_id)", realm_id, role_id) do |row|
-        first_name, last_name, type, created_at, modified_at = *row
-        first_name ||= ""
-        last_name ||= ""
-        @@cache[eid] =
-          @@cache[user_id] =
-          User.new(user_id, eid, (first_name+' '+last_name), type, created_at, modified_at)
-        users << @@cache[eid]
-      end
-      users
+      # TODO: implement this correctly
+      #  (code below isn't going to work)
+      # users = []
+      # DB.connect.fetch("select first_name, last_name, type, " +
+      #                  "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+      #                  "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at " +
+      #                  "from sakai_user where user_id in " +
+      #                  "(select user_id from sakai_realm_rl_gr " +
+      #                  "where realm_key = ? " +
+      #                  "and role_key = ?)", realm_id, role_id) do |row|
+      #   first_name, last_name, type, created_at, modified_at = *row
+      #   first_name ||= ""
+      #   last_name ||= ""
+      #   @@cache[eid] =
+      #     @@cache[user_id] =
+      #     User.new(user_id, eid, (first_name+' '+last_name), type, created_at, modified_at)
+      #   users << @@cache[eid]
+      # end
+      # users
+      nil
     end
 
     # yaml/json serialization
@@ -188,23 +205,19 @@ module SakaiInfo
 
   class UserProperty
     def self.get(user_id, property_name)
-      db = DB.connect
-      value = nil
-      db.fetch("select value from sakai_user_property " +
-               "where user_id=? and name=?", user_id, property_name) do |row|
-        value = row[:value].read
+      row = DB.connect[:sakai_user_property].
+        filter(:user_id => user_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_user_id(user_id)
-      db = DB.connect
       properties = {}
-      db.fetch("select name, value from sakai_user_property " +
-               "where user_id=?", user_id) do |row|
-        name = row[:name]
-        value = row[:value].read
-        properties[name] = value
+      DB.connect[:sakai_user_property].where(:user_id => user_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
