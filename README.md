@@ -10,7 +10,7 @@ tool or the libraries.
 
 ## Meta ##
 
-last updated: 2012-02-23
+last updated: 2012-02-24
 author: David Adams (daveadams@gmail.com)
 github url: https://github.com/daveadams/sakai-info
 
@@ -71,10 +71,25 @@ nickname for the connection.
 ## Command Line Usage ##
 
 After installing the gem, the `sakai-info` program should be found in your
-PATH. For this release, very limited functionality is included. For usage
-details, run:
+PATH. For usage details, run:
 
     $ sakai-info help
+
+To look up information about a user, run:
+
+    $ sakai-info user id
+
+For users, `id` can be either the user_id or the eid of the user you want
+details on.
+
+Similarly to look up information about a site, run:
+
+    $ sakai-info site id
+
+For sites, `id` is the `site_id` of the desired site.
+
+Further details are available for both object types, see the corresponding
+help pages for more information.
 
 ## Library Usage ##
 

@@ -1,16 +1,11 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-02-23*
-
-### 0.2 ###
-
-* MySQL support (via Sequel)
-* Round out basic user and site search in the CLI
-* Progress towards building a set of fixtures to use for serious unit testing
+*Last updated 2012-02-24*
 
 ### 0.3 ###
 
-* CLI access to quizzes, tools, assignments
+* CLI access to more objects, eg quizzes, tools, assignments, and groups
+* Sqlite test infrastructure for a few basic objects
 
 ### 0.5 ###
 
