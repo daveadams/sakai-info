@@ -27,16 +27,11 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        site_id = title = nil
-        DB.connect.exec("select site_id, title from sakai_site_group " +
-                        "where group_id = :id", id) do |row|
-          site_id = row[0]
-          title = row[1]
-          @@cache[id] = Group.new(id, site_id, title)
-        end
-        if site_id.nil? or name.nil?
+        row = DB.connect[:sakai_site_group].filter(:group_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Group, id)
         end
+        @@cache[id] = Group.new(id, row[:site_id], row[:title])
       end
       @@cache[id]
     end
@@ -46,12 +41,9 @@ module SakaiInfo
       if @@cache_by_site_id[site_id].nil?
         @@cache_by_site_id[site_id] = []
         site = Site.find(site_id)
-        DB.connect.exec("select group_id, title " +
-                        "from sakai_site_group " +
-                        "where site_id = :site_id", site_id) do |row|
-          id = row[0]
-          title = row[1]
-          @@cache[id] = Group.new(id, site, title)
+
+        DB.connect[:sakai_site_group].filter(:site_id => site_id) do |row|
+          @@cache[id] = Group.new(row[:group_id], site, row[:title])
           @@cache_by_site_id[site_id] << @@cache[id]
         end
       end
@@ -104,9 +96,8 @@ module SakaiInfo
 
     def self.find_by_group_id(group_id)
       properties = []
-      DB.connect.exec("select name, value from sakai_site_group_property " +
-                      "where group_id=:group_id", group_id) do |row|
-        properties << GroupProperty.new(row[0], row[1].read)
+      DB.connect[:sakai_site_group_property].filter(:group_id => group_id) do |row|
+        properties << GroupProperty.new(row[:name], row[:value].read)
       end
       properties
     end
