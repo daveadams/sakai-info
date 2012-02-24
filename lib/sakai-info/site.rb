@@ -350,7 +350,7 @@ module SakaiInfo
     def disk_serialization
       result = disk_unformatted_serialization["disk_usage"]
       result.keys.each do |key|
-        result[key] = format_filesize(result[key])
+        result[key] = Util.format_filesize(result[key])
       end
       {
         "disk_usage" => result
