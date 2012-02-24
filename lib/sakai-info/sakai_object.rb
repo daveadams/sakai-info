@@ -47,12 +47,12 @@ module SakaiInfo
       object_type_serialization
     end
 
-    def to_yaml
-      serialize.to_yaml
+    def to_yaml(*q)
+      serialize(q).to_yaml
     end
 
-    def to_json
-      serialize.to_json
+    def to_json(*q)
+      serialize(q).to_json
     end
   end
 end
