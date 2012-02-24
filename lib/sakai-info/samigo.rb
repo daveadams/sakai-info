@@ -149,7 +149,7 @@ module SakaiInfo
     def self.find_by_user_id(user_id)
       results = []
       user = User.find(user_id)
-      DB.connect[:sam_questionpool_t].filter(:ownerid => user_id) do |row|
+      DB.connect[:sam_questionpool_t].filter(:ownerid => user_id).all.each do |row|
         @@cache[row[:questionpoolid]] =
           QuestionPool.new(row[:questionpoolid].to_i, row[:title], user)
         results << @@cache[row[:questionpoolid]]
