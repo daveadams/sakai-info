@@ -26,15 +26,12 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        name = nil
-        DB.connect.exec("select role_name from sakai_realm_role " +
-                        "where role_key = :id", id.to_i) do |row|
-          name = row[0]
-        end
-        if name.nil?
+        row = DB.connect.fetch("select role_name from sakai_realm_role " +
+                               "where role_key = ?", id.to_i).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, id)
         end
-        @@cache[id] = AuthzRole.new(id, name)
+        @@cache[id] = AuthzRole.new(id, row[:role_name])
         @@cache[name] = @@cache[id]
       end
       @@cache[id]
@@ -45,14 +42,12 @@ module SakaiInfo
         raise ObjectNotFoundException.new(AuthzRole, "")
       end
       if @@cache[name].nil?
-        id = nil
-        DB.connect.exec("select role_key from sakai_realm_role " +
-                        "where role_name = :name", name) do |row|
-          id = row[0].to_i.to_s
-        end
-        if id.nil?
+        row = DB.connect.fetch("select role_key from sakai_realm_role " +
+                               "where role_name = ?", name).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, name)
         end
+        id = row[:role_key]
         @@cache[name] = AuthzRole.new(id, name)
         @@cache[id] = @@cache[name]
       end
