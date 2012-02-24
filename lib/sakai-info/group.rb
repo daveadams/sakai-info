@@ -2,7 +2,7 @@
 #   SakaiInfo::Group library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -59,12 +59,7 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      count = 0
-      DB.connect.exec("select count(*) from sakai_site_group " +
-                      "where site_id=:site_id", site_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sakai_site_group].filter(:site_id => site_id).count
     end
 
     def properties
