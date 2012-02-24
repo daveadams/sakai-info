@@ -103,7 +103,7 @@ EOF
         else
           STDERR.puts "ERROR: help topic '#{topic}' was unrecognized"
           STDERR.puts
-          CLI.help(:default, STDERR)
+          CLI::Help.help(:default, STDERR)
           exit 1
         end
       end
