@@ -81,7 +81,7 @@ elsif mode == "site"
   when "count" then
     puts Site.count
   else
-    puts Site.find(ARGV[0]).to_yaml(:summary)
+    puts Site.find(ARGV[0]).to_yaml
   end
 end
 

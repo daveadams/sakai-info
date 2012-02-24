@@ -90,7 +90,7 @@ module SakaiInfo
       if @@cache[id].nil?
         xml = ""
         row = DB.connect.fetch("select channel_id, draft, pubview, owner, xml, " +
-                               "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as date " +
+                               "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as message_date " +
                                "from announcement_message " +
                                "where message_id = ?", id).first
         if row.nil?
@@ -101,7 +101,7 @@ module SakaiInfo
         draft = row[:draft]
         pubview = row[:pubview]
         owner = User.find(row[:owner])
-        date = row[:date]
+        date = row[:message_date]
         REXML::Document.new(row[:xml].read).write(xml, 2)
         @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
       end
@@ -126,7 +126,7 @@ module SakaiInfo
       channel = AnnouncementChannel.find(channel_id)
 
       DB.connect.fetch("select message_id, draft, pubview, owner, xml, " +
-                       "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as date " +
+                       "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as message_date " +
                        "from announcement_message " +
                        "where channel_id = ?", channel_id) do |row|
         xml = ""
@@ -135,7 +135,7 @@ module SakaiInfo
         pubview = row[:pubview]
         owner = User.find(row[:owner])
         REXML::Document.new(row[:xml].read).write(xml, 2)
-        date = row[:date]
+        date = row[:message_date]
 
         @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
         announcements << @@cache[id]

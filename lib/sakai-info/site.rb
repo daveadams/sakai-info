@@ -427,9 +427,9 @@ module SakaiInfo
   class SiteProperty
     def self.get(site_id, property_name)
       value = nil
-      DB.connect.exec("select value from sakai_site_property " +
-                      "where site_id=? and name=?",
-                      site_id, property_name) do |row|
+      DB.connect.fetch("select value from sakai_site_property " +
+                       "where site_id=? and name=?",
+                       site_id, property_name) do |row|
         value = row[:value].read
       end
       return value
@@ -437,9 +437,11 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_property " +
-                      "where site_id=?", site_id) do |row|
-        properties[row[:name]] = row[:value].read
+      DB.connect.fetch("select name, value from sakai_site_property " +
+                       "where site_id=?", site_id) do |row|
+        name = row[:name]
+        value = row[:value].read
+        properties[name] = value
       end
       return properties
     end

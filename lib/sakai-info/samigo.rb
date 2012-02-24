@@ -47,10 +47,10 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect.exec("select count(*) as count from sam_publishedassessment_t " +
-                      "where id in (select qualifierid from sam_authzdata_t " +
-                      "where agentid=? and functionid='EDIT_ASSESSMENT')",
-                      site_id).first[:count].to_i
+      DB.connect.fetch("select count(*) as count from sam_publishedassessment_t " +
+                       "where id in (select qualifierid from sam_authzdata_t " +
+                       "where agentid=? and functionid='EDIT_ASSESSMENT')",
+                       site_id).first[:count].to_i
     end
 
     def default_serialization
@@ -106,10 +106,10 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect.exec("select count(*) as count from sam_publishedassessment_t " +
-                      "where id in (select qualifierid from sam_authzdata_t " +
-                      "where agentid=? and functionid='OWN_PUBLISHED_ASSESSMENT')",
-                      site_id).first[:count].to_i
+      DB.connect.fetch("select count(*) as count from sam_publishedassessment_t " +
+                       "where id in (select qualifierid from sam_authzdata_t " +
+                       "where agentid=? and functionid='OWN_PUBLISHED_ASSESSMENT')",
+                       site_id).first[:count].to_i
     end
 
     def default_serialization

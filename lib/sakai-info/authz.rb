@@ -195,9 +195,9 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        row = DB.connect.exec("select realm_id, provider_id, maintain_role " +
-                              "from sakai_realm " +
-                              "where realm_key = ?", id.to_i).first
+        row = DB.connect.fetch("select realm_id, provider_id, maintain_role " +
+                               "from sakai_realm " +
+                               "where realm_key = ?", id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, id)
         end
@@ -218,9 +218,9 @@ module SakaiInfo
 
     def self.find_by_name(name)
       if @@cache[name].nil?
-        row = DB.connect.exec("select realm_key, provider_id, maintain_role " +
-                              "from sakai_realm " +
-                              "where realm_id = ?", name).first
+        row = DB.connect.fetch("select realm_key, provider_id, maintain_role " +
+                               "from sakai_realm " +
+                               "where realm_id = ?", name).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, name)
         end
