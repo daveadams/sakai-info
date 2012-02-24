@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-21 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -29,6 +29,34 @@ module SakaiInfo
       @identifier = identifier
 
       super("Could not find a #{@classname} object for '#{@identifier}'")
+    end
+  end
+
+  class Util
+    # misc support functions
+    FILESIZE_LABELS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+    def self.format_filesize(i_size)
+      size = i_size.to_f
+      negative = false
+
+      if size < 0
+        negative = true
+        size = -size
+      end
+
+      label = 0
+      (FILESIZE_LABELS.size - 1).times do
+        if size >= 1024.0
+          size = size / 1024.0
+          label += 1
+        end
+      end
+
+      if size >= 100.0 or label == 0
+        "#{negative ? "-" : ""}#{size.to_i.to_s} #{FILESIZE_LABELS[label]}"
+      else
+        "#{negative ? "-" : ""}#{sprintf("%.1f", size)} #{FILESIZE_LABELS[label]}"
+      end
     end
   end
 end
