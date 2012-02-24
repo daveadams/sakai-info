@@ -2,7 +2,7 @@
 #   SakaiInfo::Group library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -27,16 +27,11 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        site_id = title = nil
-        DB.connect.exec("select site_id, title from sakai_site_group " +
-                        "where group_id = :id", id) do |row|
-          site_id = row[0]
-          title = row[1]
-          @@cache[id] = Group.new(id, site_id, title)
-        end
-        if site_id.nil? or name.nil?
+        row = DB.connect[:sakai_site_group].filter(:group_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Group, id)
         end
+        @@cache[id] = Group.new(id, row[:site_id], row[:title])
       end
       @@cache[id]
     end
@@ -46,25 +41,17 @@ module SakaiInfo
       if @@cache_by_site_id[site_id].nil?
         @@cache_by_site_id[site_id] = []
         site = Site.find(site_id)
-        DB.connect.exec("select group_id, title " +
-                        "from sakai_site_group " +
-                        "where site_id = :site_id", site_id) do |row|
-          id = row[0]
-          title = row[1]
-          @@cache[id] = Group.new(id, site, title)
-          @@cache_by_site_id[site_id] << @@cache[id]
+
+        DB.connect[:sakai_site_group].filter(:site_id => site_id).all.each do |row|
+          @@cache[row[:group_id]] = Group.new(row[:group_id], site, row[:title])
+          @@cache_by_site_id[site_id] << @@cache[row[:group_id]]
         end
       end
       @@cache_by_site_id[site_id]
     end
 
     def self.count_by_site_id(site_id)
-      count = 0
-      DB.connect.exec("select count(*) from sakai_site_group " +
-                      "where site_id=:site_id", site_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sakai_site_group].filter(:site_id => site_id).count
     end
 
     def properties
@@ -100,20 +87,22 @@ module SakaiInfo
   end
 
   class GroupProperty
-    attr_reader :name, :value
-
-    def initialize(name, value)
-      @name = name
-      @value = value
+    def self.get(group_id, property_name)
+      row = DB.connect[:sakai_site_group_property].
+        filter(:group_id => group_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
+      end
     end
 
     def self.find_by_group_id(group_id)
-      properties = []
-      DB.connect.exec("select name, value from sakai_site_group_property " +
-                      "where group_id=:group_id", group_id) do |row|
-        properties << GroupProperty.new(row[0], row[1].read)
+      properties = {}
+      DB.connect[:sakai_site_group_property].where(:group_id => group_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
-      properties
+      return properties
     end
   end
 end

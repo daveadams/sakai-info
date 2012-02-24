@@ -2,7 +2,7 @@
 #   SakaiInfo::Message library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -36,14 +36,10 @@ module SakaiInfo
         raise UnknownMessageTypeException
       end
 
-      count = 0
-      DB.connect.exec("select count(*) from mfr_message_t " +
-                      "where message_dtype = :t " +
-                      "and to_char(created,'YYYY-MM-DD') = :d",
-                      message_type, date_str) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect.fetch("select count(*) as count from mfr_message_t " +
+                       "where message_dtype = ? and " +
+                       "to_char(created,'YYYY-MM-DD') = ? ",
+                       message_type, date_str).first[:count].to_i
     end
 
    private
@@ -75,28 +71,23 @@ module SakaiInfo
     @@cache = {}
 
     def self.count_by_site_id(site_id)
-      count = 0
-      DB.connect.exec("select count(*) from mfr_open_forum_t " +
-                      "where surrogatekey = (select id from mfr_area_t " +
-                      "where type_uuid = :type_uuid " +
-                      "and context_id = :site_id)",
-                      MessageTypeUUID::FORUM_POST, site_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect.fetch("select count(*) as count from mfr_open_forum_t " +
+                       "where surrogatekey = (select id from mfr_area_t " +
+                       "where type_uuid = ? and context_id = ?)",
+                       MessageTypeUUID::FORUM_POST, site_id).first[:count].to_i
     end
 
     @@cache_by_site_id = {}
     def self.find_by_site_id(site_id)
       if @@cache_by_site_id[site_id].nil?
         @@cache_by_site_id[site_id] = []
-        DB.connect.exec("select id, title from mfr_open_forum_t " +
-                        "where surrogatekey = (select id from mfr_area_t " +
-                        "where type_uuid = :type_uuid " +
-                        "and context_id = :site_id) order by sort_index",
-                        MessageTypeUUID::FORUM_POST, site_id) do |row|
-          id = row[0].to_i.to_s
-          title = row[1]
+        DB.connect.fetch("select id, title from mfr_open_forum_t " +
+                         "where surrogatekey = (select id from mfr_area_t " +
+                         "where type_uuid = ? " +
+                         "and context_id = ?) order by sort_index",
+                         MessageTypeUUID::FORUM_POST, site_id) do |row|
+          id = row[:id].to_i.to_s
+          title = row[:title]
           @@cache[id] = Forum.new(id, title)
           @@cache_by_site_id[site_id] << @@cache[id]
         end

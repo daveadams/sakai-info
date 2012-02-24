@@ -26,15 +26,12 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        name = nil
-        DB.connect.exec("select role_name from sakai_realm_role " +
-                        "where role_key = :id", id.to_i) do |row|
-          name = row[0]
-        end
-        if name.nil?
+        row = DB.connect.fetch("select role_name from sakai_realm_role " +
+                               "where role_key = ?", id.to_i).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, id)
         end
-        @@cache[id] = AuthzRole.new(id, name)
+        @@cache[id] = AuthzRole.new(id, row[:role_name])
         @@cache[name] = @@cache[id]
       end
       @@cache[id]
@@ -45,14 +42,12 @@ module SakaiInfo
         raise ObjectNotFoundException.new(AuthzRole, "")
       end
       if @@cache[name].nil?
-        id = nil
-        DB.connect.exec("select role_key from sakai_realm_role " +
-                        "where role_name = :name", name) do |row|
-          id = row[0].to_i.to_s
-        end
-        if id.nil?
+        row = DB.connect.fetch("select role_key from sakai_realm_role " +
+                               "where role_name = ?", name).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, name)
         end
+        id = row[:role_key].to_i.to_s
         @@cache[name] = AuthzRole.new(id, name)
         @@cache[id] = @@cache[name]
       end
@@ -76,13 +71,13 @@ module SakaiInfo
 
     def self.find_by_realm_id_and_function_id(realm_id, function_id)
       roles = []
-      DB.connect.exec("select role_key, role_name from " +
-                      "sakai_realm_role where role_key in " +
-                      "(select role_key from sakai_realm_rl_fn " +
-                      "where realm_key=:realm_id and function_key=:function_id) " +
-                      "order by role_name", realm_id, function_id) do |row|
-        role_id = row[0].to_i.to_s
-        role_name = row[1]
+      DB.connect.fetch("select role_key, role_name from " +
+                       "sakai_realm_role where role_key in " +
+                       "(select role_key from sakai_realm_rl_fn " +
+                       "where realm_key=? and function_key=?) " +
+                       "order by role_name", realm_id, function_id) do |row|
+        role_id = row[:role_key].to_i.to_s
+        role_name = row[:role_name]
         roles << AuthzRole.new(role_id, role_name)
       end
       roles
@@ -105,16 +100,13 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        name = nil
-        DB.connect.exec("select function_name from sakai_realm_function " +
-                        "where function_key = :id", id.to_i) do |row|
-          name = row[0]
-        end
-        if name.nil?
+        row = DB.connect.fetch("select function_name from sakai_realm_function " +
+                               "where function_key = ?", id.to_i).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzFunction, id)
         end
-        @@cache[id] = AuthzFunction.new(id, name)
-        @@cache[name] = @@cache[id]
+        @@cache[id] = AuthzFunction.new(id, row[:function_name])
+        @@cache[row[:function_name]] = @@cache[id]
       end
       @@cache[id]
     end
@@ -122,13 +114,12 @@ module SakaiInfo
     def self.find_by_name(name)
       if @@cache[name].nil?
         id = nil
-        DB.connect.exec("select function_key from sakai_realm_function " +
-                        "where function_name = :name", name) do |row|
-          id = row[0].to_i.to_s
-        end
-        if id.nil?
+        row = DB.connect.fetch("select function_key from sakai_realm_function " +
+                               "where function_name = ?", name).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzFunction, name)
         end
+        id = row[:function_key].to_i.to_s
         @@cache[name] = AuthzFunction.new(id, name)
         @@cache[id] = @@cache[name]
       end
@@ -151,24 +142,19 @@ module SakaiInfo
     end
 
     def self.count_by_realm_id_and_role_id(realm_id, role_id)
-      count = 0
-      DB.connect.exec("select count(*) from sakai_realm_rl_fn " +
-                      "where realm_key=:realm_id and role_key=:role_id",
-                      realm_id, role_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sakai_realm_rl_fn].
+        filter(:realm_key => realm_id, :role_key => role_id).count
     end
 
     def self.find_by_realm_id_and_role_id(realm_id, role_id)
       functions = []
-      DB.connect.exec("select function_key, function_name from " +
-                      "sakai_realm_function where function_key in " +
-                      "(select function_key from sakai_realm_rl_fn " +
-                      "where realm_key=:realm_id and role_key=:role_id) " +
-                      "order by function_name", realm_id, role_id) do |row|
-        function_id = row[0].to_i.to_s
-        function_name = row[1]
+      DB.connect.fetch("select function_key, function_name from " +
+                       "sakai_realm_function where function_key in " +
+                       "(select function_key from sakai_realm_rl_fn " +
+                       "where realm_key=? and role_key=?) " +
+                       "order by function_name", realm_id, role_id) do |row|
+        function_id = row[:function_key].to_i.to_s
+        function_name = row[:function_name]
         functions << AuthzFunction.new(function_id, function_name)
       end
       functions
@@ -209,20 +195,20 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        name = providers = maintain_role = nil
-        DB.connect.exec("select realm_id, provider_id, maintain_role " +
-                        "from sakai_realm " +
-                        "where realm_key = :id", id.to_i) do |row|
-          name = row[0]
-          providers = row[1]
-          if row[2].nil? or row[2] == ""
-            maintain_role = nil
-          else
-            maintain_role = AuthzRole.find_by_id(row[2].to_i)
-          end
-        end
-        if name.nil?
+        row = DB.connect.fetch("select realm_id, provider_id, maintain_role " +
+                               "from sakai_realm " +
+                               "where realm_key = ?", id.to_i).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, id)
+        end
+
+        name = row[:realm_id]
+        providers = row[:provider_id]
+        maintain_role = nil
+        if row[:maintain_role].nil? or row[:maintain_role] == ""
+          maintain_role = nil
+        else
+          maintain_role = AuthzRole.find_by_id(row[:maintain_role].to_i)
         end
         @@cache[id] = AuthzRealm.new(id, name, providers, maintain_role)
         @@cache[name] = @@cache[id]
@@ -232,20 +218,20 @@ module SakaiInfo
 
     def self.find_by_name(name)
       if @@cache[name].nil?
-        id = providers = maintain_role = nil
-        DB.connect.exec("select realm_key, provider_id, maintain_role " +
-                        "from sakai_realm " +
-                        "where realm_id = :name", name) do |row|
-          id = row[0].to_i.to_s
-          providers = row[1]
-          if row[2].nil? or row[2] == ""
-            maintain_role = nil
-          else
-            maintain_role = AuthzRole.find_by_id(row[2].to_i)
-          end
-        end
-        if id.nil?
+        row = DB.connect.fetch("select realm_key, provider_id, maintain_role " +
+                               "from sakai_realm " +
+                               "where realm_id = ?", name).first
+        if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, name)
+        end
+
+        id = row[:realm_key].to_i.to_s
+        providers = row[:provider_id]
+        maintain_role = nil
+        if row[:maintain_role].nil? or row[:maintain_role] == ""
+          maintain_role = nil
+        else
+          maintain_role = AuthzRole.find_by_id(row[:maintain_role].to_i)
         end
         @@cache[name] = AuthzRealm.new(id, name, providers, maintain_role)
         @@cache[id] = @@cache[name]
@@ -304,11 +290,11 @@ module SakaiInfo
     def self.find_by_realm_id(realm_id)
       realm_roles = []
       realm = AuthzRealm.find_by_id(realm_id)
-      DB.connect.exec("select distinct role_key from " +
-                      "sakai_realm_rl_fn where " +
-                      "realm_key = :realm_id", realm_id) do |row|
+      DB.connect.fetch("select distinct role_key from " +
+                       "sakai_realm_rl_fn where " +
+                       "realm_key = ?", realm_id) do |row|
         begin
-          role = AuthzRole.find_by_id(row[0].to_i)
+          role = AuthzRole.find_by_id(row[:role_key].to_i)
           realm_roles << AuthzRealmRole.new(realm, role)
         rescue AuthzRoleNotFoundException
         end
@@ -345,32 +331,29 @@ module SakaiInfo
 
     def self.find_by_realm_id(realm_id)
       results = []
-      DB.connect.exec("select srrg.user_id, srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = :realm_id", realm_id) do |row|
-        results << AuthzRealmMembership.new(realm_id, row[0], row[1])
+      DB.connect.fetch("select srrg.user_id as user_id, " +
+                       "srr.role_name as role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = ?", realm_id) do |row|
+        results << AuthzRealmMembership.new(realm_id, row[:user_id], row[:role_name])
       end
       results
     end
 
     def self.count_by_realm_id(realm_id)
-      count = 0
-      DB.connect.exec("select count(*) from sakai_realm_rl_gr " +
-                      "where realm_key = :realm_id", realm_id) do |row|
-        count = row[0].to_i
-      end
-      count
+      DB.connect[:sakai_realm_rl_gr].filter(:realm_key => realm_id).count
     end
 
     def self.find_by_user_id(user_id)
       results = []
-      DB.connect.exec("select sr.realm_id, srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = sr.realm_key " +
-                      "and srrg.user_id = :user_id", user_id) do |row|
-        results << AuthzRealmMembership.new(row[0], user_id, row[1])
+      DB.connect.fetch("select sr.realm_id as realm_id, " +
+                       "srr.role_name as role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = sr.realm_key " +
+                       "and srrg.user_id = ?", user_id) do |row|
+        results << AuthzRealmMembership.new(row[:realm_id], user_id, row[:role_name])
       end
       results
     end

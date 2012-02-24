@@ -1,5 +1,4 @@
-sakai-info
-==========
+# sakai-info #
 
 *sakai-info* is a command line tool and a suite of Ruby libraries which enable
 the exploration of a Sakai database without the intermediation of a Java VM or
@@ -9,34 +8,31 @@ Because the primary goal of this tool is to assist in information gathering
 and troubleshooting, no capability to change the database is included in the
 tool or the libraries.
 
-Meta
-----
-last updated: 2012-02-19  
-author: David Adams (daveadams@gmail.com)  
+## Meta ##
+
+last updated: 2012-02-24
+author: David Adams (daveadams@gmail.com)
 github url: https://github.com/daveadams/sakai-info
 
-Testing
--------
+## Testing ##
 
 Tests are defined in ./test using Test::Unit. The default `rake` action is to
 run all tests.
 
-Building
---------
+## Building ##
 
 Use `rake` to test and build the gem:
 
     $ rake gem:build
-    
+
 The resulting gem will be saved to the working directory as
-`sakai-info-0.1.0.gem`.
+`sakai-info-0.2.0.gem`.
 
 Cleanup built gems using:
 
     $ rake clean
 
-Installing
-----------
+## Installing ##
 
 Install the *sakai-info* gem locally with:
 
@@ -46,78 +42,56 @@ Uninstall with:
 
     $ rake gem:uninstall
 
-Supported Databases
--------------------
+## Database Connectivity ##
 
-For this release, only Oracle databases are supported. MySQL support is planned
-as soon as possible. Support for SQLite or some other lightweight database may
-be implemented for unit testing purposes.
+[Sequel](http://sequel.rubyforge.org) is used for database connectivity. Driver
+gems must also be installed to support whatever database or databases you use.
 
-System Requirements
--------------------
+Oracle support requires the `ruby-oci8` gem, and MySQL support requires the
+`mysql` gem. Some unit tests make use of the `sqlite3` gem.
 
-For Oracle support, the `ruby-oci8` gem is required.
-
-So far, testing has occurred using Ruby 1.9.1p376 and Ruby 1.9.2p290, with
-version 2.0.6 of the `ruby-oci8` gem, on Ubuntu 10.04, against Oracle 11g
-R2 versions 11.2.0.1 and 11.2.0.3, using the Oracle Instant Client version
-11.2.0.3.
-
-Configuration
--------------
+## Configuration ##
 
 To run, *sakai-info* needs to be able to connect to your Sakai database server.
 It is possible to specify multiple instances to choose from at runtime.
 
 In this release, *sakai-info* expects a to find the config in a file located at
 `$HOME/.sakai-info`. The file must be in YAML format and can contain one or
-more Sakai database connection definitions. To define a single database
-connection, specify the file like this:
+more Sakai database connection nicknames and connection strings, for example:
 
-    dbtype: oracle
-    username: sakai
-    password: <password>
-    service: SAKAIPROD
-    host: oracle.db
-    port: 1521
+    prod: oracle://sakai:password@SAKAIPROD
+    test: mysql://test:password@mysql.host:3307/db_name
 
-The `port` value is optional, with a default of 1521. If your Oracle setup uses
-a `tnsnames.ora` file, then both `host` and `port` can be excluded, and
-`service` will be used to find the corresponding `tnsnames.ora` entry.
+The first connection in the list is the default connection. Other connections
+may be specified using the corresponding YAML key, which functions as a
+nickname for the connection.
 
-Multiple instances may be specified by using the following format:
+[More information on how to specify a Sequel connection string.](http://sequel.rubyforge.org/rdoc/files/doc/opening_databases_rdoc.html)
 
-    default: production
-    instances:
-      production:
-        dbtype: oracle
-        username: sakai
-        password: <password>
-        service: SAKAIPROD
-        host: oracle.db
-        port: 1521
-     test:
-       dbtype: oracle
-       username: sakai
-       password: <password>
-       service: SAKAITEST
-
-The `default` key identifies which of the connections under `instances` you
-wish to be used in the absence of any explicit specification. Other instances
-will be referenced by the corresponding YAML key (eg, `production` and `test`
-in the example above).
-
-Command Line Usage
-------------------
+## Command Line Usage ##
 
 After installing the gem, the `sakai-info` program should be found in your
-PATH. For this release, very limited functionality is included. For usage
-details, run:
+PATH. For usage details, run:
 
     $ sakai-info help
 
-Library Usage
--------------
+To look up information about a user, run:
+
+    $ sakai-info user id
+
+For users, `id` can be either the user_id or the eid of the user you want
+details on.
+
+Similarly to look up information about a site, run:
+
+    $ sakai-info site id
+
+For sites, `id` is the `site_id` of the desired site.
+
+Further details are available for both object types, see the corresponding
+help pages for more information.
+
+## Library Usage ##
 
 To use the library in your own Ruby programs, simply specify:
 
@@ -131,18 +105,16 @@ program.
 Full RDoc documentation for each class is not available in this release, but is
 planned for a future release.
 
-Change History
---------------
+## Change History ##
 
 See CHANGELOG.md
 
-Future Plans
-------------
+## Future Plans ##
 
 See ROADMAP.md
 
-License
--------
+## License ##
+
 This work is dedicated to the public domain. No rights are reserved. See
 LICENSE for more information.
 

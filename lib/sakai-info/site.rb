@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -17,24 +17,25 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        site_id = title = type = created_at = created_by_user_id =
-          modified_at = modified_by_user_id = joinable = join_role = nil
-        DB.connect.exec("select site_id, title, type, " +
-                        "createdby, to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                        "modifiedby, to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS'), " +
-                        "joinable, join_role " +
-                        "from sakai_site where site_id = :site_id", id) do |row|
-          site_id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable_n, join_role = *row
-          if joinable_n.to_i == 1
-            joinable = true
-          else
-            joinable = false
-          end
-        end
-        if site_id.nil?
+        db = DB.connect
+        row = db.fetch("select site_id, title, type, " +
+                       "createdby,  modifiedby, " +
+                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
+                       "joinable, join_role " +
+                       "from sakai_site where site_id=?", id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Site, id)
         end
-        @@cache[id] = Site.new(id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable, join_role)
+
+        joinable = false
+        if row[:joinable].to_i == 1
+          joinable = true
+        end
+
+        @@cache[id] = Site.new(id, row[:title], row[:type], row[:createdby],
+                               row[:created_at], row[:modifiedby], row[:modified_at],
+                               joinable, row[:join_role])
       end
       @@cache[id]
     end
@@ -84,23 +85,13 @@ module SakaiInfo
     end
 
     def user_count
-      if @user_count.nil?
-        DB.connect.exec("select count(*) from sakai_site_user " +
-                        "where site_id=:siteid", @id) do |row|
-          @user_count = row[0].to_i
-        end
-      end
-      @user_count
+      @user_count ||=
+        DB.connect[:sakai_site_user].filter(:site_id => @id).count
     end
 
     def page_count
-      if @page_count.nil?
-        DB.connect.exec("select count(*) from sakai_site_page " +
-                        "where site_id=:siteid", @id) do |row|
-          @page_count = row[0].to_i
-        end
-      end
-      @page_count
+      @page_count ||=
+        DB.connect[:sakai_site_page].filter(:site_id => @id).count
     end
 
     def assignment_count
@@ -202,95 +193,21 @@ module SakaiInfo
     end
 
     # finders/counters
-    @@total_site_count = nil
     def self.count
-      if @@total_site_count.nil?
-        @@total_site_count = 0
-        DB.connect.exec("select count(*) from sakai_site") do |row|
-          @@total_site_count = row[0].to_i
-        end
-      end
-      @@total_site_count
+      DB.connect[:sakai_site].count
     end
 
     def self.count_by_user_id(user_id)
-      user_count = 0
-      DB.connect.exec("select count(*) from sakai_site_user " +
-                      "where user_id=:user_id", user_id) do |row|
-        user_count = row[0].to_i
-      end
-      user_count
+      DB.connect[:sakai_site_user].where(:user_id => user_id).count
     end
 
     def self.count_by_type(type)
-      type_count = 0
-      DB.connect.exec("select count(*) from sakai_site " +
-                      "where type=:type", type) do |row|
-        type_count = row[0].to_i
-      end
-      type_count
+      DB.connect[:sakai_site].where(:type => type).count
     end
 
-    def self.count_by_semester(term_eid)
-      prop_name = "term_eid"
-      sem_count = 0
-      DB.connect.exec("select count(*) from sakai_site_property " +
-                      "where name=:name and to_char(value)=:term_eid",
-                      prop_name, term_eid) do |row|
-        sem_count = row[0].to_i
-      end
-      sem_count
-    end
-
-    def self.find_all_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_all_workspace_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where site_id like '~%'") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_all_non_workspace_ids
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where site_id not like '~%'") do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_ids_by_type(type)
-      ids = []
-      DB.connect.exec("select site_id from sakai_site where type=:type", type) do |row|
-        ids << row[0]
-      end
-      ids
-    end
-
-    def self.find_by_type(type)
-      sites = []
-      DB.connect.exec("select site_id, title, type, " +
-                      "createdby, to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                      "modifiedby, to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS'), " +
-                      "joinable, join_role " +
-                      "from sakai_site where type = :type", type) do |row|
-        joinable = false
-        site_id, title, type, created_by_user_id, created_at,
-        modified_by_user_id, modified_at, joinable_n, join_role = *row
-        if joinable_n.to_i == 1
-          joinable = true
-        end
-        @@cache[site_id] = Site.new(site_id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable, join_role)
-        sites << @@cache[site_id]
-      end
-      sites
+    def self.count_by_property(name, value)
+      DB.connect[:sakai_site_property].
+        where(:name => name, :to_char.sql_function(:value) => value).count
     end
 
     def self.find_ids_by_property(property_name, property_value)
@@ -298,7 +215,44 @@ module SakaiInfo
     end
 
     def self.find_ids_by_semester(term_eid)
-      find_ids_by_property("term_eid", term_eid)
+      Site.find_ids_by_property("term_eid", term_eid)
+    end
+
+    def self.find_all_ids
+      DB.connect[:sakai_site].select(:site_id).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_all_workspace_ids
+      DB.connect[:sakai_site].select(:site_id).
+        where(:site_id.like("~%")).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_all_non_workspace_ids
+      DB.connect[:sakai_site].select(:site_id).
+        where(~:site_id.like("~%")).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_ids_by_type(type)
+      DB.connect[:sakai_site].select(:site_id).
+        where(:type => type).all.collect{|r| r[:site_id]}
+    end
+
+    def self.find_by_type(type)
+      sites = []
+      DB.connect.fetch("select site_id, title, type, " +
+                       "createdby, modifiedby, " +
+                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
+                       "joinable, join_role " +
+                       "from sakai_site where type = ?", type) do |row|
+        joinable = false
+        if joinable_n.to_i == 1
+          joinable = true
+        end
+        @@cache[row[:site_id]] = Site.new(row[:site_id], row[:title], row[:type], row[:createdby], row[:created_at], row[:modifiedby], row[:modified_at], joinable, row[:join_role])
+        sites << @@cache[row[:site_id]]
+      end
+      sites
     end
 
     # serialization methods
@@ -378,7 +332,7 @@ module SakaiInfo
       result
     end
 
-    def disk_serialization
+    def disk_unformatted_serialization
       {
         "disk_usage" => {
           "resources" => self.resource_storage.size_on_disk,
@@ -393,10 +347,10 @@ module SakaiInfo
       }
     end
 
-    def disk_formatted_serialization
-      result = disk_serialization["disk_usage"]
+    def disk_serialization
+      result = disk_unformatted_serialization["disk_usage"]
       result.keys.each do |key|
-        result[key] = format_filesize(result[key])
+        result[key] = Util.format_filesize(result[key])
       end
       {
         "disk_usage" => result
@@ -433,7 +387,7 @@ module SakaiInfo
       end
     end
 
-    def realm_roles_serialization
+    def realm_serialization
       {
         "realm_roles" => self.realm.realm_roles.collect { |rr| rr.serialize(:summary) }
       }
@@ -448,39 +402,38 @@ module SakaiInfo
         {}
       end
     end
+
+    def self.all_serializations
+      [
+       :default, :users, :pages, :groups, :quizzes, :disk, :assignments,
+       :announcements, :gradebook, :realm, :forums
+      ]
+    end
   end
 
   class SiteProperty
     def self.get(site_id, property_name)
-      value = nil
-      DB.connect.exec("select value from sakai_site_property " +
-                      "where site_id=:site_id and name=:name",
-                      site_id, property_name) do |row|
-        value = row[0].read
+      row = DB.connect[:sakai_site_property].
+        where(:site_id => site_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_site_id(site_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_property " +
-                      "where site_id=:site_id", site_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+      DB.connect[:sakai_site_property].where(:site_id => site_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
 
     def self.find_site_ids_by_property(name, value)
-      ids = []
-      DB.connect.exec("select distinct(site_id) from sakai_site_property " +
-                      "where name=:name " +
-                      "and to_char(value)=:value",
-                      name, value) do |row|
-        ids << row[0]
-      end
-      ids
+      DB.connect[:sakai_site_property].
+        where(:name => name, :to_char.sql_function(:value) => value).
+        all.collect{|r| r[:site_id]}
     end
   end
 
@@ -490,18 +443,13 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        title = order = layout = site = nil
-        DB.connect.exec("select title, site_order, layout, site_id " +
-                        "from sakai_site_page where page_id = :page_id", id) do |row|
-          title = row[0]
-          order = row[1].to_i
-          layout = row[2]
-          site = Site.find(row[3])
-        end
-        if title.nil?
+        row = DB.connect[:sakai_site_page].where(:page_id => id).first
+        if row.nil?
           raise ObjectNotFoundException(Page, id)
         end
-        @@cache[id] = Page.new(id, title, order, layout, site)
+
+        site = Site.find(row[:site_id])
+        @@cache[id] = Page.new(id, row[:title], row[:order].to_i, row[:layout], site)
       end
       @@cache[id]
     end
@@ -509,11 +457,12 @@ module SakaiInfo
     def self.find_by_site_id(site_id)
       results = []
       site = Site.find(site_id)
-      DB.connect.exec("select page_id, title, site_order, layout " +
-                      "from sakai_site_page where site_id = :site_id " +
-                      "order by site_order", site_id) do |row|
-        @@cache[row[0]] = Page.new(row[0], row[1], row[2].to_i, row[3], site)
-        results << @@cache[row[0]]
+      DB.connect[:sakai_site_page].
+        where(:site_id => site_id).order(:site_order).all.each do |row|
+        @@cache[row[:page_id]] =
+          Page.new(row[:page_id], row[:title], row[:site_order].to_i,
+                   row[:layout], site)
+        results << @@cache[row[:page_id]]
       end
       results
     end
@@ -557,21 +506,19 @@ module SakaiInfo
 
   class PageProperty
     def self.get(page_id, property_name)
-      value = nil
-      DB.connect.exec("select value from sakai_site_page_property " +
-                      "where page_id=:page_id and name=:name", page_id, property_name) do |row|
-        value = row[0].read
+      row = DB.connect[:sakai_site_page_property].
+        filter(:page_id => page_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_page_id(page_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_page_property " +
-                      "where page_id=:page_id", page_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+      DB.connect[:sakai_site_page_property].where(:page_id => page_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
@@ -583,18 +530,15 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        tool_id = title = registration = page_order = layout_hints = page = nil
-        DB.connect.exec("select tool_id, title, registration, page_order, " +
-                        "layout_hints, page_id " +
-                        "from sakai_site_tool where tool_id = :tool_id", id) do |row|
-          tool_id, title, registration, page_order_s, layout_hints, page_id = *row
-          page_order = page_order_s.to_i
-          page = Page.find(page_id)
-        end
-        if tool_id.nil?
+        row = DB.connect[:sakai_site_tool].where(:tool_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Tool, id)
         end
-        @@cache[id] = Tool.new(tool_id, title, registration, page_order, layout_hints, page)
+
+        page = Page.find(row[:page_id])
+        @@cache[id] =
+          Tool.new(id, row[:title], row[:registration], row[:page_order].to_i,
+                   row[:layout_hints], page)
       end
       @@cache[id]
     end
@@ -602,11 +546,12 @@ module SakaiInfo
     def self.find_by_page_id(page_id)
       results = []
       page = Page.find(page_id)
-      DB.connect.exec("select tool_id, title, registration, page_order, layout_hints " +
-                      "from sakai_site_tool where page_id = :page_id " +
-                      "order by page_order", page_id) do |row|
-        @@cache[row[0]] = Tool.new(row[0], row[1], row[2], row[3].to_i, row[4], page)
-        results << @@cache[row[0]]
+      DB.connect[:sakai_site_tool].
+        where(:page_id => page_id).order(:page_order).all.each do |row|
+        @@cache[row[:tool_id]] =
+          Tool.new(row[:tool_id], row[:title], row[:registration], row[:page_order].to_i,
+                   row[:layout_hints], page)
+        results << @@cache[row[:tool_id]]
       end
       results
     end
@@ -657,22 +602,19 @@ module SakaiInfo
 
   class ToolProperty
     def self.get(tool_id, property_name)
-      value = nil
-      DB.connect.exec("select value from sakai_site_tool_property " +
-                      "where tool_id=:tool_id and name=:name",
-                      tool_id, property_name) do |row|
-        value = row[0].read
+      row = DB.connect[:sakai_site_tool_property].
+        filter(:tool_id => tool_id, :name => property_name).first
+      if row.nil?
+        nil
+      else
+        row[:value].read
       end
-      return value
     end
 
     def self.find_by_tool_id(tool_id)
       properties = {}
-      DB.connect.exec("select name, value from sakai_site_tool_property " +
-                      "where tool_id=:tool_id", tool_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+      DB.connect[:sakai_site_tool_property].where(:tool_id => tool_id).all.each do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
@@ -689,26 +631,26 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       results = []
-      DB.connect.exec("select srrg.user_id, srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = sr.realm_key " +
-                      "and sr.realm_id = '/site/'||:site_id", site_id) do |row|
-        results << SiteMembership.new(site_id, row[0], row[1])
+      DB.connect.fetch("select srrg.user_id, srr.role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = sr.realm_key " +
+                       "and sr.realm_id = '/site/' || ? ", site_id) do |row|
+        results << SiteMembership.new(site_id, row[:user_id], row[:role_name])
       end
       results
     end
 
     def self.find_by_user_id(user_id)
       results = []
-      DB.connect.exec("select substr(sr.realm_id,7), srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = sr.realm_key " +
-                      "and srrg.user_id = :1 " +
-                      "and sr.realm_id like '/site/%' " +
-                      "and sr.realm_id not like '%/group/%'", user_id) do |row|
-        results << SiteMembership.new(row[0], user_id, row[1])
+      DB.connect.fetch("select substr(sr.realm_id,7) as site_id, srr.role_name as role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = sr.realm_key " +
+                       "and srrg.user_id = ? " +
+                       "and sr.realm_id like '/site/%' " +
+                       "and sr.realm_id not like '%/group/%'", user_id) do |row|
+        results << SiteMembership.new(row[:site_id], user_id, row[:role_name])
       end
       results
     end

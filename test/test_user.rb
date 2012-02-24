@@ -41,8 +41,8 @@ class UserTest < Test::Unit::TestCase
     assert_respond_to(u, :default_serialization)
     assert_respond_to(u, :object_type_serialization)
     assert_respond_to(u, :summary_serialization)
-    assert_respond_to(u, :membership_serialization)
-    assert_respond_to(u, :question_pools_serialization)
+    assert_respond_to(u, :sites_serialization)
+    assert_respond_to(u, :pools_serialization)
     assert_respond_to(u, :to_yaml)
     assert_respond_to(u, :to_json)
 
@@ -53,6 +53,16 @@ class UserTest < Test::Unit::TestCase
     assert_equal(u.type, Data["type"])
     assert_equal(u.created_at, Data["created_at"])
     assert_equal(u.modified_at, Data["modified_at"])
+  end
+
+  # test CLI automation interface
+  def test_cli_automation_interface
+    assert_respond_to(SakaiInfo::User, :all_serializations)
+    u = fetch_user_object
+    SakaiInfo::User.all_serializations.each do |s|
+      method_name = "#{s.to_s}_serialization".to_sym
+      assert_respond_to(u, method_name)
+    end
   end
 
   # test serializations

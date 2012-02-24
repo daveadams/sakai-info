@@ -19,8 +19,14 @@ Gem::Specification.new do |spec|
   spec.author = "David Adams"
   spec.email = "daveadams@gmail.com"
   spec.homepage = "https://github.com/daveadams/sakai-info"
+  spec.license = "Public Domain"
 
   spec.files = Dir["lib/**/*.rb"] + ["bin/sakai-info"] + %w(README.md LICENSE CHANGELOG.md ROADMAP.md)
+  spec.bindir = "bin"
   spec.executables = ["sakai-info"]
+
+  spec.add_dependency('sequel')
+
+  spec.add_development_dependency('sqlite3')
 end
 
