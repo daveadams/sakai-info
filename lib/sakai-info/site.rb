@@ -17,24 +17,25 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        site_id = title = type = created_at = created_by_user_id =
-          modified_at = modified_by_user_id = joinable = join_role = nil
-        DB.connect.exec("select site_id, title, type, " +
-                        "createdby, to_char(createdon,'YYYY-MM-DD HH24:MI:SS'), " +
-                        "modifiedby, to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS'), " +
-                        "joinable, join_role " +
-                        "from sakai_site where site_id = :site_id", id) do |row|
-          site_id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable_n, join_role = *row
-          if joinable_n.to_i == 1
-            joinable = true
-          else
-            joinable = false
-          end
-        end
-        if site_id.nil?
+        db = DB.connect
+        row = db.fetch("select site_id, title, type, " +
+                       "createdby,  modifiedby, " +
+                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
+                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
+                       "joinable, join_role " +
+                       "from sakai_site where site_id=?", id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Site, id)
         end
-        @@cache[id] = Site.new(id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable, join_role)
+
+        joinable = false
+        if row[:joinable].to_i == 1
+          joinable = true
+        end
+
+        @@cache[id] = Site.new(id, row[:title], row[:type], row[:createdby],
+                               row[:created_at], row[:modifiedby], row[:modified_at],
+                               joinable, row[:join_role])
       end
       @@cache[id]
     end
@@ -84,13 +85,8 @@ module SakaiInfo
     end
 
     def user_count
-      if @user_count.nil?
-        DB.connect.exec("select count(*) from sakai_site_user " +
-                        "where site_id=:siteid", @id) do |row|
-          @user_count = row[0].to_i
-        end
-      end
-      @user_count
+      @user_count ||=
+        DB.connect[:sakai_site_user].filter(:site_id => @id).count
     end
 
     def page_count
@@ -437,9 +433,9 @@ module SakaiInfo
     def self.get(site_id, property_name)
       value = nil
       DB.connect.exec("select value from sakai_site_property " +
-                      "where site_id=:site_id and name=:name",
+                      "where site_id=? and name=?",
                       site_id, property_name) do |row|
-        value = row[0].read
+        value = row[:value].read
       end
       return value
     end
@@ -447,10 +443,8 @@ module SakaiInfo
     def self.find_by_site_id(site_id)
       properties = {}
       DB.connect.exec("select name, value from sakai_site_property " +
-                      "where site_id=:site_id", site_id) do |row|
-        name = row[0]
-        value = row[1].read
-        properties[name] = value
+                      "where site_id=?", site_id) do |row|
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end
@@ -672,26 +666,26 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       results = []
-      DB.connect.exec("select srrg.user_id, srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = sr.realm_key " +
-                      "and sr.realm_id = '/site/'||:site_id", site_id) do |row|
-        results << SiteMembership.new(site_id, row[0], row[1])
+      DB.connect.fetch("select srrg.user_id, srr.role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = sr.realm_key " +
+                       "and sr.realm_id = '/site/' || ? ", site_id) do |row|
+        results << SiteMembership.new(site_id, row[:user_id], row[:role_name])
       end
       results
     end
 
     def self.find_by_user_id(user_id)
       results = []
-      DB.connect.exec("select substr(sr.realm_id,7), srr.role_name " +
-                      "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
-                      "where srrg.role_key = srr.role_key " +
-                      "and srrg.realm_key = sr.realm_key " +
-                      "and srrg.user_id = :1 " +
-                      "and sr.realm_id like '/site/%' " +
-                      "and sr.realm_id not like '%/group/%'", user_id) do |row|
-        results << SiteMembership.new(row[0], user_id, row[1])
+      DB.connect.fetch("select substr(sr.realm_id,7) as site_id, srr.role_name as role_name " +
+                       "from sakai_realm_rl_gr srrg, sakai_realm_role srr, sakai_realm sr " +
+                       "where srrg.role_key = srr.role_key " +
+                       "and srrg.realm_key = sr.realm_key " +
+                       "and srrg.user_id = ? " +
+                       "and sr.realm_id like '/site/%' " +
+                       "and sr.realm_id not like '%/group/%'", user_id) do |row|
+        results << SiteMembership.new(row[:site_id], user_id, row[:role_name])
       end
       results
     end
