@@ -196,8 +196,8 @@ module SakaiInfo
 
     def size_on_disk
       @size_on_disk ||=
-        DB.connect[:content_resource].select{sum(:file_size).as(:total_size)}.
-        where(:resource_id.like('#{@id}%')).first[:total_size].to_i
+        DB.connect[:content_resource].select(:sum.sql_function(:file_size).as(:total_size)).
+        where(:resource_id.like("#{@id}%")).first[:total_size].to_i
     end
 
     def children
