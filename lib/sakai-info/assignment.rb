@@ -40,7 +40,7 @@ module SakaiInfo
     def self.find_by_site_id(site_id)
       assignments = []
       site = Site.find(site_id)
-      DB.connect[:assignment_assignment].filter(:context => site_id) do |row|
+      DB.connect[:assignment_assignment].filter(:context => site_id).all.each do |row|
         id = row[:assignment_id]
         xml = ""
         REXML::Document.new(row[:xml].read).write(xml, 2)
@@ -137,7 +137,7 @@ module SakaiInfo
     def self.find_by_assignment_id(assignment_id)
       submissions = []
       assignment = Assignment.find(assignment_id)
-      DB.connect[:assignment_submission].filter(:context => assignment_id) do |row|
+      DB.connect[:assignment_submission].filter(:context => assignment_id).all.each do |row|
         id = row[:submission_id]
         xml = ""
         REXML::Document.new(row[:xml].read).write(xml, 2)
@@ -156,7 +156,7 @@ module SakaiInfo
     def self.find_by_user_id(user_id)
       submissions = []
       submitter = User.find(user_id)
-      DB.connect[:assignment_submission].filter(:submitter_id => user_id) do |row|
+      DB.connect[:assignment_submission].filter(:submitter_id => user_id).all.each do |row|
         id = row[:submission_id]
         assignment = Assignment.find(row[:context])
         xml = ""
@@ -224,7 +224,7 @@ module SakaiInfo
 
     def self.find_by_user_id(user_id)
       contents = []
-      DB.connect[:assignment_content].filter(:context => user_id) do |row|
+      DB.connect[:assignment_content].filter(:context => user_id).all.each do |row|
         id = row[:content_id]
         context = row[:context]
         xml = ""
