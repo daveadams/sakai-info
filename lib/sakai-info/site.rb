@@ -90,13 +90,8 @@ module SakaiInfo
     end
 
     def page_count
-      if @page_count.nil?
-        DB.connect.exec("select count(*) from sakai_site_page " +
-                        "where site_id=:siteid", @id) do |row|
-          @page_count = row[0].to_i
-        end
-      end
-      @page_count
+      @page_count ||=
+        DB.connect[:sakai_site_page].filter(:site_id => @id).count
     end
 
     def assignment_count
