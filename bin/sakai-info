@@ -112,8 +112,6 @@ if not db_name.nil?
   DB.default_database = db_name
 end
 
-puts flags.inspect
-
 if mode == "user"
   case args[0]
   when "count" then
