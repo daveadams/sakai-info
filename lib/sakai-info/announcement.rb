@@ -2,7 +2,7 @@
 #   SakaiInfo::Announcement library
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-02-24 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -18,19 +18,16 @@ module SakaiInfo
 
     def self.find(id)
       if @@cache[id].nil?
-        next_id = nil
         xml = ""
-        DB.connect.exec("select next_id, xml from announcement_channel " +
-                        "where channel_id = :id", id) do |row|
-          nextid = row[0].to_i
-          REXML::Document.new(row[1].read).write(xml, 2)
-        end
-        if nextid.nil?
+        row = DB.connect[:announcement_channel].filter(:channel_id => id).first
+        if row.nil?
           raise ObjectNotFoundException.new(AnnouncementChannel, id)
         end
-        new_announcement = AnnouncementChannel.new(id, nextid, xml)
-        @@cache[id] = new_announcement
-        @@site_cache[new_announcement.site_id] = new_announcement
+        nextid = row[:next_id].to_i
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        channel = AnnouncementChannel.new(id, nextid, xml)
+        @@cache[id] = channel
+        @@site_cache[channel.site_id] = channel
       end
       @@cache[id]
     end
@@ -91,22 +88,21 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        channel = draft = pubview = owner = date = nil
         xml = ""
-        DB.connect.exec("select channel_id, draft, pubview, owner, " +
-                        "to_char(message_date,'YYYY-MM-DD HH24:MI:SS'), xml " +
-                        "from announcement_message " +
-                        "where message_id = :id", id) do |row|
-          channel = AnnouncementChannel.find(row[0])
-          draft = row[1]
-          pubview = row[2]
-          owner = User.find(row[3])
-          date = row[4]
-          REXML::Document.new(row[5].read).write(xml, 2)
-        end
-        if date.nil?
+        row = DB.connect.fetch("select channel_id, draft, pubview, owner, xml, " +
+                               "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as date " +
+                               "from announcement_message " +
+                               "where message_id = ?", id).first
+        if row.nil?
           raise ObjectNotFoundException.new(Announcement, id)
         end
+
+        channel = AnnouncementChannel.find(row[:channel_id])
+        draft = row[:draft]
+        pubview = row[:pubview]
+        owner = User.find(row[:owner])
+        date = row[:date]
+        REXML::Document.new(row[:xml].read).write(xml, 2)
         @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
       end
       @@cache[id]
@@ -129,17 +125,17 @@ module SakaiInfo
       announcements = []
       channel = AnnouncementChannel.find(channel_id)
 
-      DB.connect.exec("select message_id, draft, pubview, owner, " +
-                      "to_char(message_date,'YYYY-MM-DD HH24:MI:SS'), xml " +
-                      "from announcement_message " +
-                      "where channel_id = :channel_id", channel_id) do |row|
+      DB.connect.fetch("select message_id, draft, pubview, owner, xml, " +
+                       "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as date " +
+                       "from announcement_message " +
+                       "where channel_id = ?", channel_id) do |row|
         xml = ""
-        id = row[0]
-        draft = row[1]
-        pubview = row[2]
-        owner = User.find(row[3])
-        date = row[4]
-        REXML::Document.new(row[5].read).write(xml, 2)
+        id = row[:message_id]
+        draft = row[:draft]
+        pubview = row[:pubview]
+        owner = User.find(row[:owner])
+        REXML::Document.new(row[:xml].read).write(xml, 2)
+        date = row[:date]
 
         @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
         announcements << @@cache[id]
