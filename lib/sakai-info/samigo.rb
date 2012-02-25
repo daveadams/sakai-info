@@ -10,7 +10,7 @@
 #
 
 module SakaiInfo
-  class PendingQuiz < SakaiObject
+  class Quiz < SakaiObject
     attr_reader :title, :site
 
     def initialize(id, title, site)
@@ -19,6 +19,40 @@ module SakaiInfo
       @site = site
     end
 
+    @@cache = {}
+    def self.find(id)
+      if @@cache[id].nil?
+        quiz = nil
+        begin
+          quiz = PendingQuiz.find(id)
+        rescue ObjectNotFoundException
+          begin
+            quiz = PublishedQuiz.find(id)
+          rescue ObjectNotFoundException
+            raise ObjectNotFoundException.new(Quiz, id)
+          end
+        end
+        @@cache[id] = quiz
+      end
+      @@cache[id]
+    end
+
+    def self.find_by_site_id(site_id)
+      {
+        "pending" => PendingQuiz.find_by_site_id(site_id),
+        "published" => PublishedQuiz.find_by_site_id(site_id)
+      }
+    end
+
+    def self.count_by_site_id(site_id)
+      {
+        "pending_count" => PendingQuiz.count_by_site_id(site_id),
+        "published_count" => PublishedQuiz.count_by_site_id(site_id)
+      }
+    end
+  end
+
+  class PendingQuiz < Quiz
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
@@ -55,7 +89,8 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "site_id" => self.site.id
+        "site_id" => self.site.id,
+        "status" => "pending"
       }
     end
 
@@ -67,15 +102,7 @@ module SakaiInfo
     end
   end
 
-  class PublishedQuiz < SakaiObject
-    attr_reader :title, :site
-
-    def initialize(id, title, site)
-      @id = id
-      @title = title
-      @site = site
-    end
-
+  class PublishedQuiz < Quiz
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
@@ -113,7 +140,8 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "site_id" => self.site.id
+        "site_id" => self.site.id,
+        "status" => "published"
       }
     end
 
