@@ -327,7 +327,7 @@ module SakaiInfo
       end
       if self.published_quiz_count > 0
         result["quizzes"]["published"] =
-          self.pending_quizzes.collect { |pq| pq.serialize(:summary) }
+          self.published_quizzes.collect { |pq| pq.serialize(:summary) }
       end
       result
     end
