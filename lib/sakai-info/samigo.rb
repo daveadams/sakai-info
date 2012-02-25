@@ -65,13 +65,19 @@ module SakaiInfo
       @@cache[id]
     end
 
+    def self.query_by_site_id(site_id)
+      db = DB.connect
+      db[:sam_assessmentbase_t].
+        where(:id =>
+              db[:sam_authzdata_t].select(:qualifierid).
+              where(:agentid => site_id,
+                    :functionid => "EDIT_ASSESSMENT"))
+    end
+
     def self.find_by_site_id(site_id)
       results = []
       site = Site.find(site_id)
-      DB.connect.fetch("select id, title from sam_assessmentbase_t " +
-                       "where id in (select qualifierid from sam_authzdata_t " +
-                       "where agentid=? and functionid='EDIT_ASSESSMENT')",
-                       site_id) do |row|
+      PendingQuiz.query_by_site_id(site_id).all.each do |row|
         @@cache[row[:id]] = PendingQuiz.new(row[:id].to_i, row[:title], site)
         results << @@cache[row[:id]]
       end
@@ -79,10 +85,7 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect.fetch("select count(*) as count from sam_assessmentbase_t " +
-                       "where id in (select qualifierid from sam_authzdata_t " +
-                       "where agentid=? and functionid='EDIT_ASSESSMENT')",
-                       site_id).first[:count].to_i
+      PendingQuiz.query_by_site_id(site_id).count
     end
 
     def default_serialization
@@ -116,13 +119,19 @@ module SakaiInfo
       @@cache[id]
     end
 
+    def self.query_by_site_id(site_id)
+      db = DB.connect
+      db[:sam_publishedassessment_t].
+        where(:id =>
+              db[:sam_authzdata_t].select(:qualifierid).
+              where(:agentid => site_id,
+                    :functionid => "OWN_PUBLISHED_ASSESSMENT"))
+    end
+
     def self.find_by_site_id(site_id)
       results = []
       site = Site.find(site_id)
-      DB.connect.fetch("select id, title from sam_publishedassessment_t " +
-                       "where id in (select qualifierid from sam_authzdata_t " +
-                       "where agentid=? and functionid='OWN_PUBLISHED_ASSESSMENT')",
-                       site_id) do |row|
+      PublishedQuiz.query_by_site_id(site_id).all.each do |row|
         @@cache[row[:id]] = PublishedQuiz.new(row[:id].to_i, row[:title], site)
         results << @@cache[row[:id]]
       end
@@ -130,10 +139,7 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect.fetch("select count(*) as count from sam_publishedassessment_t " +
-                       "where id in (select qualifierid from sam_authzdata_t " +
-                       "where agentid=? and functionid='OWN_PUBLISHED_ASSESSMENT')",
-                       site_id).first[:count].to_i
+      PublishedQuiz.query_by_site_id(site_id).count
     end
 
     def default_serialization
