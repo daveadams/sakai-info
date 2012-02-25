@@ -2,7 +2,7 @@
 #   SakaiInfo::Samigo library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -45,7 +45,7 @@ module SakaiInfo
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect.fetch("select count(*) as count from sam_publishedassessment_t " +
+      DB.connect.fetch("select count(*) as count from sam_assessmentbase_t " +
                        "where id in (select qualifierid from sam_authzdata_t " +
                        "where agentid=? and functionid='EDIT_ASSESSMENT')",
                        site_id).first[:count].to_i
