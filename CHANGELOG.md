@@ -1,5 +1,12 @@
 # sakai-info Change History #
 
+## 0.2.1 ##
+
+*Released 2012-02-25*
+
+* Bugfix: pending quiz count was reporting incorrect numbers
+* Bugfix: published quiz list was actually listing pending quizzes
+
 ## 0.2.0 ##
 
 *Released 2012-02-24*
