@@ -2,7 +2,7 @@
 #   SakaiInfo::Database library
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -79,7 +79,8 @@ module SakaiInfo
                          end
                        else
                          @@config[database_name]
-                       end)
+                       end,
+                       @@logger)
       end
       @@databases[database_name].connect
     end
@@ -87,11 +88,26 @@ module SakaiInfo
     def self.default_database=(database_name)
       @@default_database_name = database_name
     end
+
+    # set global logger
+    @@logger = nil
+    def self.logger=(logger)
+      @@logger = logger
+
+      # also force it on any existing database connections
+      @@databases.each do |name, dbconn|
+        puts "updating #{name}"
+        puts dbconn.class
+        dbconn.logger = @@logger
+        puts dbconn.connect.loggers.inspect
+      end
+    end
   end
 
   class Database
-    def initialize(connection_string)
+    def initialize(connection_string, logger = nil)
       @connection_string = connection_string.to_s
+      @logger = logger
     end
 
     def connect
@@ -105,6 +121,17 @@ module SakaiInfo
         @connection = nil
         raise ConnectionFailureException.new("Could not connect: #{e}")
       end
+
+      if not @logger.nil?
+        @connection.logger = @logger
+      end
+
+      return @connection
+    end
+
+    def logger=(logger)
+      @logger = logger
+      @connection.logger = @logger
     end
 
     def alive?

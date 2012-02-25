@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -14,6 +14,7 @@ require 'json'
 require 'rexml/document'
 require 'base64'
 require 'sequel'
+require 'logger'
 
 require 'sakai-info/version'
 
