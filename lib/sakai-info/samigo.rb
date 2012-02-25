@@ -11,12 +11,27 @@
 
 module SakaiInfo
   class Quiz < SakaiObject
-    attr_reader :title, :site
+    attr_reader :title, :site, :dbrow
 
-    def initialize(id, title, site)
-      @id = id
-      @title = title
-      @site = site
+    def initialize(row, site = nil)
+      @site = nil
+      if site.is_a? String
+        begin
+          @site = Site.find(site)
+        rescue ObjectNotFoundException
+          @site = nil
+        end
+      elsif site.is_a? Site
+        @site = site
+      end
+
+      if @site.nil?
+        # TODO: lookup site via other tables
+      end
+
+      @id = row[:id]
+      @title = row[:title]
+      @dbrow = row
     end
 
     @@cache = {}
@@ -55,12 +70,12 @@ module SakaiInfo
   class PendingQuiz < Quiz
     @@cache = {}
     def self.find(id)
-      if @@cache[id].nil?
-        row = DB.connect[:sam_assessmentbase_t].filter(:id => id).first
+      if @@cache[id.to_s].nil?
+        row = DB.connect[:sam_assessmentbase_t].filter(:id => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(PendingQuiz, id)
         end
-        @@cache[id] = PendingQuiz.new(id, row[0], Site.find(row[1]))
+        @@cache[id] = PendingQuiz.new(row)
       end
       @@cache[id]
     end
@@ -76,9 +91,8 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       results = []
-      site = Site.find(site_id)
       PendingQuiz.query_by_site_id(site_id).all.each do |row|
-        @@cache[row[:id]] = PendingQuiz.new(row[:id].to_i, row[:title], site)
+        @@cache[row[:id]] = PendingQuiz.new(row, site_id)
         results << @@cache[row[:id]]
       end
       results
@@ -92,7 +106,7 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "site_id" => self.site.id,
+        # "site_id" => self.site.id,
         "status" => "pending"
       }
     end
@@ -108,13 +122,13 @@ module SakaiInfo
   class PublishedQuiz < Quiz
     @@cache = {}
     def self.find(id)
-      if @@cache[id].nil?
-        row = DB.connect[:sam_publishedassessment_t].filter(:id => id).first
+      if @@cache[id.to_s].nil?
+        row = DB.connect[:sam_publishedassessment_t].filter(:id => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(PublishedQuiz, id)
         end
 
-        @@cache[id] = PublishedQuiz.new(id, row[:title], Site.find(row[:agent_id]))
+        @@cache[id] = PublishedQuiz.new(row)
       end
       @@cache[id]
     end
@@ -130,9 +144,8 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       results = []
-      site = Site.find(site_id)
       PublishedQuiz.query_by_site_id(site_id).all.each do |row|
-        @@cache[row[:id]] = PublishedQuiz.new(row[:id].to_i, row[:title], site)
+        @@cache[row[:id]] = PublishedQuiz.new(row, site_id)
         results << @@cache[row[:id]]
       end
       results
@@ -146,7 +159,7 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "site_id" => self.site.id,
+        # "site_id" => self.site.id,
         "status" => "published"
       }
     end
