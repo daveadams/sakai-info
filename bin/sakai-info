@@ -5,7 +5,7 @@
 #   sakai-info library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -17,14 +17,17 @@ include SakaiInfo
 
 require 'sakai-info/cli'
 
-ObjectModes = {
-  "site" => Site,
-  "user" => User
-}
-
 flags = []
 args = []
 db_name = nil
+logfile = nil
+
+__trace = proc { |event, file, line, id, binding, classname|
+  if %w(call raise return).include? event
+    t = Time.now
+    printf "%s.%06d %-8s %-25s %-10s .%-10s\n", t.strftime("%H:%M:%S"), t.usec, event, File.basename(file) + ":#{line}", classname, id
+  end
+}
 
 while arg = ARGV.shift
   if arg =~ /^-/
@@ -32,6 +35,10 @@ while arg = ARGV.shift
       db_name = ARGV.shift
     elsif arg =~ /^--database=/
       db_name = arg.split("=")[1]
+    elsif arg =~ /^--log(file)?=/
+      logfile = arg.split("=")[1]
+    elsif arg == "--trace"
+      set_trace_func __trace
     else
       flags << arg
     end
@@ -99,7 +106,7 @@ when "test" then
 
 else
   # test to see if it's an accepted object mode
-  if ObjectModes.keys.include? args[0]
+  if CLI::ObjectModes.keys.include? args[0]
     mode = args.shift
     id = args.shift
 
@@ -110,6 +117,19 @@ else
   end
 end
 
+# set up a logger if specified
+logger = nil
+if not logfile.nil?
+  if logfile == "-"
+    logfile = STDOUT
+  end
+  logger = Logger.new(logfile)
+  logger.formatter = proc do |level, timestamp, progname, msg|
+    "#{timestamp.strftime("%Y-%m-%d %H:%M:%S")} #{msg}\n"
+  end
+end
+DB.logger = logger
+
 # load database config and set instance to the instance given on the command line
 DB.load_config
 if not db_name.nil?
@@ -117,12 +137,15 @@ if not db_name.nil?
 end
 
 if flags.include? "--all"
-  serials = ObjectModes[mode].all_serializations
+  serials = CLI::ObjectModes[mode].all_serializations
+elsif
+  flags.include? "--dbrow-only"
+  serials = [:dbrow]
 else
   serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').to_sym}
 end
 begin
-  puts ObjectModes[mode].find(id).to_yaml(serials)
+  puts CLI::ObjectModes[mode].find(id).to_yaml(serials)
 rescue ObjectNotFoundException
   STDERR.puts "ERROR: Could not find #{mode} with an ID of '#{id}'"
   exit 1

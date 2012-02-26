@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-23 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,4 +10,18 @@
 #
 
 require 'sakai-info/cli/help'
+
+module SakaiInfo
+  class CLI
+    ObjectModes = {
+      "site" => Site,
+      "user" => User,
+      "quiz" => Quiz,
+      "quiz-section" => QuizSection,
+      "quiz-item" => QuizItem,
+      "qpool" => QuestionPool,
+      "question-pool" => QuestionPool,
+    }
+  end
+end
 

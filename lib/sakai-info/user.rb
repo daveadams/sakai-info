@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -84,11 +84,7 @@ module SakaiInfo
     end
 
     def question_pool_count
-      if @question_pools.nil?
-        QuestionPool.count_by_user_id(@id)
-      else
-        @question_pools.length
-      end
+      @question_pool_count ||= QuestionPool.count_by_user_id(@id)
     end
 
     def assignment_submissions
