@@ -11,14 +11,23 @@
 
 module SakaiInfo
   class QuestionPool < SakaiObject
-    attr_reader :title, :owner, :dbrow
+    attr_reader :title, :owner, :description, :dbrow
+    attr_reader :created_by, :modified_by, :created_at, :modified_at
 
     def initialize(dbrow)
       @dbrow = dbrow
 
       @id = dbrow[:questionpoolid]
       @title = dbrow[:title]
+      @description = dbrow[:description]
       @owner = User.find(dbrow[:ownerid])
+      @parent_id = dbrow[:parentpoolid]
+
+      @created_at = dbrow[:datecreated]
+      @created_by = @owner
+
+      @modified_at = dbrow[:lastmodifieddate]
+      @modified_by = User.find(dbrow[:lastmodifiedby])
     end
 
     @@cache = {}
@@ -82,6 +91,15 @@ module SakaiInfo
     def dbrow_serialization
       {
         "dbrow" => self.dbrow
+      }
+    end
+
+    def mod_serialization
+      {
+        "created_by" => self.created_by.serialize(:summary),
+        "created_at" => self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "modified_by" => self.modified_by.serialize(:summary),
+        "modified_at" => self.modified_at.strftime("%Y-%m-%d %H:%M:%S")
       }
     end
   end

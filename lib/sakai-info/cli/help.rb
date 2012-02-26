@@ -126,6 +126,7 @@ sakai-info qpool
   Prints information about the question pool ID specified. Additional options
   may be passed to include additional information:
 
+    --mod      Print creation/modification info
     --dbrow    Print the raw database fields
 
   Not yet implemented:
