@@ -12,52 +12,51 @@
 module SakaiInfo
   module ModProps
     def self.included(klass)
-      klass.module_eval {
-        @@mod_props_keys = {
-          :created_at => :createdon,
-          :created_by => :createdby,
-          :modified_at => :modifiedon,
-          :modified_by => :modifiedby
-        }
+      klass.class_eval {
+        # defaults based on User and Site objects
+        def get_created_at_key; :createdon; end
+        def get_created_by_key; :createdby; end
+        def get_modified_at_key; :modifiedon; end
+        def get_modified_by_key; :modifiedby; end
 
         def self.created_at_key(newkey)
-          @@mod_props_keys[:created_at] = newkey
+          self.class_eval("def get_created_at_key; :#{newkey}; end")
         end
 
         def self.created_by_key(newkey)
-          @@mod_props_keys[:created_by] = newkey
+          self.class_eval("def get_created_by_key; :#{newkey}; end")
         end
 
         def self.modified_at_key(newkey)
-          @@mod_props_keys[:modified_at] = newkey
+          self.class_eval("def get_modified_at_key; :#{newkey}; end")
         end
 
         def self.modified_by_key(newkey)
-          @@mod_props_keys[:modified_by] = newkey
+          self.class_eval("def get_modified_by_key; :#{newkey}; end")
         end
 
         def created_by_id
-          self.dbrow[@@mod_props_keys[:created_by]]
+          @dbrow[self.get_created_by_key]
         end
 
         def created_by
-          @created_by ||= User.find(@dbrow[@@mod_props_keys[:created_by]])
+          User.find(self.created_by_id)
         end
 
         def created_at
-          @dbrow[@@mod_props_keys[:created_at]]
-        end
-
-        def modified_by
-          @modified_by ||= User.find(@dbrow[@@mod_props_keys[:modified_by]])
+          @dbrow[self.get_created_at_key]
         end
 
         def modified_by_id
-          @dbrow[@@mod_props_keys[:modified_by]]
+          @dbrow[self.get_modified_by_key]
+        end
+
+        def modified_by
+          User.find(self.modified_by_id)
         end
 
         def modified_at
-          @dbrow[@@mod_props_keys[:modified_at]]
+          @dbrow[self.get_modified_at_key]
         end
 
         def mod_serialization
