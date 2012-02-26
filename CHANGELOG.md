@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+## 0.3.0 ##
+
+*Released 2012-02-26*
+
+* Support for new object types: question-pool, quiz, quiz-section, quiz-item
+* New CLI options for logging and trace-debugging
+* New object abstraction patterns allow for --dbrow and --mod options
+
 ## 0.2.1 ##
 
 *Released 2012-02-25*

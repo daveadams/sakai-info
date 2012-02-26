@@ -1,16 +1,36 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-02-24*
+*Last updated 2012-02-26*
 
-### 0.3 ###
+### 0.3.1  ###
 
-* CLI access to more objects, eg quizzes, tools, assignments, and groups
+* CLI access to assignments
+
+### 0.3.2 ###
+
+* CLI access to groups
+
+### 0.3.3 ###
+
+* CLI access to pages and tools
+
+### 0.3.4 ###
+
+* CLI access to forums
+
+### 0.4 ###
+
+* Standardized abstraction for user and site to support --mod and --dbrow
 * Sqlite test infrastructure for a few basic objects
 
 ### 0.5 ###
 
 * Test fixtures and basic unit tests for all represented objects
 * RDoc coverage for every class
+
+### 0.6 ###
+
+* Basic OSP support
 
 ------
 
@@ -36,4 +56,5 @@ Other things on the wishlist for future releases:
 * Additional tools
   * httpd log analysis helper
   * RPC client for Sakai-monitoring servlet
+  * schema analysis and generators
 
