@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -26,11 +26,8 @@ module SakaiInfo
       serialization = {}
       q.each do |sub|
         sub_method_name = (sub.to_s + "_serialization").to_sym
-        begin
-          sub_method = self.method(sub_method_name)
-          serialization = serialization.merge(sub_method.call)
-        rescue NameError
-          # ignore any missing serialization patterns
+        if self.respond_to? sub_method_name
+          serialization = serialization.merge(self.method(sub_method_name).call)
         end
       end
 
