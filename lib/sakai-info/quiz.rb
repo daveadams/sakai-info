@@ -52,6 +52,7 @@ module SakaiInfo
 
     @@cache = {}
     def self.find(id)
+      id = id.to_s
       if @@cache[id].nil?
         quiz = nil
         begin
@@ -86,15 +87,20 @@ module SakaiInfo
       nil
     end
 
+    def section_count
+      @section_count ||= QuizSection.count_by_quiz_id(@id)
+    end
+
     def default_serialization
       result = {
         "id" => self.id,
         "title" => self.title,
         "site" => nil,
-        "type" => self.quiz_type
+        "type" => self.quiz_type,
+        "section_count" => self.section_count
       }
       if not self.site.nil?
-        result["site_id"] = self.site.serialize(:summary)
+        result["site"] = self.site.serialize(:summary)
       end
       result
     end
@@ -205,5 +211,81 @@ module SakaiInfo
     def quiz_type
       "published"
     end
+  end
+
+  class QuizSection < SakaiObject
+    attr_reader :dbrow, :quiz, :sequence, :title, :description, :typeid, :status
+
+    include ModProps
+    created_by_key :createdby
+    created_at_key :createddate
+    modified_by_key :lastmodifiedby
+    modified_at_key :lastmodifieddate
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:sectionid]
+      @quiz = Quiz.find(dbrow[:assessmentid])
+      @sequence = dbrow[:sequence]
+      @title = dbrow[:title]
+      @description = dbrow[:description]
+      @typeid = dbrow[:typeid]
+      @status = dbrow[:status]
+    end
+
+    def self.find(id)
+      quiz = nil
+      begin
+        quiz = PendingQuizSection.find(id)
+      rescue ObjectNotFoundException
+        begin
+          quiz = PublishedQuizSection.find(id)
+        rescue ObjectNotFoundException
+          raise ObjectNotFoundException(QuizSection, id)
+        end
+      end
+      quiz
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      table = if Quiz.find(quiz_id).quiz_type == "pending"
+                :sam_section_t
+              else
+                :sam_publishedsection_t
+              end
+      DB.connect[table].where(:assessmentid => quiz_id).order(:sequence)
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      section_class = if Quiz.find(quiz_id).quiz_type == "pending"
+                        PendingQuizSection
+                      else
+                        PublishedQuizSection
+                      end
+
+      QuizSection.query_by_quiz_id(quiz_id).all.collect do |row|
+        results << section_class.new(row)
+      end
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      QuizSection.query_by_quiz_id(quiz_id).count
+    end
+  end
+
+  class PendingQuizSection < QuizSection
+  end
+
+  class PublishedQuizSection < QuizSection
+  end
+
+  class QuizItem < SakaiObject
+  end
+
+  class PendingQuizItem < QuizItem
+  end
+
+  class PublishedQuizItem < QuizItem
   end
 end
