@@ -2,7 +2,7 @@
 #   SakaiInfo::Samigo library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-25 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -210,31 +210,32 @@ module SakaiInfo
   class QuestionPool < SakaiObject
     attr_reader :title, :owner
 
-    def initialize(id, title, owner)
-      @id = id
-      @title = title
-      @owner = owner
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:questionpoolid]
+      @title = dbrow[:title]
+      @owner = User.find(dbrow[:ownerid])
     end
 
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        row = DB.connect[:sam_questionpool_t].filter(:id => id).first
+        row = DB.connect[:sam_questionpool_t].filter(:questionpoolid => id).first
         if row.nil?
           raise ObjectNotFoundException.new(QuestionPool, id)
         end
-        @@cache[id] = QuestionPool.new(id, row[:title], User.find(row[:owner_id]))
+        @@cache[id] = QuestionPool.new(row)
       end
       @@cache[id]
     end
 
     def self.find_by_user_id(user_id)
       results = []
-      user = User.find(user_id)
       DB.connect[:sam_questionpool_t].filter(:ownerid => user_id).all.each do |row|
-        @@cache[row[:questionpoolid]] =
-          QuestionPool.new(row[:questionpoolid].to_i, row[:title], user)
-        results << @@cache[row[:questionpoolid]]
+        id = row[:questionpoolid]
+        @@cache[id] = QuestionPool.new(row)
+        results << @@cache[id]
       end
       results
     end
@@ -272,6 +273,12 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "item_count" => self.item_count
+      }
+    end
+
+    def dbrow_serialization
+      {
+        "dbrow" => self.dbrow
       }
     end
   end
