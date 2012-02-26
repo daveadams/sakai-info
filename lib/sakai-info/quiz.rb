@@ -334,11 +334,68 @@ module SakaiInfo
   end
 
   class QuizItem < SakaiObject
+    attr_reader :dbrow, :section, :sequence, :typeid
+
+    include ModProps
+    created_by_key :createdby
+    created_at_key :createddate
+    modified_by_key :lastmodifiedby
+    modified_at_key :lastmodifieddate
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:itemid]
+      @section = QuizSection.find(dbrow[:sectionid])
+      @sequence = dbrow[:sequence]
+      @typeid = dbrow[:typeid]
+    end
+
+    def self.find(id)
+    end
+
+    def self.query_by_section_id(section_id)
+    end
+
+    def self.count_by_section_id(section_id)
+    end
+
+    def self.find_by_section_id(section_id)
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+    end
+
+    def item_type
+      nil
+    end
+
+    def default_serialization
+      {
+      }
+    end
+
+    def summary_serialization
+      {
+      }
+    end
   end
 
   class PendingQuizItem < QuizItem
+    def item_type
+      "pending"
+    end
   end
 
   class PublishedQuizItem < QuizItem
+    def item_type
+      "published"
+    end
   end
 end
