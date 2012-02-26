@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-19 daveadams@gmail.com
+# Last updated 2012-02-26 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -30,10 +30,13 @@ sakai-info #{VERSION}
     version      Prints version
 
   Options that apply to most commands:
-    -D <name>
     --database=<name>
         Connect to database instance <name> as defined in ~/.sakai-info instead
         of the default (which is typically the first entry)
+
+    --log=<logfile>
+        Log actual SQL statements to <logfile> as they are executed. Use "-"
+        to log to STDOUT.
 
   Type 'sakai-info help <command>' for help on a specific command.
 EOF

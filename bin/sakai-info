@@ -28,6 +28,7 @@ ObjectModes = {
 flags = []
 args = []
 db_name = nil
+logfile = nil
 
 while arg = ARGV.shift
   if arg =~ /^-/
@@ -35,6 +36,8 @@ while arg = ARGV.shift
       db_name = ARGV.shift
     elsif arg =~ /^--database=/
       db_name = arg.split("=")[1]
+    elsif arg =~ /^--log(file)?=/
+      logfile = arg.split("=")[1]
     else
       flags << arg
     end
@@ -112,6 +115,20 @@ else
     exit 1
   end
 end
+
+# set up a logger if specified
+logger = nil
+if not logfile.nil?
+  if logfile == "-"
+    logfile = STDOUT
+  end
+  logger = Logger.new(logfile)
+  logger.datetime_format = "%Y-%m-%d %H:%M:%S"
+  logger.formatter = proc do |level, timestamp, progname, msg|
+    "#{timestamp.sub(/ [-+][0-9]{4}$/,"")} #{msg}\n"
+  end
+end
+DB.logger = logger
 
 # load database config and set instance to the instance given on the command line
 DB.load_config
