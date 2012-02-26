@@ -97,6 +97,10 @@ module SakaiInfo
       @section_count ||= QuizSection.count_by_quiz_id(@id)
     end
 
+    def sections
+      @sections ||= QuizSection.find_by_quiz_id(@id)
+    end
+
     def default_serialization
       result = {
         "id" => self.id,
@@ -128,6 +132,12 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title
+      }
+    end
+
+    def sections_serialization
+      {
+        "sections" => self.sections.collect{|s|s.serialize(:quiz_summary)}
       }
     end
 
@@ -271,19 +281,56 @@ module SakaiInfo
                       end
 
       QuizSection.query_by_quiz_id(quiz_id).all.collect do |row|
-        results << section_class.new(row)
+        section_class.new(row)
       end
     end
 
     def self.count_by_quiz_id(quiz_id)
       QuizSection.query_by_quiz_id(quiz_id).count
     end
+
+    def section_type
+      nil
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+        "quiz" => self.quiz.serialize(:summary),
+        "sequence" => self.sequence,
+        "description" => self.description,
+        "typeid" => self.typeid,
+        "status" => self.status
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+        "quiz_id" => self.quiz.id,
+        "sequence" => self.sequence
+      }
+    end
+
+    def quiz_summary_serialization
+      result = summary_serialization
+      result.delete("quiz_id")
+      result
+    end
   end
 
   class PendingQuizSection < QuizSection
+    def section_type
+      "pending"
+    end
   end
 
   class PublishedQuizSection < QuizSection
+    def section_type
+      "published"
+    end
   end
 
   class QuizItem < SakaiObject
