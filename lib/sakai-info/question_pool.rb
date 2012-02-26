@@ -11,7 +11,7 @@
 
 module SakaiInfo
   class QuestionPool < SakaiObject
-    attr_reader :title, :owner, :description, :dbrow
+    attr_reader :title, :owner, :description, :parent_pool_id, :dbrow
     attr_reader :created_by, :modified_by, :created_at, :modified_at
 
     def initialize(dbrow)
@@ -21,7 +21,8 @@ module SakaiInfo
       @title = dbrow[:title]
       @description = dbrow[:description]
       @owner = User.find(dbrow[:ownerid])
-      @parent_id = dbrow[:parentpoolid]
+      @parent_pool_id = dbrow[:parentpoolid]
+      @parent_pool_id = nil if @parent_pool_id == 0
 
       @created_at = dbrow[:datecreated]
       @created_by = @owner
@@ -61,23 +62,41 @@ module SakaiInfo
         DB.connect[:sam_questionpoolitem_t].filter(:questionpoolid => @id).count
     end
 
+    def parent
+      if not @parent_pool_id.nil?
+        @parent ||= QuestionPool.find(@parent_pool_id)
+      end
+    end
+
     # serialization
     def default_serialization
-      {
+      result = {
         "id" => self.id,
         "title" => self.title,
         "owner" => self.owner.serialize(:summary),
+        "parent" => nil,
         "item_count" => self.item_count
       }
+      if not self.parent.nil?
+        result["parent"] = self.parent.serialize(:summary)
+      else
+        result.delete("parent")
+      end
+      result
     end
 
     def summary_serialization
-      {
+      result = {
         "id" => self.id,
         "title" => self.title,
         "owner_eid" => self.owner.eid,
+        "parent_pool_id" => self.parent_pool_id,
         "item_count" => self.item_count
       }
+      if result["parent_pool_id"].nil?
+        result.delete("parent_pool_id")
+      end
+      result
     end
 
     def user_summary_serialization
