@@ -1,5 +1,5 @@
-# sakai-info/samigo.rb
-#   SakaiInfo::Samigo library
+# sakai-info/quiz.rb
+#   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
 # Last updated 2012-02-26 daveadams@gmail.com

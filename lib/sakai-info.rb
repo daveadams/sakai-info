@@ -86,6 +86,6 @@ require 'sakai-info/content'
 require 'sakai-info/gradebook'
 require 'sakai-info/group'
 require 'sakai-info/message'
-require 'sakai-info/samigo'
+require 'sakai-info/quiz'
 require 'sakai-info/question_pool'
 
