@@ -138,6 +138,9 @@ end
 
 if flags.include? "--all"
   serials = CLI::ObjectModes[mode].all_serializations
+elsif
+  flags.include? "--dbrow-only"
+  serials = [:dbrow]
 else
   serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').to_sym}
 end

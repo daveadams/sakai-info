@@ -42,6 +42,9 @@ sakai-info #{VERSION}
         For development troubleshooting work, this outputs an extremely verbose
         trace log to STDOUT.
 
+    --dbrow-only
+        Print only the raw database fields for the object requested.
+
   Type 'sakai-info help <command>' for help on a specific command.
 EOF
 
