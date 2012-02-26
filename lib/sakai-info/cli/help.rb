@@ -29,7 +29,7 @@ sakai-info #{VERSION}
     help         Prints general help
     version      Prints version
 
-  Options that apply to most commands:
+  Options that apply globally:
     --database=<name>
         Connect to database instance <name> as defined in ~/.sakai-info instead
         of the default (which is typically the first entry)
@@ -37,6 +37,10 @@ sakai-info #{VERSION}
     --log=<logfile>
         Log actual SQL statements to <logfile> as they are executed. Use "-"
         to log to STDOUT.
+
+    --trace
+        For development troubleshooting work, this outputs an extremely verbose
+        trace log to STDOUT.
 
   Type 'sakai-info help <command>' for help on a specific command.
 EOF
@@ -109,6 +113,7 @@ sakai-info quiz
   a pending quiz or a published quiz. Additional options may be passed to
   include additional information:
 
+    --mod      Print creation/modification info
     --dbrow      Print the raw database fields
 
   Not yet implemented:
