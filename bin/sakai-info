@@ -123,9 +123,8 @@ if not logfile.nil?
     logfile = STDOUT
   end
   logger = Logger.new(logfile)
-  logger.datetime_format = "%Y-%m-%d %H:%M:%S"
   logger.formatter = proc do |level, timestamp, progname, msg|
-    "#{timestamp.sub(/ [-+][0-9]{4}$/,"")} #{msg}\n"
+    "#{timestamp.strftime("%Y-%m-%d %H:%M:%S")} #{msg}\n"
   end
 end
 DB.logger = logger
