@@ -18,6 +18,22 @@
 
 * CLI access to forums
 
+### 0.3.5 ###
+
+* CLI access to gradebook
+
+### 0.3.6 ###
+
+* CLI access to announcements
+
+### 0.3.7 ###
+
+* CLI access to content
+
+### 0.3.8 ###
+
+* CLI access to authz (realms, roles, functions)
+
 ### 0.4 ###
 
 * Standardized abstraction for user and site to support --mod and --dbrow
