@@ -292,12 +292,21 @@ module SakaiInfo
       nil
     end
 
+    def item_count
+      @item_count ||= QuizItem.count_by_section_id(@id)
+    end
+
+    def items
+      @items ||= QuizItem.find_by_section_id(@id)
+    end
+
     def default_serialization
       {
         "id" => self.id,
         "title" => self.title,
         "quiz" => self.quiz.serialize(:summary),
         "sequence" => self.sequence,
+        "item_count" => self.item_count,
         "description" => self.description,
         "type" => self.section_type,
         "typeid" => self.typeid,
@@ -318,6 +327,16 @@ module SakaiInfo
       result = summary_serialization
       result.delete("quiz_id")
       result
+    end
+
+    def items_serialization
+      {
+        "items" => self.items.collect{|i|i.serialize(:summary)}
+      }
+    end
+
+    def self.all_serializations
+      [:default, :items, :mod]
     end
   end
 
@@ -362,7 +381,7 @@ module SakaiInfo
   end
 
   class QuizItem < SakaiObject
-    attr_reader :dbrow, :section, :sequence, :typeid
+    attr_reader :dbrow, :section, :quiz, :sequence, :typeid
 
     include ModProps
     created_by_key :createdby
@@ -375,29 +394,75 @@ module SakaiInfo
 
       @id = dbrow[:itemid]
       @section = QuizSection.find(dbrow[:sectionid])
+      @quiz = @section.quiz
       @sequence = dbrow[:sequence]
       @typeid = dbrow[:typeid]
     end
 
+    @@cache = {}
     def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        begin
+          @@cache[id] = PendingQuizItem.find(id)
+        rescue ObjectNotFoundException
+          begin
+            @@cache[id] = PublishedQuizItem.find(id)
+          rescue ObjectNotFoundException
+            raise ObjectNotFoundException(QuizItem, id)
+          end
+        end
+      end
+      @@cache[id]
+    end
+
+    def self.table_name_for_type(type)
+      if type == "pending"
+        :sam_item_t
+      else
+        :sam_publisheditem_t
+      end
+    end
+
+    def self.class_for_type(type)
+      if type == "pending"
+        PendingQuizItem
+      else
+        PublishedQuizItem
+      end
     end
 
     def self.query_by_section_id(section_id)
+      table = QuizItem.table_name_for_type(QuizSection.find(section_id).section_type)
+      DB.connect[table].where(:sectionid => section_id).order(:sequence)
     end
 
     def self.count_by_section_id(section_id)
+      QuizItem.query_by_section_id(section_id).count
     end
 
     def self.find_by_section_id(section_id)
+      item_class = QuizItem.class_for_type(QuizSection.find(section_id).section_type)
+      QuizItem.query_by_section_id(section_id).all.collect do |row|
+        item_class.new(row)
+      end
     end
 
     def self.query_by_quiz_id(quiz_id)
+      table = QuizItem.table_name_for_type(Quiz.find(quiz_id).quiz_type)
+      DB.connect[table].
+        where(:sectionid => Quiz.find(quiz_id).sections.collect{|s|s.id})
     end
 
     def self.count_by_quiz_id(quiz_id)
+      QuizItem.query_by_quiz_id(quiz_id).count
     end
 
     def self.find_by_quiz_id(quiz_id)
+      item_class = QuizItem.class_for_type(Quiz.find(quiz_id).quiz_type)
+      QuizItem.query_by_quiz_id(quiz_id).all.collect do |row|
+        item_class.new(row)
+      end
     end
 
     def item_type
@@ -406,22 +471,63 @@ module SakaiInfo
 
     def default_serialization
       {
+        "id" => self.id,
+        "quiz" => self.quiz.serialize(:summary),
+        "section" => self.section.serialize(:summary),
+        "sequence" => self.sequence,
+        "type" => self.item_type,
+        "typeid" => self.typeid
       }
     end
 
     def summary_serialization
       {
+        "id" => self.id,
+        "quiz_id" => self.quiz.id,
+        "section_id" => self.section.id
       }
+    end
+
+    def self.all_serializations
+      [:default, :mod]
     end
   end
 
   class PendingQuizItem < QuizItem
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_item_t].where(:itemid => id).first
+        if row.nil?
+          raise ObjectNotFoundException(PendingQuizItem, id)
+        end
+
+        @@cache[id] = PendingQuizItem.new(row)
+      end
+      @@cache[id]
+    end
+
     def item_type
       "pending"
     end
   end
 
   class PublishedQuizItem < QuizItem
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_publisheditem_t].where(:itemid => id).first
+        if row.nil?
+          raise ObjectNotFoundException(PublishedQuizItem, id)
+        end
+
+        @@cache[id] = PublishedQuizItem.new(row)
+      end
+      @@cache[id]
+    end
+
     def item_type
       "published"
     end

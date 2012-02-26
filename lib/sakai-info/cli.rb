@@ -17,9 +17,10 @@ module SakaiInfo
       "site" => Site,
       "user" => User,
       "quiz" => Quiz,
+      "quiz-section" => QuizSection,
+      "quiz-item" => QuizItem,
       "qpool" => QuestionPool,
       "question-pool" => QuestionPool,
-      "quiz-section" => QuizSection
     }
   end
 end
