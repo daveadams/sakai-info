@@ -11,7 +11,7 @@
 
 module SakaiInfo
   class QuestionPool < SakaiObject
-    attr_reader :title, :owner
+    attr_reader :title, :owner, :dbrow
 
     def initialize(dbrow)
       @dbrow = dbrow
