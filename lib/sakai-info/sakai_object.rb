@@ -40,6 +40,16 @@ module SakaiInfo
       }
     end
 
+    def dbrow_serialization
+      if self.respond_to? :dbrow
+        {
+          "dbrow" => self.dbrow
+        }
+      else
+        {}
+      end
+    end
+
     def default_serialization
       object_type_serialization
     end

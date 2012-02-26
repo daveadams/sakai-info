@@ -140,12 +140,6 @@ module SakaiInfo
         "sections" => self.sections.collect{|s|s.serialize(:quiz_summary)}
       }
     end
-
-    def dbrow_serialization
-      {
-        "dbrow" => self.dbrow
-      }
-    end
   end
 
   class PendingQuiz < Quiz

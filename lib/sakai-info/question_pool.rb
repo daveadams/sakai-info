@@ -105,11 +105,5 @@ module SakaiInfo
         "item_count" => self.item_count
       }
     end
-
-    def dbrow_serialization
-      {
-        "dbrow" => self.dbrow
-      }
-    end
   end
 end
