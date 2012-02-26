@@ -75,6 +75,7 @@ require 'sakai-info/database'
 # base objects
 require 'sakai-info/sakai_object'
 require 'sakai-info/sakai_xml_entity'
+require 'sakai-info/mod_props'
 
 # sakai object classes
 require 'sakai-info/user'

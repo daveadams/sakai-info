@@ -12,7 +12,12 @@
 module SakaiInfo
   class QuestionPool < SakaiObject
     attr_reader :title, :owner, :description, :parent_pool_id, :dbrow
-    attr_reader :created_by, :modified_by, :created_at, :modified_at
+
+    include ModProps
+    created_at_key :datecreated
+    created_by_key :ownerid
+    modified_at_key :lastmodifieddate
+    modified_by_key :lastmodifiedby
 
     def initialize(dbrow)
       @dbrow = dbrow
@@ -23,12 +28,6 @@ module SakaiInfo
       @owner = User.find(dbrow[:ownerid])
       @parent_pool_id = dbrow[:parentpoolid]
       @parent_pool_id = nil if @parent_pool_id == 0
-
-      @created_at = dbrow[:datecreated]
-      @created_by = @owner
-
-      @modified_at = dbrow[:lastmodifieddate]
-      @modified_by = User.find(dbrow[:lastmodifiedby])
     end
 
     @@cache = {}
@@ -110,15 +109,6 @@ module SakaiInfo
     def dbrow_serialization
       {
         "dbrow" => self.dbrow
-      }
-    end
-
-    def mod_serialization
-      {
-        "created_by" => self.created_by.serialize(:summary),
-        "created_at" => self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "modified_by" => self.modified_by.serialize(:summary),
-        "modified_at" => self.modified_at.strftime("%Y-%m-%d %H:%M:%S")
       }
     end
   end
