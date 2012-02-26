@@ -13,6 +13,12 @@ module SakaiInfo
   class Quiz < SakaiObject
     attr_reader :title, :site, :dbrow
 
+    include ModProps
+    created_by_key :createdby
+    created_at_key :createddate
+    modified_by_key :lastmodifiedby
+    modified_at_key :lastmodifieddate
+
     # a note about quizzes:
     # they do not link directly back to sites
     # instead, they link back only via the sam_authzdata_t table
