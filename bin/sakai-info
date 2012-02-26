@@ -17,15 +17,6 @@ include SakaiInfo
 
 require 'sakai-info/cli'
 
-ObjectModes = {
-  "site" => Site,
-  "user" => User,
-  "quiz" => Quiz,
-  "qpool" => QuestionPool,
-  "question-pool" => QuestionPool,
-  "quiz-section" => QuizSection
-}
-
 flags = []
 args = []
 db_name = nil
@@ -115,7 +106,7 @@ when "test" then
 
 else
   # test to see if it's an accepted object mode
-  if ObjectModes.keys.include? args[0]
+  if CLI::ObjectModes.keys.include? args[0]
     mode = args.shift
     id = args.shift
 
@@ -146,12 +137,12 @@ if not db_name.nil?
 end
 
 if flags.include? "--all"
-  serials = ObjectModes[mode].all_serializations
+  serials = CLI::ObjectModes[mode].all_serializations
 else
   serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').to_sym}
 end
 begin
-  puts ObjectModes[mode].find(id).to_yaml(serials)
+  puts CLI::ObjectModes[mode].find(id).to_yaml(serials)
 rescue ObjectNotFoundException
   STDERR.puts "ERROR: Could not find #{mode} with an ID of '#{id}'"
   exit 1
