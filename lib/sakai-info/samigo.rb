@@ -13,7 +13,10 @@ module SakaiInfo
   class Quiz < SakaiObject
     attr_reader :title, :site, :dbrow
 
-    def initialize(row, site = nil)
+    # a note about quizzes:
+    # they do not link directly back to sites
+    # instead, they link back only via the sam_authzdata_t table
+    def initialize(dbrow, site = nil)
       @site = nil
       if site.is_a? String
         begin
@@ -25,13 +28,26 @@ module SakaiInfo
         @site = site
       end
 
-      if @site.nil?
-        # TODO: lookup site via other tables
-      end
+      @id = dbrow[:id]
+      @title = dbrow[:title]
+      @dbrow = dbrow
 
-      @id = row[:id]
-      @title = row[:title]
-      @dbrow = row
+      if @site.nil?
+        # published quizzes map to site_id via the OWN_PUBLISHED_ASSESSMENT function
+        # pending quizzes map to site_id via the EDIT_ASSESSMENT function
+        DB.connect[:sam_authzdata_t].select(:distinct.sql_function(:agentid)).
+          where(:qualifierid => @id).
+          where(:functionid => ["OWN_PUBLISHED_ASSESSMENT","EDIT_ASSESSMENT"]).
+          all.each do |row|
+          begin
+            site = Site.find(row[:agentid])
+            @site = site
+          rescue ObjectNotFoundException
+            @site = nil
+          end
+          break if not @site.nil?
+        end
+      end
     end
 
     @@cache = {}
@@ -63,6 +79,49 @@ module SakaiInfo
       {
         "pending_count" => PendingQuiz.count_by_site_id(site_id),
         "published_count" => PublishedQuiz.count_by_site_id(site_id)
+      }
+    end
+
+    def quiz_type
+      nil
+    end
+
+    def default_serialization
+      result = {
+        "id" => self.id,
+        "title" => self.title,
+        "site" => nil,
+        "type" => self.quiz_type
+      }
+      if not self.site.nil?
+        result["site_id"] = self.site.serialize(:summary)
+      end
+      result
+    end
+
+    def summary_serialization
+      result = {
+        "id" => self.id,
+        "title" => self.title,
+        "site_id" => nil,
+        "type" => self.quiz_type
+      }
+      if not self.site.nil?
+        result["site_id"] = self.site.id
+      end
+      result
+    end
+
+    def site_summary_serialization
+      {
+        "id" => self.id,
+        "title" => self.title
+      }
+    end
+
+    def dbrow_serialization
+      {
+        "dbrow" => self.dbrow
       }
     end
   end
@@ -102,20 +161,8 @@ module SakaiInfo
       PendingQuiz.query_by_site_id(site_id).count
     end
 
-    def default_serialization
-      {
-        "id" => self.id,
-        "title" => self.title,
-        # "site_id" => self.site.id,
-        "status" => "pending"
-      }
-    end
-
-    def summary_serialization
-      {
-        "id" => self.id,
-        "title" => self.title
-      }
+    def quiz_type
+      "pending"
     end
   end
 
@@ -155,20 +202,8 @@ module SakaiInfo
       PublishedQuiz.query_by_site_id(site_id).count
     end
 
-    def default_serialization
-      {
-        "id" => self.id,
-        "title" => self.title,
-        # "site_id" => self.site.id,
-        "status" => "published"
-      }
-    end
-
-    def summary_serialization
-      {
-        "id" => self.id,
-        "title" => self.title
-      }
+    def quiz_type
+      "published"
     end
   end
 
