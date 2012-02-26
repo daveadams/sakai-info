@@ -145,7 +145,8 @@ module SakaiInfo
   class PendingQuiz < Quiz
     @@cache = {}
     def self.find(id)
-      if @@cache[id.to_s].nil?
+      id = id.to_s
+      if @@cache[id].nil?
         row = DB.connect[:sam_assessmentbase_t].filter(:id => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(PendingQuiz, id)
@@ -185,7 +186,8 @@ module SakaiInfo
   class PublishedQuiz < Quiz
     @@cache = {}
     def self.find(id)
-      if @@cache[id.to_s].nil?
+      id = id.to_s
+      if @@cache[id].nil?
         row = DB.connect[:sam_publishedassessment_t].filter(:id => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(PublishedQuiz, id)
@@ -244,18 +246,21 @@ module SakaiInfo
       @status = dbrow[:status]
     end
 
+    @@cache = {}
     def self.find(id)
-      quiz = nil
-      begin
-        quiz = PendingQuizSection.find(id)
-      rescue ObjectNotFoundException
+      id = id.to_s
+      if @@cache[id].nil?
         begin
-          quiz = PublishedQuizSection.find(id)
+          @@cache[id] = PendingQuizSection.find(id)
         rescue ObjectNotFoundException
-          raise ObjectNotFoundException(QuizSection, id)
+          begin
+            @@cache[id] = PublishedQuizSection.find(id)
+          rescue ObjectNotFoundException
+            raise ObjectNotFoundException(QuizSection, id)
+          end
         end
       end
-      quiz
+      @@cache[id]
     end
 
     def self.query_by_quiz_id(quiz_id)
@@ -294,6 +299,7 @@ module SakaiInfo
         "quiz" => self.quiz.serialize(:summary),
         "sequence" => self.sequence,
         "description" => self.description,
+        "type" => self.section_type,
         "typeid" => self.typeid,
         "status" => self.status
       }
@@ -316,12 +322,40 @@ module SakaiInfo
   end
 
   class PendingQuizSection < QuizSection
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_section_t].where(:sectionid => id).first
+        if row.nil?
+          raise ObjectNotFoundException(PendingQuizSection, id)
+        end
+
+        @@cache[id] = PendingQuizSection.new(row)
+      end
+      @@cache[id]
+    end
+
     def section_type
       "pending"
     end
   end
 
   class PublishedQuizSection < QuizSection
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_publishedsection_t].where(:sectionid => id).first
+        if row.nil?
+          raise ObjectNotFoundException(PublishedQuizSection, id)
+        end
+
+        @@cache[id] = PublishedQuizSection.new(row)
+      end
+      @@cache[id]
+    end
+
     def section_type
       "published"
     end

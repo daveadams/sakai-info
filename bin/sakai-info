@@ -22,7 +22,8 @@ ObjectModes = {
   "user" => User,
   "quiz" => Quiz,
   "qpool" => QuestionPool,
-  "question-pool" => QuestionPool
+  "question-pool" => QuestionPool,
+  "quiz-section" => QuizSection
 }
 
 flags = []
