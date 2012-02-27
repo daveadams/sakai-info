@@ -16,22 +16,20 @@ require File.join(File.dirname(__FILE__), 'schema_info')
 ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
 
 namespace :schema do
-  desc "Create schema dump directory"
-  task :create_dir do
+  task :create_schema_dir do
     print "Creating directory for schema creation files... "; STDOUT.flush
     system "mkdir -p #{Support::SchemaInfo::DumpDir}"
     puts "OK"
   end
 
-  desc "Remove schema creation files"
-  task :clean do
+  task :clean_schema do
     print "Deleting any old schema creation files... ";STDOUT.flush
     n = File.delete(*Dir[File.join(Support::SchemaInfo::DumpDir, "create_*.rb")])
     puts "#{n} files deleted"
   end
 
   desc "Dump schema creation files"
-  task :dump, [:db] => [:create_dir, :clean] do |t, args|
+  task :dump, [:db] => [:create_schema_dir, :clean_schema] do |t, args|
     args.with_defaults(:db => :default)
 
     ConfigFile = File.expand_path("~/.sakai-info")
@@ -85,6 +83,34 @@ namespace :schema do
                     line
                   end
                 end.join("\n"))
+      end
+      puts "OK"
+    end
+  end
+
+  task :create_testdb_dir do
+    print "Creating directory for test database... "; STDOUT.flush
+    system "mkdir -p #{Support::SchemaInfo::TestDbDir}"
+    puts "OK"
+  end
+
+  task :clean_testdb do
+    print "Deleting test database... "; STDOUT.flush
+    system "rm -f #{Support::SchemaInfo::TestDbFile}"
+    puts "OK"
+  end
+
+  desc "Create test DB"
+  task :testdb => [:create_testdb_dir, :clean_testdb] do
+    require 'sequel'
+    db = Sequel.sqlite(Support::SchemaInfo::TestDbFile)
+
+    puts "Initializing test database:"
+    Dir["#{Support::SchemaInfo::DumpDir}/create_*.rb"].each do |filename|
+      table = File.basename(filename, ".rb").sub(/^create_/,"")
+      print "  Creating table #{table}... ";STDOUT.flush
+      File.open(filename) do |f|
+        db.instance_eval(f.read)
       end
       puts "OK"
     end
