@@ -25,6 +25,7 @@ module SakaiInfo
       "qpool" => QuestionPool,
       "question-pool" => QuestionPool,
       "assignment" => Assignment,
+      "assignment-submission" => AssignmentSubmission,
     }
   end
 end

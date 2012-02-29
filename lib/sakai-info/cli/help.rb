@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-28 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -34,6 +34,8 @@ sakai-info #{VERSION}
     question-pool  Question Pool information
 
     assignment     Assignment information
+    assignment-submission
+                   Assignment submission information
 
   Misc commands:
     test         Tests configured database connections
@@ -246,6 +248,20 @@ sakai-info assignment
   may be passed to include additional information:
 
     --submissions  Print summary of all submissions
+    --xml          Print the raw XML
+    --mod          Print creation/modification info
+    --all          Print all possible details
+    --dbrow        Print the raw database fields
+EOF
+
+        "assignment-submission" => <<EOF,
+sakai-info assignment-submission
+
+  Usage: sakai-info assignment-submission <id> [<options>]
+
+  Prints information about the assignment submission ID specified. Additional
+  options may be passed to include additional information:
+
     --xml          Print the raw XML
     --mod          Print creation/modification info
     --all          Print all possible details
