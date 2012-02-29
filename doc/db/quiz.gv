@@ -1,3 +1,18 @@
+# quiz.gv
+#   sam_* table relationships
+#
+# Created 2012-02-29 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
+#
+# https://github.com/daveadams/sakai-info
+#
+# This software is public domain.
+#
+
+# TODO: add sam_authzdata_t to complete map of tables used by quiz.rb
+
+# TODO: autogenerate graphviz language from a simpler description file
+
 digraph sam {
   graph [
     rankdir = "RL"
@@ -13,12 +28,20 @@ digraph sam {
     label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Pending Quiz</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_assessmentbase_t</td></tr><tr><td port="pk">id</td></tr><tr><td>istemplate</td></tr><tr><td port="parentid">parentid</td></tr><tr><td>title</td></tr><tr><td>description</td></tr><tr><td>comments</td></tr><tr><td>typeid</td></tr><tr><td>instructornotification</td></tr><tr><td>testeenotification</td></tr><tr><td>multipartallowed</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr><tr><td>assessmenttemplateid</td></tr></table></td></tr></table>>
   ]
 
+  "sam_section_t" [
+    label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Pending Quiz Section</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_section_t</td></tr><tr><td port="pk">sectionid</td></tr><tr><td port="assessmentid">assessmentid</td></tr><tr><td>duration</td></tr><tr><td>sequence</td></tr><tr><td>title</td></tr><tr><td>description</td></tr><tr><td>typeid</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr></table></td></tr></table>>
+  ]
+
+  "sam_item_t" [
+    label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Pending Quiz Item</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_item_t</td></tr><tr><td port="pk">itemid</td></tr><tr><td port="sectionid">sectionid</td></tr><tr><td>itemidstring</td></tr><tr><td>sequence</td></tr><tr><td>duration</td></tr><tr><td>triesallowed</td></tr><tr><td>instruction</td></tr><tr><td>description</td></tr><tr><td>typeid</td></tr><tr><td>grade</td></tr><tr><td>score</td></tr><tr><td>hint</td></tr><tr><td>hasrationale</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr><tr><td>discount</td></tr><tr><td>partial_credit_flag</td></tr></table></td></tr></table>>
+  ]
+
   "sam_publishedassessment_t" [
     label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Published Quiz</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_publishedassessment_t</td></tr><tr><td port="pk">id</td></tr><tr><td port="assessmentid">assessmentid</td></tr><tr><td>title</td></tr><tr><td>description</td></tr><tr><td>comments</td></tr><tr><td>typeid</td></tr><tr><td>instructornotification</td></tr><tr><td>testeenotification</td></tr><tr><td>multipartallowed</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr><tr><td>lastneedresubmitdate</td></tr></table></td></tr></table>>
   ]
 
   "sam_publishedsection_t" [
-    label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Published Quiz Section</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_publishedsection_t</td></tr><tr><td port="pk">sectionid</td></tr><tr><td port="publishedassessmentid">publishedassessmentid</td></tr><tr><td>duration</td></tr><tr><td>sequence</td></tr><tr><td>title</td></tr><tr><td>description</td></tr><tr><td>typeid</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr></table></td></tr></table>>
+    label = <<table cellpadding="0" cellspacing="0" border="0"><tr><td><font face="Arial">Published Quiz Section</font></td></tr><tr><td><table cellspacing="0"><tr><td bgcolor="gray80" cellpadding="5">sam_publishedsection_t</td></tr><tr><td port="pk">sectionid</td></tr><tr><td port="assessmentid">assessmentid</td></tr><tr><td>duration</td></tr><tr><td>sequence</td></tr><tr><td>title</td></tr><tr><td>description</td></tr><tr><td>typeid</td></tr><tr><td>status</td></tr><tr><td port="createdby">createdby</td></tr><tr><td>createddate</td></tr><tr><td port="lastmodifiedby">lastmodifiedby</td></tr><tr><td>lastmodifieddate</td></tr></table></td></tr></table>>
   ]
 
   "sam_publisheditem_t" [
@@ -38,8 +61,10 @@ digraph sam {
   ]
 
   sam_assessmentbase_t:parentid -> sam_assessmentbase_t:pk;
+  sam_section_t:assessmentid -> sam_assessmentbase_t:pk;
+  sam_item_t:sectionid -> sam_section_t:pk;
   sam_publishedassessment_t:assessmentid -> sam_assessmentbase_t:pk;
-  sam_publishedsection_t:publishedassessmentid -> sam_publishedassessment_t:pk;
+  sam_publishedsection_t:assessmentid -> sam_publishedassessment_t:pk;
   sam_publisheditem_t:sectionid -> sam_publishedsection_t:pk;
   sam_assessmentgrading_t:publishedassessmentid -> sam_publishedassessment_t:pk;
   sam_itemgrading_t:assessmentgradingid -> sam_assessmentgrading_t:pk;
