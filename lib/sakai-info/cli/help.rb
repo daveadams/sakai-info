@@ -21,6 +21,7 @@ sakai-info #{VERSION}
   Object commands:
     user           User information
     site           Site information
+
     quiz           Quiz aka Assessment information, pending or published
     quiz-section   Quiz section information, pending or published
     quiz-item      Quiz item information, pending or published
@@ -29,7 +30,10 @@ sakai-info #{VERSION}
                    Information on attempted quiz items
     quiz-attempt-item-attachment
                    Information on file attachments to attempted quiz items
+
     question-pool  Question Pool information
+
+    assignment     Assignment information
 
   Misc commands:
     test         Tests configured database connections
@@ -50,11 +54,17 @@ sakai-info #{VERSION}
         trace log to STDOUT.
 
   Options that work on most object types:
+    --dbrow
+        Print the raw database fields in addition to the usual summary.
+
     --dbrow-only
         Print only the raw database fields for the object requested.
 
     --mod
-        Print creation and modification users and timestamps.
+        Print creation and modification user EIDs and timestamps.
+
+    --mod-details
+        Print creation and modification user details and timestamps.
 
     --all
         Print all possible information (other than dbrow)
@@ -214,7 +224,6 @@ sakai-info quiz-attempt-item
     --dbrow        Print the raw database fields
 EOF
 
-
         "quiz-attempt-item-attachment" => <<EOF,
 sakai-info quiz-attempt-item-attachment
 
@@ -226,6 +235,21 @@ sakai-info quiz-attempt-item-attachment
     --mod        Print creation/modification info
     --all        Print all possible details
     --dbrow      Print the raw database fields
+EOF
+
+        "assignment" => <<EOF,
+sakai-info assignment
+
+  Usage: sakai-info assignment <id> [<options>]
+
+  Prints information about the assignment ID specified. Additional options
+  may be passed to include additional information:
+
+    --submissions  Print summary of all submissions
+    --xml          Print the raw XML
+    --mod          Print creation/modification info
+    --all          Print all possible details
+    --dbrow        Print the raw database fields
 EOF
       }
 
