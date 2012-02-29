@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-02-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -24,6 +24,11 @@ sakai-info #{VERSION}
     quiz           Quiz aka Assessment information, pending or published
     quiz-section   Quiz section information, pending or published
     quiz-item      Quiz item information, pending or published
+    quiz-attempt   Quiz attempt information
+    quiz-attempt-item
+                   Information on attempted quiz items
+    quiz-attempt-item-attachment
+                   Information on file attachments to attempted quiz items
     question-pool  Question Pool information
 
   Misc commands:
@@ -126,13 +131,13 @@ sakai-info quiz
   include additional information:
 
     --sections   Print section summary list
+    --attempts   Print summary of user quiz attempts
     --mod        Print creation/modification info
     --all        Print all possible details
     --dbrow      Print the raw database fields
 
   Not yet implemented:
     --items      Print summary of items on the quiz
-    --attempts   Print summary of user quiz attempts (for published quizzes)
 EOF
 
         "quiz-section" => <<EOF,
@@ -182,6 +187,46 @@ sakai-info question-pool
     --all      Print all possible details
 EOF
 
+        "quiz-attempt" => <<EOF,
+sakai-info quiz-attempt
+
+  Usage: sakai-info quiz-attempt <id> [<options>]
+
+  Prints information about the quiz attempt ID specified. Additional options
+  may be passed to include additional information:
+
+    --items      Print list of attempted items
+    --all        Print all possible details
+    --dbrow      Print the raw database fields
+EOF
+
+
+        "quiz-item" => <<EOF,
+sakai-info quiz-item
+
+  Usage: sakai-info quiz-attempt-item <id> [<options>]
+
+  Prints information about the quiz attempt item ID specified. Additional
+  options may be passed to include additional information:
+
+    --attachments  Print a list of file attachments, if any
+    --all          Print all possible details
+    --dbrow        Print the raw database fields
+EOF
+
+
+        "quiz-attempt-item-attachment" => <<EOF,
+sakai-info quiz-attempt-item-attachment
+
+  Usage: sakai-info quiz-attempt-item-attachment <id> [<options>]
+
+  Prints information about the quiz attempt item attachment ID specified.
+  Additional options may be passed to include additional information:
+
+    --mod        Print creation/modification info
+    --all        Print all possible details
+    --dbrow      Print the raw database fields
+EOF
       }
 
       def self.help(topic = :default, io = STDOUT)
