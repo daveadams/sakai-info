@@ -273,7 +273,7 @@ module SakaiInfo
         "pending_quiz_count" => self.pending_quiz_count,
         "published_quiz_count" => self.published_quiz_count,
         "assignment_count" => self.assignment_count,
-        "announcement_count" => self.announcement_count,
+#        "announcement_count" => self.announcement_count,
         "gradebook_item_count" => (self.gradebook.nil? ? 0 : self.gradebook.item_count),
         "forum_count" => self.forum_count
       }
