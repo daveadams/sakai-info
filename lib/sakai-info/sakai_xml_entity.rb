@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiXMLEntity
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-28 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -39,12 +39,22 @@ module SakaiInfo
   class SakaiXMLEntity < SakaiObject
     attr_reader :xml, :xmldoc, :attributes, :properties
 
-    private
+    include ModProps
+    created_by_key :_xml_entity_created_by
+    created_at_key :_xml_entity_created_at
+    modified_by_key :_xml_entity_modified_by
+    modified_at_key :_xml_entity_modified_at
+
     # this method parses the universal XML field for all entities
     # down to two collections: attributes (XML attributes defined in the
     # top-level tag) and properties (<property> tags inside the top-level
     # tag). Properties are generally base64 encoded
     def parse_xml
+      if @xml.nil?
+        @xml = ""
+        REXML::Document.new(@dbrow[:xml].read).write(@xml, 2)
+      end
+
       @xmldoc = REXML::Document.new(@xml)
       @attributes = {}
       @xmldoc.root.attributes.keys.each do |att_name|
@@ -64,63 +74,58 @@ module SakaiInfo
         end
         @properties[prop_name] = prop_value
       end
+
+      @dbrow[:_xml_entity_created_by] = @properties["CHEF:creator"]
+      @dbrow[:_xml_entity_modified_by] = @properties["CHEF:modifiedby"]
+      @dbrow[:_xml_entity_created_at] = format_entity_date(@properties["DAV:creationdate"])
+      @dbrow[:_xml_entity_modified_at] = format_entity_date(@properties["DAV:getlastmodified"])
     end
 
     def format_entity_date(raw)
-      raw.gsub(/^(....)(..)(..)(..)(..)(..).*$/, '\1-\2-\3 \4:\5:\6')
-    end
-
-    public
-    # standard property for all entities
-    def created_by
-      @created_by ||= User.find(@properties["CHEF:creator"])
-    end
-
-    # standard property for all entities
-    def modified_by
-      @modified_by ||= User.find(@properties["CHEF:modifiedby"])
-    end
-
-    # standard property for all entities
-    def created_at
-      format_entity_date(@properties["DAV:creationdate"])
-    end
-
-    # standard property for all entities
-    def modified_at
-      format_entity_date(@properties["DAV:getlastmodified"])
-    end
-
-    # by default, serialize all the common properties
-    def default_serialization
-      {
-        "id" => self.id,
-        "created_by" => self.created_by,
-        "created_at" => self.created_at,
-        "modified_by" => self.modified_by,
-        "modified_at" => self.modified_at
-      }
+      if raw =~ /^(....)(..)(..)(..)(..)(..).*$/
+        # I believe these are usually in UTC
+        Time.utc($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i).getlocal
+      end
     end
 
     # serialize all attributes
     def attributes_serialization
       {
-        "attributes" => @attributes
+        "attributes" => self.attributes
       }
     end
 
     # serialize all properties
     def properties_serialization
       {
-        "properties" => @properties
+        "properties" => self.properties
       }
     end
 
     # xml dump serialization option
     def xml_serialization
       {
-        "xml" => xml
+        "xml" => self.xml
       }
+    end
+
+    # tweak the dbrow out since we hacked dbrow for other purposes
+    # and since the xml field doesn't display typically
+    def dbrow_serialization
+      dbrow = super["dbrow"]
+      dbrow[:xml] = self.xml
+      dbrow.delete(:_xml_entity_created_by)
+      dbrow.delete(:_xml_entity_created_at)
+      dbrow.delete(:_xml_entity_modified_by)
+      dbrow.delete(:_xml_entity_modified_at)
+
+      {
+        "dbrow" => dbrow
+      }
+    end
+
+    def self.all_serializations
+      [ :default, :attributes, :properties, :xml ]
     end
   end
 end
