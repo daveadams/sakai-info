@@ -17,7 +17,7 @@ module SakaiInfo
     def self.find(id)
       if @@cache[id].nil?
         xml = ""
-        row = DB.connect[:assignment_assignment].filter(:assignment_id => id).first
+        row = DB.connect[:assignment_assignment].where(:assignment_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(Assignment, id)
         end
@@ -38,7 +38,7 @@ module SakaiInfo
 
     # set lookup
     def self.query_by_site_id(site_id)
-      DB.connect[:assignment_assignment].filter(:context => site_id)
+      DB.connect[:assignment_assignment].where(:context => site_id)
     end
 
     def self.find_by_site_id(site_id)
@@ -109,9 +109,7 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        assignment = submitter = submitted_at = submitted = graded = nil
-        xml = ""
-        row = DB.connect[:assignment_submission].filter(:submission_id => id).first
+        row = DB.connect[:assignment_submission].where(:submission_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(AssignmentSubmission, id)
         end
@@ -139,6 +137,10 @@ module SakaiInfo
       @submitted_at ||= format_entity_date(@attributes["datesubmitted"])
     end
 
+    def self.query_by_assignment_id(assignment_id)
+      DB.connect[:assignment_submission].where(:context => assignment_id)
+    end
+
     def self.find_by_assignment_id(assignment_id)
       submissions = []
       assignment = Assignment.find(assignment_id)
@@ -155,7 +157,11 @@ module SakaiInfo
     end
 
     def self.count_by_assignment_id(assignment_id)
-      DB.connect[:assignment_submission].filter(:context => assignment_id).count
+      AssignmentSubmission.query_by_assignment_id(assignment_id).count
+    end
+
+    def self.query_by_user_id(user_id)
+      DB.connect[:assignment_submission].where(:submitter_id => user_id)
     end
 
     def self.find_by_user_id(user_id)
@@ -220,7 +226,7 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        row = DB.connect[:assignment_content].filter(:content_id => id).first
+        row = DB.connect[:assignment_content].where(:content_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(AssignmentContent, id)
         end
@@ -233,7 +239,7 @@ module SakaiInfo
 
     def self.find_by_user_id(user_id)
       contents = []
-      DB.connect[:assignment_content].filter(:context => user_id).all.each do |row|
+      DB.connect[:assignment_content].where(:context => user_id).all.each do |row|
         id = row[:content_id]
         context = row[:context]
         xml = ""
@@ -244,7 +250,7 @@ module SakaiInfo
     end
 
     def self.count_by_user_id(user_id)
-      DB.connect[:assignment_content].filter(:context => user_id).count
+      DB.connect[:assignment_content].where(:context => user_id).count
     end
 
     # getters
