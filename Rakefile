@@ -42,10 +42,11 @@ task :todo do
   system "for FILE in $(grep -rl TODO: * --exclude=Rakefile); do echo $FILE; cat -n $FILE |grep TODO: |sed 's/^ *\\([0-9]\\+\\).*TODO:/  \\1- TODO:/' ; echo; done |sed '$d'"
 end
 
-desc "Delete built gemfiles and tmp files"
+desc "Delete built gemfiles, tmp, and doc"
 task :clean do
   system "rm -f sakai-info-*.gem"
   system "rm -rf tmp/"
+  system "rm -rf doc/"
 end
 
 # include external support tasks

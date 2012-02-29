@@ -16,6 +16,49 @@ require File.join(File.dirname(__FILE__), 'doc_tasks')
 # using the oci8 driver will complain if NLS_LANG is not set in the environment
 ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
 
+def db_connect(connection_name = :default)
+  config_file = File.expand_path("~/.sakai-info")
+  config = nil
+  if File.exist? config_file
+    begin
+      config = YAML::load_file(config_file)
+    rescue
+    end
+  end
+
+  connection_string = if not config.nil?
+                        if connection_name == :default
+                          # none specified--use the first entry in the file
+                          config.values[0]
+                        else
+                          config[connection_name]
+                        end
+                      else
+                        # interpret the argument as a literal connection string
+                        args[:db]
+                      end
+
+  # now set up Sequel
+  require 'sequel'
+
+  # and try to connect
+  db = nil
+  begin
+    db = Sequel.connect(connection_string)
+  rescue => e
+    if connection_name == :default
+      STDERR.puts "Could not connect to default database"
+    else
+      STDERR.puts "Could not connect to database '#{connection_name}'"
+    end
+    STDERR.puts "  #{e}"
+    exit 1
+  end
+
+  return db
+end
+
+
 namespace :schema do
   task :create_schema_dir do
     print "Creating directory for schema creation files... "; STDOUT.flush
@@ -33,44 +76,8 @@ namespace :schema do
   task :dump, [:db] => [:create_schema_dir, :clean_schema] do |t, args|
     args.with_defaults(:db => :default)
 
-    ConfigFile = File.expand_path("~/.sakai-info")
-    config = nil
-    if File.exist? ConfigFile
-      begin
-        config = YAML::load_file(ConfigFile)
-      rescue
-      end
-    end
-
-    connection_string = if not config.nil?
-                          if args[:db] == :default
-                            # none specified--use the first entry in the file
-                            config.values[0]
-                          else
-                            config[args[:db]]
-                          end
-                        else
-                          # interpret the argument as a literal connection string
-                          args[:db]
-                        end
-
-    # now set up Sequel
-    require 'sequel'
+    db = db_connect(args[:db])
     Sequel.extension(:schema_dumper)
-
-    # and try to connect
-    db = nil
-    begin
-      db = Sequel.connect(connection_string)
-    rescue => e
-      if args[:db] == :default
-        STDERR.puts "Could not connect to default database"
-      else
-        STDERR.puts "Could not connect to database '#{args[:db]}'"
-      end
-      STDERR.puts "  #{e}"
-      exit 1
-    end
 
     puts "Dumping schema creation files to disk:"
     Support::SchemaInfo.tables.each do |table|

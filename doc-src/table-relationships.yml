@@ -1,0 +1,112 @@
+sakai_user:
+  description: User
+  pk: user_id
+  fk:
+  - field: createdby
+    table: sakai_user
+  - field: modifiedby
+    table: sakai_user
+sakai_user_id_map:
+  description: User EID Lookup
+  fk:
+  - field: user_id
+    table: sakai_user
+sakai_user_property:
+  description: User Property
+  fk:
+  - field: user_id
+    table: sakai_user
+sakai_preferences:
+  description: User Preferences
+  fk:
+  - field: preferences_id
+    table: sakai_user
+sam_assessmentbase_t:
+  description: Pending Quiz
+  pk: id
+  fk:
+  - field: parentid
+    table: sam_assessmentbase_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_section_t:
+  description: Pending Quiz Section
+  pk: sectionid
+  fk:
+  - field: assessmentid
+    table: sam_assessmentbase_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_item_t:
+  description: Pending Quiz Item
+  pk: itemid
+  fk:
+  - field: sectionid
+    table: sam_section_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_publishedassessment_t:
+  description: Published Quiz
+  pk: id
+  fk:
+  - field: assessmentid
+    table: sam_assessmentbase_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_publishedsection_t:
+  description: Published Quiz Section
+  pk: sectionid
+  fk:
+  - field: assessmentid
+    table: sam_publishedassessment_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_publisheditem_t:
+  description: Published Quiz Item
+  pk: itemid
+  fk:
+  - field: sectionid
+    table: sam_publishedsection_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_assessmentgrading_t:
+  description: Quiz Attempt
+  pk: assessmentgradingid
+  fk:
+  - field: publishedassessmentid
+    table: sam_publishedassessment_t
+  - field: agentid
+    table: sakai_user
+sam_itemgrading_t:
+  description: Quiz Attempt Item
+  pk: itemgradingid
+  fk:
+  - field: assessmentgradingid
+    table: sam_assessmentgrading_t
+  - field: publisheditemid
+    table: sam_publisheditem_t
+  - field: agentid
+    table: sakai_user
+sam_media_t:
+  description: Quiz Attempt Item Attachment
+  pk: mediaid
+  fk:
+  - field: itemgradingid
+    table: sam_itemgrading_t
+  - field: createdby
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+
