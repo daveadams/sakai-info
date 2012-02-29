@@ -142,7 +142,7 @@ elsif
   flags.include? "--dbrow-only"
   serials = [:dbrow]
 else
-  serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').to_sym}
+  serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').gsub("-","_").to_sym}
 end
 begin
   puts CLI::ObjectModes[mode].find(id).to_yaml(serials)
