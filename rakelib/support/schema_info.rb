@@ -2,7 +2,7 @@
 #   Support::SchemaInfo class for rake task support
 #
 # Created 2012-02-27 daveadams@gmail.com
-# Last updated 2012-02-27 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -30,7 +30,8 @@ module Support
       :message => [:mfr_message_t, :mfr_open_forum_t, :mfr_area_t],
       :question_pool => [:sam_questionpool_t, :sam_questionpoolitem_t],
       :quiz => [:sam_authzdata_t, :sam_assessmentbase_t, :sam_publishedassessment_t,
-                :sam_section_t, :sam_publishedsection_t, :sam_item_t, :sam_publisheditem_t]
+                :sam_section_t, :sam_publishedsection_t, :sam_item_t, :sam_publisheditem_t,
+                :sam_assessmentgrading_t, :sam_itemgrading_t, :sam_media_t]
     }
 
     ExtraTables = {
@@ -57,10 +58,10 @@ module Support
                    :mfr_topic_t, :mfr_unread_status_t],
       :question_pool => [:sam_questionpoolaccess_t],
       :quiz => [:sam_answer_t, :sam_answerfeedback_t, :sam_assessaccesscontrol_t,
-                :sam_assessevaluation_t, :sam_assessfeedback_t, :sam_assessmentgrading_t,
+                :sam_assessevaluation_t, :sam_assessfeedback_t,
                 :sam_assessmetadata_t, :sam_attachment_t, :sam_functiondata_t,
                 :sam_gradingattachment_t, :sam_gradingsummary_t, :sam_itemfeedback_t,
-                :sam_itemgrading_t, :sam_itemmetadata_t, :sam_itemtext_t, :sam_media_t,
+                :sam_itemmetadata_t, :sam_itemtext_t,
                 :sam_publishedaccesscontrol_t, :sam_publishedanswerfeedback_t,
                 :sam_publishedanswer_t, :sam_publishedassessment_t,
                 :sam_publishedevaluation_t, :sam_publishedfeedback_t,
