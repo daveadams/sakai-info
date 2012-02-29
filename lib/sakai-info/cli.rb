@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-02-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -19,6 +19,9 @@ module SakaiInfo
       "quiz" => Quiz,
       "quiz-section" => QuizSection,
       "quiz-item" => QuizItem,
+      "quiz-attempt" => QuizAttempt,
+      "quiz-attempt-item" => QuizAttemptItem,
+      "quiz-attempt-item-attachment" => QuizAttemptItemAttachment,
       "qpool" => QuestionPool,
       "question-pool" => QuestionPool,
     }
