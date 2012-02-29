@@ -107,10 +107,16 @@ module SakaiInfo
         "title" => self.title,
         "site" => nil,
         "type" => self.quiz_type,
-        "section_count" => self.section_count
+        "section_count" => self.section_count,
+        "attempt_count" => nil
       }
       if not self.site.nil?
         result["site"] = self.site.serialize(:summary)
+      end
+      if self.respond_to? :attempt_count
+        result["attempt_count"] = self.attempt_count
+      else
+        result.delete("attempt_count")
       end
       result
     end
@@ -139,6 +145,10 @@ module SakaiInfo
       {
         "sections" => self.sections.collect{|s|s.serialize(:quiz_summary)}
       }
+    end
+
+    def self.all_serializations
+      [:default, :sections]
     end
   end
 
@@ -222,6 +232,24 @@ module SakaiInfo
 
     def quiz_type
       "published"
+    end
+
+    def attempt_count
+      @attempt_count ||= QuizAttempt.count_by_quiz_id(self.id)
+    end
+
+    def attempts
+      @attempts ||= QuizAttempt.find_by_quiz_id(self.id)
+    end
+
+    def attempts_serialization
+      {
+        "attempts" => self.attempts.collect { |a| a.serialize(:quiz_summary) }
+      }
+    end
+
+    def self.all_serializations
+      [:default, :sections, :attempts]
     end
   end
 
@@ -530,6 +558,297 @@ module SakaiInfo
 
     def item_type
       "published"
+    end
+  end
+
+  # class QuizItemAttachment < SakaiObject
+  # end
+
+  # class PendingQuizItemAttachment < QuizItemAttachment
+  # end
+
+  # class PublishedQuizItemAttachment < QuizItemAttachment
+  # end
+
+  class QuizAttempt < SakaiObject
+    attr_reader :dbrow, :submitted_at, :total_auto_score, :status, :attempted_at
+    attr_reader :time_elapsed, :comments, :user_id, :quiz_id
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:assessmentgradingid]
+      @submitted_at = dbrow[:submitteddate]
+      @user_id = dbrow[:agentid]
+      @quiz_id = dbrow[:publishedassessmentid]
+      @total_auto_score = dbrow[:totalautoscore]
+      @status = dbrow[:status]
+      @attempted_at = dbrow[:attempted_at]
+      @time_elapsed = dbrow[:timeelapsed]
+      @is_auto_submitted = dbrow[:is_auto_submitted]
+      @is_late = dbrow[:islate]
+      @comments = dbrow[:comments]
+    end
+
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_assessmentgrading_t].where(:assessmentgradingid => id).first
+        if row.nil?
+          raise ObjectNotFoundException.new(QuizAttempt, id)
+        end
+
+        @@cache[id] = QuizAttempt.new(row)
+      end
+      @@cache[id]
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      DB.connect[:sam_assessmentgrading_t].where(:publishedassessmentid => quiz_id)
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      QuizAttempt.query_by_quiz_id(quiz_id).count
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      QuizAttempt.query_by_quiz_id(quiz_id).
+        all.collect { |row| QuizAttempt.new(row) }
+    end
+
+    def items
+      @items ||= QuizAttemptItem.find_by_attempt_id(self.id)
+    end
+
+    def item_count
+      @item_count ||= QuizAttemptItem.count_by_attempt_id(self.id)
+    end
+
+    def user
+      @user ||= User.find(@user_id)
+    end
+
+    def quiz
+      @quiz ||= PublishedQuiz.find(@quiz_id)
+    end
+
+    def auto_submitted?
+      @is_auto_submitted == 1
+    end
+
+    def late?
+      @is_late == 1
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "user" => self.user.serialize(:summary),
+        "quiz" => self.quiz.serialize(:summary),
+        "item_count" => self.item_count,
+        "submitted_at" => self.submitted_at,
+        "is_auto_submitted" => self.auto_submitted?,
+        "is_late" => self.late?,
+        "status" => self.status,
+        "total_auto_score" => self.total_auto_score
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "eid" => User.get_eid(self.user_id),
+        "quiz_id" => self.quiz_id,
+        "status" => self.status
+      }
+    end
+
+    def quiz_summary_serialization
+      {
+        "id" => self.id,
+        "eid" => User.get_eid(self.user_id),
+        "status" => self.status
+      }
+    end
+
+    def items_serialization
+      {
+        "items" => self.items.collect { |i| i.serialize(:attempt_summary) }
+      }
+    end
+
+    def self.all_serializations
+      [:default, :items]
+    end
+  end
+
+  class QuizAttemptItem < SakaiObject
+    attr_reader :dbrow, :submitted_at, :answer, :user_id, :item_id, :attempt_id
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:itemgradingid]
+      @submitted_at = dbrow[:submitteddate]
+      @user_id = dbrow[:agentid]
+      @attempt_id = dbrow[:assessmentgradingid]
+      @item_id = dbrow[:publisheditemid]
+      @answer = dbrow[:answertext]
+    end
+
+    def user
+      @user ||= User.find(@user_id)
+    end
+
+    def attempt
+      @attempt ||= QuizAttempt.find(@attempt_id)
+    end
+
+    def item
+      @item ||= PublishedQuizItem.find(@item_id)
+    end
+
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_itemgrading_t].where(:itemgradingid => id).first
+        if row.nil?
+          raise ObjectNotFoundException.new(QuizAttemptItem, id)
+        end
+
+        @@cache[id] = QuizAttemptItem.new(row)
+      end
+      @@cache[id]
+    end
+
+    def self.query_by_attempt_id(attempt_id)
+      DB.connect[:sam_itemgrading_t].where(:assessmentgradingid => attempt_id)
+    end
+
+    def self.count_by_attempt_id(attempt_id)
+      QuizAttemptItem.query_by_attempt_id(attempt_id).count
+    end
+
+    def self.find_by_attempt_id(attempt_id)
+      QuizAttemptItem.query_by_attempt_id(attempt_id).
+        all.collect { |row| QuizAttemptItem.new(row) }
+    end
+
+    def attachments
+      @attachments ||=
+        QuizAttemptItemAttachment.find_by_quiz_attempt_item_id(self.id)
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "user" => self.user.serialize(:summary),
+        "attempt" => self.attempt.serialize(:summary),
+        "item" => self.item.serialize(:summary),
+        "answer" => self.answer,
+        "attachment_count" => self.attachments.length
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "eid" => User.get_eid(self.user_id),
+        "attempt_id" => self.attempt_id,
+        "item_id" => self.item_id
+      }
+    end
+
+    def attempt_summary_serialization
+      {
+        "id" => self.id,
+        "item_id" => self.item_id
+      }
+    end
+
+    def attachments_serialization
+      {
+        "attachments" => self.attachments.collect{|a|a.serialize(:attempt_item_summary)}
+      }
+    end
+
+    def self.all_serializations
+      [:default, :attachments]
+    end
+  end
+
+  class QuizAttemptItemAttachment < SakaiObject
+    attr_reader :dbrow, :status, :filepath, :filename, :filesize, :mimetype
+    attr_reader :description, :quiz_attempt_item_id
+
+    include ModProps
+    created_by_key :createdby
+    created_at_key :createddate
+    modified_by_key :lastmodifiedby
+    modified_at_key :lastmodifieddate
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:mediaid]
+      @quiz_attempt_item_id = dbrow[:itemgradingid]
+      @status = dbrow[:status]
+      @filepath = dbrow[:location]
+      @filename = dbrow[:filename]
+      @filesize = dbrow[:filesize]
+      @mimetype = dbrow[:mimetype]
+      @description = dbrow[:description]
+    end
+
+    def quiz_attempt_item
+      @quiz_attempt_item ||= QuizAttemptItem.find(@quiz_attempt_item_id)
+    end
+
+    def self.find_by_quiz_attempt_item_id(quiz_attempt_item_id)
+      DB.connect[:sam_media_t].where(:itemgradingid => quiz_attempt_item_id).
+        all.collect { |row| QuizAttemptItemAttachment.new(row) }
+    end
+
+    @@cache = {}
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_media_t].where(:mediaid => id).first
+        if row.nil?
+          raise ObjectNotFoundException.new(QuizAttemptItemAttachment, id)
+        end
+
+        @@cache[id] = QuizAttemptItemAttachment.new(row)
+      end
+      @@cache[id]
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "filename" => self.filename,
+        "mimetype" => self.mimetype,
+        "filesize" => self.filesize,
+        "status" => self.status,
+        "quiz_attempt_item" => self.quiz_attempt_item.serialize(:summary)
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "filename" => self.filename,
+        "quiz_attempt_item_id" => self.quiz_attempt_item_id
+      }
+    end
+
+    def attempt_item_summary_serialization
+      {
+        "id" => self.id,
+        "filename" => self.filename
+      }
     end
   end
 end
