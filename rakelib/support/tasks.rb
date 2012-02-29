@@ -2,7 +2,7 @@
 #   task definitions for project support
 #
 # Created 2012-02-27 daveadams@gmail.com
-# Last updated 2012-02-27 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -11,6 +11,7 @@
 
 require 'yaml'
 require File.join(File.dirname(__FILE__), 'schema_info')
+require File.join(File.dirname(__FILE__), 'doc_tasks')
 
 # using the oci8 driver will complain if NLS_LANG is not set in the environment
 ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
