@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -45,6 +45,14 @@ module SakaiInfo
         {
           "dbrow" => self.dbrow
         }
+      else
+        {}
+      end
+    end
+
+    def dbrow_only_serialization
+      if not self.dbrow_serialization["dbrow"].nil?
+        self.dbrow_serialization["dbrow"]
       else
         {}
       end
