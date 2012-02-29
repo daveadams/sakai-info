@@ -2,7 +2,7 @@
 #   SakaiInfo::Assignment library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-02-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -11,46 +11,43 @@
 
 module SakaiInfo
   class Assignment < SakaiXMLEntity
-    attr_reader :site
+    attr_reader :dbrow, :site_id
 
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         xml = ""
-        row = DB.connect[:assignment_assigment].filter(:assignment_id => id).first
+        row = DB.connect[:assignment_assignment].filter(:assignment_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(Assignment, id)
         end
-        site = Site.find(row[:context])
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        @@cache[id] = Assignment.new(id, site, xml)
+        @@cache[id] = Assignment.new(row)
       end
       @@cache[id]
     end
 
     # raw data constructor
-    def initialize(id, site, xml)
-      @id = id
-      @site = site
-      @xml = xml
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:assignment_id]
+      @site_id = dbrow[:context]
+
       parse_xml
     end
 
     # set lookup
+    def self.query_by_site_id(site_id)
+      DB.connect[:assignment_assignment].filter(:context => site_id)
+    end
+
     def self.find_by_site_id(site_id)
-      assignments = []
-      site = Site.find(site_id)
-      DB.connect[:assignment_assignment].filter(:context => site_id).all.each do |row|
-        id = row[:assignment_id]
-        xml = ""
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        assignments << Assignment.new(id, site, xml)
-      end
-      return assignments
+      Assignment.query_by_site_id(site_id).
+        all.collect { |row| Assignment.new(row) }
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect[:assignment_assignment].filter(:context => site_id).count
+      Assignment.query_by_site_id(site_id).count
     end
 
     # getters
@@ -58,12 +55,16 @@ module SakaiInfo
       @attributes["title"]
     end
 
+    def site
+      @site ||= Site.find(self.site_id)
+    end
+
     def submissions
-      @submissions ||= AssignmentSubmission.find_by_assignment_id(@id)
+      @submissions ||= AssignmentSubmission.find_by_assignment_id(self.id)
     end
 
     def submission_count
-      @submission_count ||= AssignmentSubmission.count_by_assignment_id(@id)
+      @submission_count ||= AssignmentSubmission.count_by_assignment_id(self.id)
     end
 
     # yaml/json serialization
@@ -72,8 +73,6 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "site" => self.site.serialize(:summary),
-        "created_by" => self.created_by.eid,
-        "created_at" => self.created_at,
         "submissions" => self.submission_count
       }
     end
@@ -82,8 +81,14 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "created_by" => self.created_by.eid,
+        "created_by" => User.get_eid(self.created_by_id),
         "submissions" => self.submission_count
+      }
+    end
+
+    def submissions_serialization
+      {
+        "submissions" => self.submissions.collect{|s|s.serialize(:assignment_summary)}
       }
     end
   end
@@ -181,10 +186,6 @@ module SakaiInfo
         "submitted" => self.submitted?,
         "submitted_at" => self.submitted_at,
         "graded" => self.graded?,
-        "created_by" => self.created_by.eid,
-        "created_at" => self.created_at,
-        "modified_by" => self.modified_by.eid,
-        "modified_at" => self.modified_at
       }
     end
 
@@ -192,6 +193,14 @@ module SakaiInfo
       {
         "id" => self.id,
         "assignment_id" => self.assignment.id,
+        "submitter" => self.submitter.eid,
+        "submitted" => self.submitted?
+      }
+    end
+
+    def assignment_summary_serialization
+      {
+        "id" => self.id,
         "submitter" => self.submitter.eid,
         "submitted" => self.submitted?
       }
