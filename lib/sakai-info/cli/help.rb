@@ -146,7 +146,6 @@ sakai-info quiz
     --attempts   Print summary of user quiz attempts
     --mod        Print creation/modification info
     --all        Print all possible details
-    --dbrow      Print the raw database fields
 
   Not yet implemented:
     --items      Print summary of items on the quiz
@@ -164,7 +163,6 @@ sakai-info quiz-section
     --items      Print summary of items in the section
     --mod        Print creation/modification info
     --all        Print all possible details
-    --dbrow      Print the raw database fields
 EOF
 
         "quiz-item" => <<EOF,
@@ -178,7 +176,6 @@ sakai-info quiz-item
 
     --mod        Print creation/modification info
     --all        Print all possible details
-    --dbrow      Print the raw database fields
 EOF
 
         "question-pool" => <<EOF,
@@ -191,7 +188,6 @@ sakai-info question-pool
   may be passed to include additional information:
 
     --mod      Print creation/modification info
-    --dbrow    Print the raw database fields
 
   Not yet implemented:
     --items    Print summary of items in the pool
@@ -209,7 +205,6 @@ sakai-info quiz-attempt
 
     --items      Print list of attempted items
     --all        Print all possible details
-    --dbrow      Print the raw database fields
 EOF
 
 
@@ -223,7 +218,6 @@ sakai-info quiz-attempt-item
 
     --attachments  Print a list of file attachments, if any
     --all          Print all possible details
-    --dbrow        Print the raw database fields
 EOF
 
         "quiz-attempt-item-attachment" => <<EOF,
@@ -236,7 +230,6 @@ sakai-info quiz-attempt-item-attachment
 
     --mod        Print creation/modification info
     --all        Print all possible details
-    --dbrow      Print the raw database fields
 EOF
 
         "assignment" => <<EOF,
@@ -251,7 +244,6 @@ sakai-info assignment
     --xml          Print the raw XML
     --mod          Print creation/modification info
     --all          Print all possible details
-    --dbrow        Print the raw database fields
 EOF
 
         "assignment-submission" => <<EOF,
@@ -265,7 +257,6 @@ sakai-info assignment-submission
     --xml          Print the raw XML
     --mod          Print creation/modification info
     --all          Print all possible details
-    --dbrow        Print the raw database fields
 EOF
       }
 
