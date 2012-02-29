@@ -61,10 +61,19 @@ module SakaiInfo
 
         def mod_serialization
           {
+            "created_at" => self.created_at,
+            "created_by" => User.get_eid(self.created_by_id),
+            "modified_at" => self.modified_at,
+            "modified_by" => User.get_eid(self.modified_by_id),
+          }
+        end
+
+        def mod_details_serialization
+          {
+            "created_at" => self.created_at,
             "created_by" => self.created_by.serialize(:summary),
-            "created_at" => self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "modified_at" => self.modified_at,
             "modified_by" => self.modified_by.serialize(:summary),
-            "modified_at" => self.modified_at.strftime("%Y-%m-%d %H:%M:%S")
           }
         end
       }
