@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiXMLEntity
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-02-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -60,7 +60,7 @@ module SakaiInfo
         if prop_encoding == "BASE64"
           prop_value = Base64.decode64(prop_value)
         else
-          raise UnrecognizedPropertyEncodingException(prop_name, prop_encoding, prop_value)
+          raise UnrecognizedPropertyEncodingException.new(prop_name, prop_encoding, prop_value)
         end
         @properties[prop_name] = prop_value
       end

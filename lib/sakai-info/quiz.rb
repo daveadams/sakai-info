@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-02-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -256,7 +256,7 @@ module SakaiInfo
           begin
             @@cache[id] = PublishedQuizSection.find(id)
           rescue ObjectNotFoundException
-            raise ObjectNotFoundException(QuizSection, id)
+            raise ObjectNotFoundException.new(QuizSection, id)
           end
         end
       end
@@ -347,7 +347,7 @@ module SakaiInfo
       if @@cache[id].nil?
         row = DB.connect[:sam_section_t].where(:sectionid => id).first
         if row.nil?
-          raise ObjectNotFoundException(PendingQuizSection, id)
+          raise ObjectNotFoundException.new(PendingQuizSection, id)
         end
 
         @@cache[id] = PendingQuizSection.new(row)
@@ -367,7 +367,7 @@ module SakaiInfo
       if @@cache[id].nil?
         row = DB.connect[:sam_publishedsection_t].where(:sectionid => id).first
         if row.nil?
-          raise ObjectNotFoundException(PublishedQuizSection, id)
+          raise ObjectNotFoundException.new(PublishedQuizSection, id)
         end
 
         @@cache[id] = PublishedQuizSection.new(row)
@@ -409,7 +409,7 @@ module SakaiInfo
           begin
             @@cache[id] = PublishedQuizItem.find(id)
           rescue ObjectNotFoundException
-            raise ObjectNotFoundException(QuizItem, id)
+            raise ObjectNotFoundException.new(QuizItem, id)
           end
         end
       end
@@ -500,7 +500,7 @@ module SakaiInfo
       if @@cache[id].nil?
         row = DB.connect[:sam_item_t].where(:itemid => id).first
         if row.nil?
-          raise ObjectNotFoundException(PendingQuizItem, id)
+          raise ObjectNotFoundException.new(PendingQuizItem, id)
         end
 
         @@cache[id] = PendingQuizItem.new(row)
@@ -520,7 +520,7 @@ module SakaiInfo
       if @@cache[id].nil?
         row = DB.connect[:sam_publisheditem_t].where(:itemid => id).first
         if row.nil?
-          raise ObjectNotFoundException(PublishedQuizItem, id)
+          raise ObjectNotFoundException.new(PublishedQuizItem, id)
         end
 
         @@cache[id] = PublishedQuizItem.new(row)
