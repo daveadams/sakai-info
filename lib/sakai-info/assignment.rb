@@ -73,7 +73,7 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "site" => self.site.serialize(:summary),
-        "submissions" => self.submission_count
+        "submission_count" => self.submission_count
       }
     end
 
@@ -81,8 +81,7 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "created_by" => User.get_eid(self.created_by_id),
-        "submissions" => self.submission_count
+        "submission_count" => self.submission_count
       }
     end
 
@@ -94,11 +93,12 @@ module SakaiInfo
   end
 
   class AssignmentSubmission < SakaiXMLEntity
-    attr_reader :assignment_id, :submitter_id
+    attr_reader :dbrow, :assignment_id, :submitter_id
 
     def initialize(dbrow)
       @dbrow = dbrow
 
+      @id = dbrow[:submission_id]
       @assignment_id = dbrow[:context]
       @submitter_id = dbrow[:submitter_id]
       @is_submitted = (dbrow[:submitted] == "true")
@@ -188,7 +188,7 @@ module SakaiInfo
         "id" => self.id,
         "assignment_id" => self.assignment_id,
         "submitter" => User.get_eid(self.submitter_id),
-        "submitted" => self.submitted?
+        "is_submitted" => self.submitted?
       }
     end
 
@@ -196,7 +196,7 @@ module SakaiInfo
       {
         "id" => self.id,
         "submitter" => User.get_eid(self.submitter_id),
-        "submitted" => self.submitted?
+        "is_submitted" => self.submitted?
       }
     end
   end
