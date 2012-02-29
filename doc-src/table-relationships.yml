@@ -1,3 +1,206 @@
+announcement_channel:
+  description: Announcement Channel
+  pk: channel_id
+announcement_message:
+  description: Announcement
+  pk: message_id
+  fk:
+  - field: channel_id
+    table: announcement_channel
+  - field: owner
+    table: sakai_user
+
+content_resource:
+  description: Content File
+  pk: resource_id
+  fk:
+  - field: in_collection
+    table: content_collection
+  - field: context
+    table: sakai_site
+content_collection:
+  description: Content Directory
+  pk: collection_id
+  fk:
+  - field: in_collection
+    table: content_collection
+
+gb_gradebook_t:
+  description: Gradebook
+  pk: id
+  fk:
+  - field: gradebook_uid
+    table: sakai_site
+gb_gradable_object_t:
+  description: Gradebook Entry
+  pk: id
+  fk:
+  - field: gradebook_id
+    table: gb_gradebook_t
+
+mfr_area_t:
+  description: Forum Set
+  pk: id
+  fk:
+  - field: context_id
+    table: sakai_site
+  - field: created_by
+    table: sakai_user
+  - field: modified_by
+    table: sakai_user
+mfr_open_forum_t:
+  description: Forum
+  pk: id
+  fk:
+  - field: surrogatekey
+    table: mfr_area_t
+  - field: created_by
+    table: sakai_user
+  - field: modified_by
+    table: sakai_user
+mfr_message_t:
+  description: Message
+  pk: id
+  fk:
+  - field: surrogatekey
+    table: mfr_open_forum_t
+  - field: created_by
+    table: sakai_user
+  - field: modified_by
+    table: sakai_user
+
+sam_questionpool_t:
+  description: Question Pool
+  pk: questionpoolid
+  fk:
+  - field: parentpoolid
+    table: sam_questionpool_t
+  - field: ownerid
+    table: sakai_user
+  - field: lastmodifiedby
+    table: sakai_user
+sam_questionpoolitem_t:
+  description: Question Pool Item
+  fk:
+  - field: questionpoolid
+    table: sam_questionpool_t
+  - field: itemid
+    table: sam_item_t
+
+sakai_site:
+  description: Site
+  pk: site_id
+  fk:
+  - field: createdby
+    table: sakai_user
+  - field: modifiedby
+    table: sakai_user
+sakai_site_property:
+  description: Site Property
+  fk:
+  - field: site_id
+    table: sakai_site
+sakai_site_user:
+  description: Site Membership
+  fk:
+  - field: site_id
+    table: sakai_site
+  - field: user_id
+    table: sakai_user
+sakai_site_page:
+  description: Page
+  pk: page_id
+  fk:
+  - field: site_id
+    table: sakai_site
+sakai_site_page_property:
+  description: Page Property
+  fk:
+  - field: page_id
+    table: sakai_site_page
+  - field: site_id
+    table: sakai_site
+sakai_site_tool:
+  description: Tool
+  pk: tool_id
+  fk:
+  - field: site_id
+    table: sakai_site
+  - field: page_id
+    table: sakai_site_page
+sakai_site_tool_property:
+  description: Tool Property
+  fk:
+  - field: tool_id
+    table: sakai_site_tool
+  - field: site_id
+    table: sakai_site
+
+sakai_site_group:
+  description: Group
+  pk: group_id
+  fk:
+  - field: site_id
+    table: sakai_site
+sakai_site_group_property:
+  description: Group Property
+  fk:
+  - field: group_id
+    table: sakai_site_group
+  - field: site_id
+    table: sakai_site
+
+sakai_realm_rl_gr:
+  description: Realm Membership
+  fk:
+  - field: realm_key
+    table: sakai_realm
+  - field: role_key
+    table: sakai_realm_role
+  - field: user_id
+    table: sakai_user
+sakai_realm_rl_fn:
+  description: Realm/Role/Function
+  fk:
+  - field: realm_key
+    table: sakai_realm
+  - field: role_key
+    table: sakai_realm_role
+  - field: function_key
+    table: sakai_realm_function
+sakai_realm:
+  description: Realm
+  pk: realm_key
+  fk:
+  - field: createdby
+    table: sakai_user
+  - field: modifiedby
+    table: sakai_user
+sakai_realm_role:
+  description: Realm Role
+  pk: role_key
+sakai_realm_function:
+  description: Realm Function
+  pk: function_key
+
+assignment_assignment:
+  description: Assignment
+  pk: assignment_id
+  fk:
+  - field: context
+    table: sakai_site
+assignment_submission:
+  description: Assignment Submission
+  pk: submission_id
+  fk:
+  - field: context
+    table: assignment_assignment
+  - field: submitter_id
+    table: sakai_user
+# assignment_content:
+#   description: Additional Assignment Content
+#   pk: content_id
+
 sakai_user:
   description: User
   pk: user_id
@@ -21,6 +224,7 @@ sakai_preferences:
   fk:
   - field: preferences_id
     table: sakai_user
+
 sam_assessmentbase_t:
   description: Pending Quiz
   pk: id
