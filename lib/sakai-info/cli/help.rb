@@ -201,8 +201,8 @@ sakai-info quiz-attempt
 EOF
 
 
-        "quiz-item" => <<EOF,
-sakai-info quiz-item
+        "quiz-attempt-item" => <<EOF,
+sakai-info quiz-attempt-item
 
   Usage: sakai-info quiz-attempt-item <id> [<options>]
 
