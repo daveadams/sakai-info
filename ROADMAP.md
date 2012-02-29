@@ -1,10 +1,6 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-02-26*
-
-### 0.3.1  ###
-
-* CLI access to assignments
+*Last updated 2012-02-29*
 
 ### 0.3.2 ###
 

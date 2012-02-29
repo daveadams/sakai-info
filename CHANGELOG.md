@@ -1,5 +1,16 @@
 # sakai-info Change History #
 
+## 0.3.1 ##
+
+*Released 2012-02-29*
+
+* New objects: quiz-attempt, quiz-attempt-item, quiz-attempt-item-attachment
+* More new objects: assignment, assignment-submission
+* SakaiXMLEntity base class supports ModProps
+* New standard CL arguments: --dbrow-only and --mod-details
+* First steps towards a sqlite test infrastructure: schema creation
+* First steps towards better Sakai DB docs: graphviz file for quiz tables
+
 ## 0.3.0 ##
 
 *Released 2012-02-26*
