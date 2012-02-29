@@ -94,15 +94,16 @@ module SakaiInfo
   end
 
   class AssignmentSubmission < SakaiXMLEntity
-    attr_reader :assignment, :submitter
+    attr_reader :assignment_id, :submitter_id
 
-    def initialize(id, assignment, xml, submitter, submitted, graded)
-      @id = id
-      @assignment = assignment
-      @xml = xml
-      @submitter = submitter
-      @submitted = submitted
-      @graded = graded
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @assignment_id = dbrow[:context]
+      @submitter_id = dbrow[:submitter_id]
+      @is_submitted = (dbrow[:submitted] == "true")
+      @is_graded = (dbrow[:graded] == "true")
+
       parse_xml
     end
 
@@ -114,23 +115,25 @@ module SakaiInfo
           raise ObjectNotFoundException.new(AssignmentSubmission, id)
         end
 
-        assignment = Assignment.find(row[:context])
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        submitter = User.find(row[:submitter_id])
-        submitted = (row[:submitted] == "true")
-        graded = (row[:graded] == "true")
-
-        @@cache[id] = AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
+        @@cache[id] = AssignmentSubmission.new(row)
       end
       @@cache[id]
     end
 
+    def submitter
+      @submitter ||= User.find(self.submitter_id)
+    end
+
+    def assignment
+      @assignment ||= Assignment.find(self.assignment_id)
+    end
+
     def submitted?
-      ( created_by.eid == @submitter.eid && @submitted ) || false
+      ( self.created_by_id == self.submitter_id && @is_submitted ) || false
     end
 
     def graded?
-      @graded || false
+      @is_graded || false
     end
 
     def submitted_at
@@ -142,18 +145,8 @@ module SakaiInfo
     end
 
     def self.find_by_assignment_id(assignment_id)
-      submissions = []
-      assignment = Assignment.find(assignment_id)
-      DB.connect[:assignment_submission].filter(:context => assignment_id).all.each do |row|
-        id = row[:submission_id]
-        xml = ""
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        submitter = User.find(row[:submitter_id])
-        submitted = (row[:submitted] == "true")
-        graded = (row[:graded] == "true")
-        submissions << AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
-      end
-      return submissions
+      AssignmentSubmission.query_by_assignment_id(assignment_id).
+        all.collect { |row| AssignmentSubmission.new(row) }
     end
 
     def self.count_by_assignment_id(assignment_id)
@@ -165,41 +158,36 @@ module SakaiInfo
     end
 
     def self.find_by_user_id(user_id)
-      submissions = []
-      submitter = User.find(user_id)
-      DB.connect[:assignment_submission].filter(:submitter_id => user_id).all.each do |row|
-        id = row[:submission_id]
-        assignment = Assignment.find(row[:context])
-        xml = ""
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        submitted = (row[:submitted] == "true")
-        graded = (row[:graded] == "true")
-        submissions << AssignmentSubmission.new(id, assignment, xml, submitter, submitted, graded)
-      end
-      return submissions
+      AssignmentSubmission.query_by_user_id(user_id).
+        all.collect { |row| AssignmentSubmission.new(row) }
     end
 
     def self.count_by_user_id(user_id)
-      DB.connect[:assignment_submission].filter(:submitter_id => user_id).count
+      AssignmentSubmission.query_by_user_id(user_id).count
     end
 
     # yaml/json serialization
     def default_serialization
-      {
+      result = {
         "id" => self.id,
         "assignment" => self.assignment.serialize(:summary),
         "submitter" => self.submitter.serialize(:summary),
-        "submitted" => self.submitted?,
+        "is_submitted" => self.submitted?,
         "submitted_at" => self.submitted_at,
-        "graded" => self.graded?,
+        "is_graded" => self.graded?,
       }
+      if not self.submitted?
+        result.delete("submitted_at")
+        result.delete("is_graded")
+      end
+      result
     end
 
     def summary_serialization
       {
         "id" => self.id,
-        "assignment_id" => self.assignment.id,
-        "submitter" => self.submitter.eid,
+        "assignment_id" => self.assignment_id,
+        "submitter" => User.get_eid(self.submitter_id),
         "submitted" => self.submitted?
       }
     end
@@ -207,7 +195,7 @@ module SakaiInfo
     def assignment_summary_serialization
       {
         "id" => self.id,
-        "submitter" => self.submitter.eid,
+        "submitter" => User.get_eid(self.submitter_id),
         "submitted" => self.submitted?
       }
     end
