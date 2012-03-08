@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-03-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -20,7 +20,9 @@ sakai-info #{VERSION}
 
   Object commands:
     user           User information
+
     site           Site information
+    page           Site page information
 
     quiz           Quiz aka Assessment information, pending or published
     quiz-section   Quiz section information, pending or published
@@ -130,7 +132,16 @@ sakai-info site
     --gradebook    Print gradebook item info
     --realm        Print site realm details
     --forums       Print forum details
+    --mod          Print creation/modification info
     --all          Print all possible details
+EOF
+
+        "page" => <<EOF,
+sakai-info page
+
+  Usage: sakai-info page <id> [<options>]
+
+  Prints information about the page ID specified, including tools.
 EOF
 
         "quiz" => <<EOF,
