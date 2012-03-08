@@ -80,6 +80,8 @@ require 'sakai-info/sakai_xml_entity'
 # sakai object classes
 require 'sakai-info/user'
 require 'sakai-info/site'
+require 'sakai-info/page'
+require 'sakai-info/tool'
 require 'sakai-info/announcement'
 require 'sakai-info/assignment'
 require 'sakai-info/authz'
