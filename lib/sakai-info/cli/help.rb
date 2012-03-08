@@ -23,6 +23,7 @@ sakai-info #{VERSION}
 
     site           Site information
     page           Site page information
+    tool           Page tool information
 
     quiz           Quiz aka Assessment information, pending or published
     quiz-section   Quiz section information, pending or published
@@ -142,6 +143,14 @@ sakai-info page
   Usage: sakai-info page <id> [<options>]
 
   Prints information about the page ID specified, including tools.
+EOF
+
+        "tool" => <<EOF,
+sakai-info tool
+
+  Usage: sakai-info tool <id> [<options>]
+
+  Prints information about the tool ID specified.
 EOF
 
         "quiz" => <<EOF,

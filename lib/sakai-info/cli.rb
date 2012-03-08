@@ -16,6 +16,7 @@ module SakaiInfo
     ObjectModes = {
       "site" => Site,
       "page" => Page,
+      "tool" => Tool,
       "user" => User,
       "quiz" => Quiz,
       "quiz-section" => QuizSection,
