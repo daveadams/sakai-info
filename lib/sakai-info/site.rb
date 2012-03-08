@@ -15,9 +15,9 @@ module SakaiInfo
 
     include ModProps
     created_by_key :createdby
-    created_at_key :created_at
+    created_at_key :createdon
     modified_by_key :modifiedby
-    modified_at_key :modified_at
+    modified_at_key :modifiedon
 
     @@cache = {}
     def self.find(id)
