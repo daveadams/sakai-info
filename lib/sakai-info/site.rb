@@ -514,7 +514,7 @@ module SakaiInfo
   end
 
   class Tool < SakaiObject
-    attr_reader :title, :registration, :order, :layout, :page, :site
+    attr_reader :title, :registration, :order, :layout, :page_id, :site_id, :dbrow
 
     @@cache = {}
     def self.find(id)
@@ -524,35 +524,42 @@ module SakaiInfo
           raise ObjectNotFoundException.new(Tool, id)
         end
 
-        page = Page.find(row[:page_id])
-        @@cache[id] =
-          Tool.new(id, row[:title], row[:registration], row[:page_order].to_i,
-                   row[:layout_hints], page)
+        @@cache[id] = Tool.new(row)
       end
       @@cache[id]
     end
 
-    def self.find_by_page_id(page_id)
-      results = []
-      page = Page.find(page_id)
-      DB.connect[:sakai_site_tool].
-        where(:page_id => page_id).order(:page_order).all.each do |row|
-        @@cache[row[:tool_id]] =
-          Tool.new(row[:tool_id], row[:title], row[:registration], row[:page_order].to_i,
-                   row[:layout_hints], page)
-        results << @@cache[row[:tool_id]]
-      end
-      results
+    def self.query_by_page_id(page_id)
+      DB.connect[:sakai_site_tool].where(:page_id => page_id)
     end
 
-    def initialize(id, title, registration, order, layout, page)
-      @id = id
-      @title = title
-      @registration = registration
-      @order = order
-      @layout = layout
-      @page = page
-      @site = page.site
+    def self.count_by_page_id(page_id)
+      Tool.query_by_page_id(page_id).count
+    end
+
+    def self.find_by_page_id(page_id)
+      Tool.query_by_page_id(page_id).order(:page_order).all.
+        collect { |row| @@cache[row[:tool_id]] = Tool.new(row) }
+    end
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:tool_id]
+      @title = dbrow[:title]
+      @registration = dbrow[:registration]
+      @order = dbrow[:page_order].to_i
+      @layout = dbrow[:layout_hints]
+      @page_id = dbrow[:page_id]
+      @site_id = dbrow[:site_id]
+    end
+
+    def page
+      @page ||= Page.find(@page_id)
+    end
+
+    def site
+      @site ||= Site.find(@site_id)
     end
 
     def properties
@@ -566,7 +573,7 @@ module SakaiInfo
         "registration" => self.registration,
         "title" => self.title,
         "site" => self.site.serialize(:summary),
-        "page_id" => self.page.id,
+        "page_id" => self.page_id,
         "order" => self.order,
         "layout" => self.layout,
         "properties" => self.properties
