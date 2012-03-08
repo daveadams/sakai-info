@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-28 daveadams@gmail.com
+# Last updated 2012-03-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -11,49 +11,44 @@
 
 module SakaiInfo
   class Site < SakaiObject
-    attr_reader :title, :type
-    attr_reader :created_at, :modified_at
+    attr_reader :title, :type, :dbrow
+
+    include ModProps
+    created_by_key :createdby
+    created_at_key :created_at
+    modified_by_key :modifiedby
+    modified_at_key :modified_at
 
     @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
-        db = DB.connect
-        row = db.fetch("select site_id, title, type, " +
-                       "createdby,  modifiedby, " +
-                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
-                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
-                       "joinable, join_role " +
-                       "from sakai_site where site_id=?", id).first
+        row = DB.connect[:sakai_site].where(:site_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(Site, id)
         end
 
-        joinable = false
-        if row[:joinable].to_i == 1
-          joinable = true
-        end
-
-        @@cache[id] = Site.new(id, row[:title], row[:type], row[:createdby],
-                               row[:created_at], row[:modifiedby], row[:modified_at],
-                               joinable, row[:join_role])
+        @@cache[id] = Site.new(row)
       end
       @@cache[id]
     end
 
-    def initialize(id, title, type, created_by_user_id, created_at, modified_by_user_id, modified_at, joinable, join_role)
-      @id = id
-      @title = title
-      @type = type
-      @created_by_user_id = created_by_user_id
-      @created_at = created_at
-      @modified_by_user_id = modified_by_user_id
-      @modified_at = modified_at
-      @joinable = joinable
-      @join_role_string = join_role.to_s
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:site_id]
+      @title = dbrow[:title]
+      @type = dbrow[:type]
+      @is_joinable = (dbrow[:joinable].to_i == 1)
+      @is_published = (dbrow[:published].to_i == 1)
+      @join_role_string = dbrole[:join_role].to_s
     end
 
     def joinable?
-      @joinable
+      @is_joinable
+    end
+
+    def published?
+      @is_published
     end
 
     def join_role
@@ -74,14 +69,6 @@ module SakaiInfo
 
     def assignments
       @assignments ||= Assignment.find_by_site_id(@id)
-    end
-
-    def created_by
-      @created_by ||= User.find(@created_by_user_id)
-    end
-
-    def modified_by
-      @modified_by ||= User.find(@modified_by_user_id)
     end
 
     def user_count
@@ -261,11 +248,10 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "type" => self.type,
-        "created_at" => self.created_at,
-        "created_by" => self.created_by.serialize(:summary),
+        "is_published" => self.published?,
         "site_properties" => self.properties,
         "providers" => self.realm.providers,
-        "joinable" => self.joinable?,
+        "is_joinable" => self.joinable?,
         "join_role" => (self.joinable? ? self.join_role : nil),
         "user_count" => self.user_count,
         "group_count" => self.group_count,
@@ -294,7 +280,7 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "type" => self.type,
-        "created_by" => self.created_by.eid
+        "created_by" => self.created_by_id
       }
     end
 
