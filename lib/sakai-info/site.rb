@@ -40,7 +40,7 @@ module SakaiInfo
       @type = dbrow[:type]
       @is_joinable = (dbrow[:joinable].to_i == 1)
       @is_published = (dbrow[:published].to_i == 1)
-      @join_role_string = dbrole[:join_role].to_s
+      @join_role_string = dbrow[:join_role].to_s
     end
 
     def joinable?
@@ -258,7 +258,7 @@ module SakaiInfo
       if result["providers"].nil? or result["providers"] == ""
         result.delete("providers")
       end
-      if result["joinable"] == false
+      if result["is_joinable"] == false
         result.delete("join_role")
       end
       if self.gradebook.nil?
@@ -477,6 +477,7 @@ module SakaiInfo
 
     def site_summary_serialization
       result = summary_serialization
+      result.delete("site_id")
       result["order"] = self.order
       result["tools"] = self.tools.collect { |tool| tool.serialize(:summary) }
       if not self.properties.nil? and self.properties != {}
