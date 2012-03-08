@@ -188,10 +188,6 @@ module SakaiInfo
       DB.connect[:sakai_site_user].where(:user_id => user_id).count
     end
 
-    def self.count_by_type(type)
-      DB.connect[:sakai_site].where(:type => type).count
-    end
-
     def self.count_by_property(name, value)
       DB.connect[:sakai_site_property].
         where(:name => name, :to_char.sql_function(:value) => value).count
@@ -224,24 +220,20 @@ module SakaiInfo
         where(:type => type).all.collect{|r| r[:site_id]}
     end
 
-    def self.find_by_type(type)
-      sites = []
-      DB.connect.fetch("select site_id, title, type, " +
-                       "createdby, modifiedby, " +
-                       "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
-                       "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at, " +
-                       "joinable, join_role " +
-                       "from sakai_site where type = ?", type) do |row|
-        joinable = false
-        if joinable_n.to_i == 1
-          joinable = true
-        end
-        @@cache[row[:site_id]] = Site.new(row[:site_id], row[:title], row[:type], row[:createdby], row[:created_at], row[:modifiedby], row[:modified_at], joinable, row[:join_role])
-        sites << @@cache[row[:site_id]]
-      end
-      sites
+    # by_type queries
+    def self.query_by_type(type)
+      DB.connect[:sakai_site].where(:type => type)
     end
 
+    def self.count_by_type(type)
+      Site.query_by_type(type).count
+    end
+
+    def self.find_by_type(type)
+      Site.query_by_type(type).all.collect{|row| @@cache[row[:site_id]] = Site.new(row)}
+    end
+
+    ############################################################
     # serialization methods
     def default_serialization
       result = {
@@ -292,7 +284,7 @@ module SakaiInfo
 
     def pages_serialization
       {
-        "pages" => self.pages.collect { |pg| pg.serialize(:summary) }
+        "pages" => self.pages.collect { |pg| pg.serialize(:site_summary) }
       }
     end
 
@@ -424,7 +416,7 @@ module SakaiInfo
   end
 
   class Page < SakaiObject
-    attr_reader :title, :order, :layout, :site
+    attr_reader :title, :order, :layout, :site_id, :dbrow
 
     @@cache = {}
     def self.find(id)
@@ -434,31 +426,36 @@ module SakaiInfo
           raise ObjectNotFoundException.new(Page, id)
         end
 
-        site = Site.find(row[:site_id])
-        @@cache[id] = Page.new(id, row[:title], row[:order].to_i, row[:layout], site)
+        @@cache[id] = Page.new(row)
       end
       @@cache[id]
     end
 
-    def self.find_by_site_id(site_id)
-      results = []
-      site = Site.find(site_id)
-      DB.connect[:sakai_site_page].
-        where(:site_id => site_id).order(:site_order).all.each do |row|
-        @@cache[row[:page_id]] =
-          Page.new(row[:page_id], row[:title], row[:site_order].to_i,
-                   row[:layout], site)
-        results << @@cache[row[:page_id]]
-      end
-      results
+    def self.query_by_site_id(site_id)
+      DB.connect[:sakai_site_page].where(:site_id => site_id)
     end
 
-    def initialize(id, title, order, layout, site)
-      @id = id
-      @title = title
-      @order = order
-      @layout = layout
-      @site = site
+    def self.count_by_site_id(site_id)
+      Page.query_by_site_id(site_id).count
+    end
+
+    def self.find_by_site_id(site_id)
+      Page.query_by_site_id(site_id).order(:site_order).all.
+        collect { |row| @@cache[row[:page_id]] = Page.new(row) }
+    end
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:page_id]
+      @title = dbrow[:title]
+      @order = dbrow[:site_order].to_i
+      @layout = dbrow[:layout]
+      @site_id = dbrow[:site_id]
+    end
+
+    def site
+      @site ||= Site.find(@site_id)
     end
 
     def properties
@@ -470,23 +467,28 @@ module SakaiInfo
     end
 
     # serialization
-    def default_serialization
+    def summary_serialization
       {
         "id" => self.id,
         "title" => self.title,
-        "order" => self.order,
-        "tools" => self.tools.collect { |tool| tool.serialize(:summary) },
-        "properties" => self.properties,
-        "site_id" => self.site.id
-      }.delete_if do |k,v|
-        k == "properties" && v == {}
-      end
+        "site_id" => self.site_id
+      }
     end
 
-    def summary_serialization
-      default_serialization.delete_if do |k,v|
-        k == "site_id"
+    def site_summary_serialization
+      result = summary_serialization
+      result["order"] = self.order
+      result["tools"] = self.tools.collect { |tool| tool.serialize(:summary) }
+      if not self.properties.nil? and self.properties != {}
+        result["properties"] = self.properties
       end
+      result
+    end
+
+    def default_serialization
+      result = site_summary_serialization
+      result["site"] = self.site.serialize(:summary)
+      result
     end
   end
 
