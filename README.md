@@ -1,5 +1,9 @@
 # sakai-info #
 
+last updated: 2012-03-08  
+author: David Adams (daveadams@gmail.com)  
+github url: https://github.com/daveadams/sakai-info
+
 *sakai-info* is a command line tool and a suite of Ruby libraries which enable
 the exploration of a Sakai database without the intermediation of a Java VM or
 any official Sakai code.
@@ -7,12 +11,6 @@ any official Sakai code.
 Because the primary goal of this tool is to assist in information gathering
 and troubleshooting, no capability to change the database is included in the
 tool or the libraries.
-
-## Meta ##
-
-last updated: 2012-02-29  
-author: David Adams (daveadams@gmail.com)  
-github url: https://github.com/daveadams/sakai-info
 
 ## Testing ##
 
@@ -26,7 +24,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
 
 The resulting gem will be saved to the working directory as
-`sakai-info-0.3.1.gem`.
+`sakai-info-0.3.2.gem`.
 
 Cleanup built gems using:
 

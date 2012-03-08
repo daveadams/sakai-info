@@ -1,14 +1,11 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-02-29*
-
-### 0.3.2 ###
-
-* CLI access to groups
+*Last updated 2012-03-08*
 
 ### 0.3.3 ###
 
-* CLI access to pages and tools
+* CLI access to groups
+* User support for --mod and --dbrow
 
 ### 0.3.4 ###
 
@@ -32,8 +29,8 @@
 
 ### 0.4 ###
 
-* Standardized abstraction for user and site to support --mod and --dbrow
 * Sqlite test infrastructure for a few basic objects
+* Command line tool name change to "sin"
 
 ### 0.5 ###
 

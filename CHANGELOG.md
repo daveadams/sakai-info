@@ -1,5 +1,14 @@
 # sakai-info Change History #
 
+## 0.3.2 ##
+
+*Released 2012-03-08*
+
+* Site supports dbrow and ModProps, added published? method
+* Page supports dbrow, improved serialization methods
+* Tool supports dbrow, improved serialization methods
+* CLI now supports page and tool objects
+
 ## 0.3.1 ##
 
 *Released 2012-02-29*
