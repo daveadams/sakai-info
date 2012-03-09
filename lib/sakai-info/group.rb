@@ -11,17 +11,18 @@
 
 module SakaiInfo
   class Group < SakaiObject
-    attr_reader :site, :title
+    attr_reader :site_id, :title, :dbrow
 
-    def initialize(id, site, title)
-      @id = id
-      if site.is_a? Site
-        @site = site
-      else
-        # assume the string version is a site_id
-        @site = Site.find(site.to_s)
-      end
-      @title = title
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:group_id]
+      @site_id = dbrow[:site_id]
+      @title = dbrow[:title]
+    end
+
+    def site
+      @site ||= Site.find(@site_id)
     end
 
     @@cache = {}
@@ -31,35 +32,38 @@ module SakaiInfo
         if row.nil?
           raise ObjectNotFoundException.new(Group, id)
         end
-        @@cache[id] = Group.new(id, row[:site_id], row[:title])
+        @@cache[id] = Group.new(row)
       end
       @@cache[id]
     end
 
-    @@cache_by_site_id = {}
-    def self.find_by_site_id(site_id)
-      if @@cache_by_site_id[site_id].nil?
-        @@cache_by_site_id[site_id] = []
-        site = Site.find(site_id)
+    def self.query_by_site_id(site_id)
+      DB.connect[:sakai_site_group].where(:site_id => site_id)
+    end
 
-        DB.connect[:sakai_site_group].filter(:site_id => site_id).all.each do |row|
-          @@cache[row[:group_id]] = Group.new(row[:group_id], site, row[:title])
-          @@cache_by_site_id[site_id] << @@cache[row[:group_id]]
-        end
-      end
-      @@cache_by_site_id[site_id]
+    def self.find_by_site_id(site_id)
+      Group.query_by_site_id(site_id).all.
+        collect { |row| @@cache[row[:group_id]] = Group.new(row) }
     end
 
     def self.count_by_site_id(site_id)
-      DB.connect[:sakai_site_group].filter(:site_id => site_id).count
+      Group.query_by_site_id(site_id).count
     end
 
     def properties
-      @properties ||= GroupProperty.find_by_group_id(@id)
+      @properties ||= GroupProperty.find_by_group_id(self.id)
     end
 
     def realm
-      @authz_realm ||= AuthzRealm.find_by_site_id_and_group_id(@site.id, @id)
+      @authz_realm ||= AuthzRealm.find_by_site_id_and_group_id(self.site_id, self.id)
+    end
+
+    def providers
+      @providers ||= self.realm.providers
+    end
+
+    def users
+      @users ||= AuthzRealmMembership.find_by_realm_id(self.realm.id).collect{|arm|arm.user}
     end
 
     # serialization
@@ -67,8 +71,9 @@ module SakaiInfo
       result = {
         "id" => self.id,
         "title" => self.title,
-        "site_id" => self.site.id,
-        "members" => self.realm.user_count,
+        "site" => self.site.serialize(:summary),
+        "user_count" => self.realm.user_count,
+        "providers" => self.providers,
         "properties" => self.properties
       }
       if result["properties"] == {}
@@ -81,8 +86,24 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "members" => self.realm.user_count
+        "user_count" => self.realm.user_count
       }
+    end
+
+    def users_serialization
+      {
+        "users" => self.users.collect { |u| u.serialize(:summary) }
+      }
+    end
+
+    def realm_serialization
+      {
+        "realm" => self.realm.name
+      }
+    end
+
+    def self.all_serializations
+      [:default, :users, :realm]
     end
   end
 
