@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-03-08 daveadams@gmail.com
+# Last updated 2012-03-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,6 +10,9 @@
 #
 
 require 'sakai-info/cli/help'
+
+# it's faster to run single-threaded
+Sequel.single_threaded = true
 
 module SakaiInfo
   class CLI
