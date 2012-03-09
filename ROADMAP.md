@@ -2,10 +2,6 @@
 
 *Last updated 2012-03-09*
 
-### 0.3.4 ###
-
-* User support for --mod and --dbrow
-
 ### 0.3.5 ###
 
 * CLI access to forums

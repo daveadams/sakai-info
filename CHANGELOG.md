@@ -1,5 +1,12 @@
 # sakai-info Change History #
 
+## 0.3.4 ##
+
+*Released 2012-03-09*
+
+* Added --dbrow and --mod support to User
+* User property lookup performance improvements
+
 ## 0.3.3 ##
 
 *Released 2012-03-09*
