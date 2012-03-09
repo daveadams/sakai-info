@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-03-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -11,8 +11,13 @@
 
 module SakaiInfo
   class User < SakaiObject
-    attr_reader :eid, :name, :type
-    attr_reader :created_by, :created_at, :modified_by, :modified_at
+    attr_reader :eid, :name, :type, :email, :dbrow
+
+    include ModProps
+    created_by_key :createdby
+    created_at_key :createdon
+    modified_by_key :modifiedby
+    modified_at_key :modifiedon
 
     @@cache = {}
     def self.find(id)
@@ -23,18 +28,11 @@ module SakaiInfo
           raise ObjectNotFoundException.new(User, id)
         end
 
-        row = DB.connect.fetch("select first_name, last_name, type, " +
-                               "to_char(createdon,'YYYY-MM-DD HH24:MI:SS') as created_at, " +
-                               "to_char(modifiedon,'YYYY-MM-DD HH24:MI:SS') as modified_at " +
-                               "from sakai_user where user_id=?", user_id).first
+        row = DB.connect[:sakai_user].where(:user_id => user_id).first
         if row.nil?
           raise ObjectNotFoundException.new(User, id)
         end
-        @@cache[eid] =
-          @@cache[user_id] =
-          User.new(user_id, eid,
-                   ((row[:first_name] || "") + " " + (row[:last_name] || "")).strip,
-                   row[:type], row[:created_at], row[:modified_at])
+        @@cache[eid] = @@cache[user_id] = User.new(row)
       end
       @@cache[id]
     end
@@ -61,14 +59,14 @@ module SakaiInfo
       end
     end
 
-    def initialize(id, eid, name, type, created_at, modified_at)
-      @id = id
-      @eid = eid
-      @name = name
-      @type = type
-      @created_at = created_at
-      @modified_at = modified_at
-      @properties = nil
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:user_id]
+      @eid = User.get_eid(@id)
+      @email = dbrow[:email]
+      @name = ((dbrow[:first_name] || "") + " " + (dbrow[:last_name] || "")).strip
+      @type = dbrow[:type]
     end
 
     def properties
@@ -165,8 +163,8 @@ module SakaiInfo
         "id" => self.id,
         "name" => self.name,
         "eid" => self.eid,
+        "email" => self.email,
         "type" => self.type,
-        "created_at" => self.created_at,
         "user_properties" => UserProperty.find_by_user_id(self.id),
         "site_count" => self.site_count,
         "question_pool_count" => self.question_pool_count
@@ -216,8 +214,17 @@ module SakaiInfo
 
     def self.find_by_user_id(user_id)
       properties = {}
-      DB.connect[:sakai_user_property].where(:user_id => user_id).all.each do |row|
-        properties[row[:name]] = row[:value].read
+      # HACK: reading blobs via OCI8 is really slow, make the db server do it!
+      #  This is multiple orders of magnitude faster.
+      #  But, this will break if the property value is > 4000chars and may not work
+      #  on mysql, so here's the original version:
+      # DB.connect[:sakai_user_property].where(:user_id => user_id).all.each do |row|
+      #   properties[row[:name]] = row[:value].read
+      # end
+      DB.connect[:sakai_user_property].
+        select(:name, :to_char.sql_function(:value).as(:value)).
+        where(:user_id => user_id).all.each do |row|
+        properties[row[:name]] = row[:value]
       end
       return properties
     end
