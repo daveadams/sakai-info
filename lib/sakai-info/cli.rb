@@ -21,6 +21,7 @@ module SakaiInfo
       "page" => Page,
       "tool" => Tool,
       "user" => User,
+      "group" => Group,
       "quiz" => Quiz,
       "quiz-section" => QuizSection,
       "quiz-item" => QuizItem,

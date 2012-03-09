@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-03-08 daveadams@gmail.com
+# Last updated 2012-03-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -20,6 +20,7 @@ sakai-info #{VERSION}
 
   Object commands:
     user           User information
+    group          Group information
 
     site           Site information
     page           Site page information
@@ -113,6 +114,19 @@ sakai-info user
 
     --sites    Print site membership information
     --pools    Print list of owned question pools
+    --all      Print all possible details
+EOF
+
+        "group" => <<EOF,
+sakai-info group
+
+  Usage: sakai-info group <id> [<options>]
+
+  Prints information about the group ID or EID specified. Additional options
+  may be passed to include additional information:
+
+    --users    Print user membership information
+    --realm    Print corresponding realm information
     --all      Print all possible details
 EOF
 
