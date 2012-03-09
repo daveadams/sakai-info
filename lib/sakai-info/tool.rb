@@ -2,7 +2,7 @@
 #   SakaiInfo::Tool library
 #
 # Created 2012-03-08 daveadams@gmail.com
-# Last updated 2012-03-08 daveadams@gmail.com
+# Last updated 2012-03-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -106,8 +106,17 @@ module SakaiInfo
 
     def self.find_by_tool_id(tool_id)
       properties = {}
-      DB.connect[:sakai_site_tool_property].where(:tool_id => tool_id).all.each do |row|
-        properties[row[:name]] = row[:value].read
+      # HACK: reading blobs via OCI8 is really slow, make the db server do it!
+      #  This is multiple orders of magnitude faster.
+      #  But, this will break if the property value is > 4000chars and may not work
+      #  on mysql, so here's the original version:
+      # DB.connect[:sakai_site_tool_property].where(:tool_id => tool_id).all.each do |row|
+      #   properties[row[:name]] = row[:value].read
+      # end
+      DB.connect[:sakai_site_tool_property].
+        select(:name, :to_char.sql_function(:value).as(:value)).
+        where(:tool_id => tool_id).all.each do |row|
+        properties[row[:name]] = row[:value]
       end
       return properties
     end
