@@ -135,7 +135,7 @@ module SakaiInfo
     end
 
     def alive?
-      @connection.nil? && @connection.test_connection
+      (not @connection.nil?) && @connection.test_connection
     end
   end
 end
