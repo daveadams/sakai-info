@@ -1,29 +1,28 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-03-08*
-
-### 0.3.3 ###
-
-* CLI access to groups
-* User support for --mod and --dbrow
+*Last updated 2012-03-09*
 
 ### 0.3.4 ###
 
-* CLI access to forums
+* User support for --mod and --dbrow
 
 ### 0.3.5 ###
 
-* CLI access to gradebook
+* CLI access to forums
 
 ### 0.3.6 ###
 
-* CLI access to announcements
+* CLI access to gradebook
 
 ### 0.3.7 ###
 
-* CLI access to content
+* CLI access to announcements
 
 ### 0.3.8 ###
+
+* CLI access to content
+
+### 0.3.9 ###
 
 * CLI access to authz (realms, roles, functions)
 

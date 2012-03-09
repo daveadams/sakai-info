@@ -1,5 +1,14 @@
 # sakai-info Change History #
 
+## 0.3.3 ##
+
+*Released 2012-03-09*
+
+* Fixed performance bug connecting to the database on every query
+* Performance improvements (with possible downsides) in property lookups
+* Group supports dbrow, improved serialization
+* CLI now supports group objects
+
 ## 0.3.2 ##
 
 *Released 2012-03-08*
