@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-03-09 daveadams@gmail.com
+# Last updated 2012-04-01 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -244,7 +244,7 @@ module SakaiInfo
         "site_properties" => self.properties,
         "providers" => self.realm.providers,
         "is_joinable" => self.joinable?,
-        "join_role" => (self.joinable? ? self.join_role : nil),
+        "join_role" => (self.joinable? ? self.join_role.name : nil),
         "user_count" => self.user_count,
         "group_count" => self.group_count,
         "page_count" => self.page_count,
