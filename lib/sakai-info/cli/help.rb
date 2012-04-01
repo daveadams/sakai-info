@@ -41,6 +41,8 @@ sakai-info #{VERSION}
     assignment-submission
                    Assignment submission information
 
+    forum          Forum information
+
   Misc commands:
     test         Tests configured database connections
     help         Prints general help
@@ -292,6 +294,19 @@ sakai-info assignment-submission
     --mod          Print creation/modification info
     --all          Print all possible details
 EOF
+
+        "forum" => <<EOF,
+sakai-info forum
+
+  Usage: sakai-info forum <id> [<options>]
+
+  Prints information about the forum ID specified. Additional options may be
+  passed to include additional information:
+
+    --mod        Print creation/modification info
+    --all        Print all possible details
+EOF
+
       }
 
       def self.help(topic = :default, io = STDOUT)

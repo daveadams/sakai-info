@@ -32,6 +32,7 @@ module SakaiInfo
       "question-pool" => QuestionPool,
       "assignment" => Assignment,
       "assignment-submission" => AssignmentSubmission,
+      "forum" => Forum,
     }
   end
 end
