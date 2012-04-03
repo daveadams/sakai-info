@@ -31,6 +31,7 @@ sin #{VERSION}
 EOF
 
         "options" => <<EOF,
+sin #{VERSION}
   Options that apply globally:
     --database=<name>
         Connect to database instance <name> as defined in ~/.sakai-info instead
