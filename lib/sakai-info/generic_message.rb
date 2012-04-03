@@ -12,8 +12,15 @@
 module SakaiInfo
   class UnknownMessageTypeException < SakaiException; end
   class GenericMessage < SakaiObject
-    def self.valid_message_type?(s)
-      s =="ME" or s =="PM"
+    def self.types
+      {
+        "ME" => "Forum Post",
+        "PM" => "Private Message"
+      }
+    end
+
+    def self.valid_message_type?(mt)
+      GenericMessage.types.keys.include?(mt)
     end
 
     def self.count_by_date_and_message_type(count_date, message_type)
@@ -40,4 +47,21 @@ module SakaiInfo
                        message_type, date_str).first[:count].to_i
     end
   end
+
+  class GenericThread < SakaiObject
+    def self.types
+      {
+        "TO" => "Generic Thread",
+        "PT" => "Private Thread",
+        "OT" => "Open Thread",
+        "DT" => "Discussion Thread"
+      }
+    end
+
+    def self.valid_message_type?(mt)
+      GenericThread.types.keys.include?(mt)
+    end
+  end
 end
+
+
