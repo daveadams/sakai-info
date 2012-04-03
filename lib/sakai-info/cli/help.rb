@@ -1,5 +1,5 @@
 # sakai-info/cli/help.rb
-#  - sakai-info command line help
+#  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
 # Last updated 2012-04-02 daveadams@gmail.com
@@ -14,42 +14,23 @@ module SakaiInfo
     class Help
       STRINGS = {
         :default => <<EOF,
-sakai-info #{VERSION}
-
-  Usage: sakai-info <command> [<id>] [<options>]
+sin #{VERSION}
+  Usage: sin <command> [<id>] [<options>]
 
   Object commands:
-    user           User information
-    group          Group information
-
-    site           Site information
-    page           Site page information
-    tool           Page tool information
-
-    quiz           Quiz aka Assessment information, pending or published
-    quiz-section   Quiz section information, pending or published
-    quiz-item      Quiz item information, pending or published
-    quiz-attempt   Quiz attempt information
-    quiz-attempt-item
-                   Information on attempted quiz items
-    quiz-attempt-item-attachment
-                   Information on file attachments to attempted quiz items
-
-    question-pool  Question Pool information
-
-    assignment     Assignment information
-    assignment-submission
-                   Assignment submission information
-
-    forum          Forum information
-    forum-thread   Forum Thread information
-    forum-post     Forum Post information
+    user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
+    quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
+    assignment-submission, forum, forum-thread, forum-post
 
   Misc commands:
-    test         Tests configured database connections
-    help         Prints general help
-    version      Prints version
+    test             Tests configured database connections
+    help             Prints general help
+    version          Prints version
+    help <command>   Prints help about a particular command
+    help options     Prints help about additional options
+EOF
 
+        "options" => <<EOF,
   Options that apply globally:
     --database=<name>
         Connect to database instance <name> as defined in ~/.sakai-info instead
@@ -78,40 +59,38 @@ sakai-info #{VERSION}
 
     --all
         Print all possible information (other than dbrow)
-
-  Type 'sakai-info help <command>' for help on a specific command.
 EOF
 
         "help" => <<EOF,
-sakai-info help
+sin help
 
-  Usage: sakai-info help [<command>]
+  Usage: sin help [<command>]
 
-  Prints usage information for other sakai-info commands, or without an
+  Prints usage information for other sin commands, or without an
   argument it prints a list of possible commands.
 EOF
 
         "version" => <<EOF,
-sakai-info version
+sin version
 
-  Usage: sakai-info version
+  Usage: sin version
 
-  Prints the current version of sakai-info.
+  Prints the current version of sin.
 EOF
 
         "test" => <<EOF,
-sakai-info test
+sin test
 
-  Usage: sakai-info test [<options>]
+  Usage: sin test [<options>]
 
   Reads configuration and tests connecting to each database specified, or if
   a specific database is specified it will test only that connection.
 EOF
 
         "user" => <<EOF,
-sakai-info user
+sin user
 
-  Usage: sakai-info user <id> [<options>]
+  Usage: sin user <id> [<options>]
 
   Prints information about the user ID or EID specified. Additional options
   may be passed to include additional information:
@@ -122,9 +101,9 @@ sakai-info user
 EOF
 
         "group" => <<EOF,
-sakai-info group
+sin group
 
-  Usage: sakai-info group <id> [<options>]
+  Usage: sin group <id> [<options>]
 
   Prints information about the group ID or EID specified. Additional options
   may be passed to include additional information:
@@ -135,9 +114,9 @@ sakai-info group
 EOF
 
         "site" => <<EOF,
-sakai-info site
+sin site
 
-  Usage: sakai-info site <id> [<options>]
+  Usage: sin site <id> [<options>]
 
   Prints information about the site ID specified. Additional options may be
   passed to include additional information:
@@ -156,25 +135,25 @@ sakai-info site
 EOF
 
         "page" => <<EOF,
-sakai-info page
+sin page
 
-  Usage: sakai-info page <id> [<options>]
+  Usage: sin page <id> [<options>]
 
   Prints information about the page ID specified, including tools.
 EOF
 
         "tool" => <<EOF,
-sakai-info tool
+sin tool
 
-  Usage: sakai-info tool <id> [<options>]
+  Usage: sin tool <id> [<options>]
 
   Prints information about the tool ID specified.
 EOF
 
         "quiz" => <<EOF,
-sakai-info quiz
+sin quiz
 
-  Usage: sakai-info quiz <id> [<options>]
+  Usage: sin quiz <id> [<options>]
 
   Prints information about the quiz ID specified. The quiz ID may represent
   a pending quiz or a published quiz. Additional options may be passed to
@@ -190,9 +169,9 @@ sakai-info quiz
 EOF
 
         "quiz-section" => <<EOF,
-sakai-info quiz-section
+sin quiz-section
 
-  Usage: sakai-info quiz-section <id> [<options>]
+  Usage: sin quiz-section <id> [<options>]
 
   Prints information about the quiz section ID specified. The ID may represent
   a pending quiz section or a published quiz section. Additional options may be
@@ -204,9 +183,9 @@ sakai-info quiz-section
 EOF
 
         "quiz-item" => <<EOF,
-sakai-info quiz-item
+sin quiz-item
 
-  Usage: sakai-info quiz-item <id> [<options>]
+  Usage: sin quiz-item <id> [<options>]
 
   Prints information about the quiz item ID specified. The ID may represent
   a pending quiz item or a published quiz item. Additional options may be
@@ -217,10 +196,10 @@ sakai-info quiz-item
 EOF
 
         "question-pool" => <<EOF,
-sakai-info question-pool
+sin question-pool
 
-  Usage: sakai-info qpool <id> [<options>]
-         sakai-info question-pool <id> [<options>]
+  Usage: sin qpool <id> [<options>]
+         sin question-pool <id> [<options>]
 
   Prints information about the question pool ID specified. Additional options
   may be passed to include additional information:
@@ -234,9 +213,9 @@ sakai-info question-pool
 EOF
 
         "quiz-attempt" => <<EOF,
-sakai-info quiz-attempt
+sin quiz-attempt
 
-  Usage: sakai-info quiz-attempt <id> [<options>]
+  Usage: sin quiz-attempt <id> [<options>]
 
   Prints information about the quiz attempt ID specified. Additional options
   may be passed to include additional information:
@@ -247,9 +226,9 @@ EOF
 
 
         "quiz-attempt-item" => <<EOF,
-sakai-info quiz-attempt-item
+sin quiz-attempt-item
 
-  Usage: sakai-info quiz-attempt-item <id> [<options>]
+  Usage: sin quiz-attempt-item <id> [<options>]
 
   Prints information about the quiz attempt item ID specified. Additional
   options may be passed to include additional information:
@@ -259,9 +238,9 @@ sakai-info quiz-attempt-item
 EOF
 
         "quiz-attempt-item-attachment" => <<EOF,
-sakai-info quiz-attempt-item-attachment
+sin quiz-attempt-item-attachment
 
-  Usage: sakai-info quiz-attempt-item-attachment <id> [<options>]
+  Usage: sin quiz-attempt-item-attachment <id> [<options>]
 
   Prints information about the quiz attempt item attachment ID specified.
   Additional options may be passed to include additional information:
@@ -271,9 +250,9 @@ sakai-info quiz-attempt-item-attachment
 EOF
 
         "assignment" => <<EOF,
-sakai-info assignment
+sin assignment
 
-  Usage: sakai-info assignment <id> [<options>]
+  Usage: sin assignment <id> [<options>]
 
   Prints information about the assignment ID specified. Additional options
   may be passed to include additional information:
@@ -285,9 +264,9 @@ sakai-info assignment
 EOF
 
         "assignment-submission" => <<EOF,
-sakai-info assignment-submission
+sin assignment-submission
 
-  Usage: sakai-info assignment-submission <id> [<options>]
+  Usage: sin assignment-submission <id> [<options>]
 
   Prints information about the assignment submission ID specified. Additional
   options may be passed to include additional information:
@@ -298,9 +277,9 @@ sakai-info assignment-submission
 EOF
 
         "forum" => <<EOF,
-sakai-info forum
+sin forum
 
-  Usage: sakai-info forum <id> [<options>]
+  Usage: sin forum <id> [<options>]
 
   Prints information about the forum ID specified. Additional options may be
   passed to include additional information:
@@ -311,9 +290,9 @@ sakai-info forum
 EOF
 
         "forum-thread" => <<EOF,
-sakai-info forum-thread
+sin forum-thread
 
-  Usage: sakai-info forum-thread <id> [<options>]
+  Usage: sin forum-thread <id> [<options>]
 
   Prints information about the forum thread ID specified. Additional options
   may be passed to include additional information:
@@ -324,9 +303,9 @@ sakai-info forum-thread
 EOF
 
         "forum-post" => <<EOF,
-sakai-info forum-post
+sin forum-post
 
-  Usage: sakai-info forum-post <id> [<options>]
+  Usage: sin forum-post <id> [<options>]
 
   Prints information about the forum post ID specified. Additional options
   may be passed to include additional information:

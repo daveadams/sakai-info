@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# sakai-info
+# sin
 #   Command line tool for exploring the Sakai database via the
 #   sakai-info library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #

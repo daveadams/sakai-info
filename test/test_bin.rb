@@ -2,7 +2,7 @@
 #   Direct tests for bin/sakai-info
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -17,7 +17,7 @@ require 'open3'
 
 class BinTest < Test::Unit::TestCase
   CLI_ENV = { "RUBYLIB" => "lib" }
-  COMMAND = "bin/sakai-info"
+  COMMAND = "bin/sin"
 
   # test with no command line arguments
   #  $ sakai-info
@@ -28,7 +28,7 @@ class BinTest < Test::Unit::TestCase
 
       # stderr ought to match what's given here
       # TODO: pull strings directly from CLI class
-      assert_equal("ERROR: No command was given.\nRun 'sakai-info help' for a list of commands.\n",
+      assert_equal("ERROR: No command was given.\nRun 'sin help' for a list of commands.\n",
                    stderr.readlines.join)
 
       # exit code ought to be 1
