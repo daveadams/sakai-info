@@ -4,9 +4,9 @@ last updated: 2012-04-02
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
-*sakai-info* is a command line tool and a suite of Ruby libraries which enable
-the exploration of a Sakai database without the intermediation of a Java VM or
-any official Sakai code.
+The *sakai-info* gem consists of a suite of Ruby libraries which enable the
+exploration of a Sakai database without the intermediation of a Java VM or
+any official Sakai code, along with a command line tool, `sin`.
 
 Because the primary goal of this tool is to assist in information gathering
 and troubleshooting, no capability to change the database is included in the
@@ -24,7 +24,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
 
 The resulting gem will be saved to the working directory as
-`sakai-info-0.3.5.gem`.
+`sakai-info-0.4.0.gem`.
 
 Cleanup built gems using:
 
@@ -68,10 +68,10 @@ nickname for the connection.
 
 ## Command Line Usage ##
 
-After installing the gem, the `sakai-info` program should be found in your
-PATH. For usage details, run:
+After installing the gem, the `sin` program should be found in your PATH. For
+usage details, run:
 
-    $ sakai-info help
+    $ sin help
 
 ## Library Usage ##
 
