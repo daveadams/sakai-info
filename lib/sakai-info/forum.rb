@@ -22,7 +22,7 @@ module SakaiInfo
     @@cache = {}
     def self.find(id)
       if @@cache[id.to_s].nil?
-        row = DB.connect[:mfr_open_forum_t].filter(:id => id).first
+        row = DB.connect[:mfr_open_forum_t].where(:id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(Forum, id)
         end
@@ -65,6 +65,14 @@ module SakaiInfo
       @site ||= Site.find(self.site_id)
     end
 
+    def thread_count
+      @thread_count ||= ForumThread.count_by_forum_id(self.id)
+    end
+
+    def threads
+      @threads ||= ForumThread.find_by_forum_id(self.id)
+    end
+
     def self.query_by_site_id(site_id)
       db = DB.connect
       db[:mfr_open_forum_t].
@@ -86,7 +94,14 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
-        "site" => self.site.serialize(:summary)
+        "site" => self.site.serialize(:summary),
+        "thread_count" => self.thread_count,
+      }
+    end
+
+    def threads_serialization
+      {
+        "threads" => self.threads.collect { |t| t.serialize(:summary) }
       }
     end
 
@@ -96,9 +111,65 @@ module SakaiInfo
         "title" => self.title
       }
     end
+
+    def self.all_serializations
+      [ :default, :threads ]
+    end
   end
 
-  class ForumTopic < SakaiObject
+  class ForumThread < GenericThread
+    attr_reader :id, :title, :dbrow
+
+    include ModProps
+    created_by_key :created_by
+    created_at_key :created
+    modified_by_key :modified_by
+    modified_at_key :modified
+
+    @@cache = {}
+    def self.find(id)
+      if @@cache[id.to_s].nil?
+        row = DB.connect[:mfr_topic_t].where(:id => id, :topic_dtype => "DT").first
+        if row.nil?
+          raise ObjectNotFoundException.new(ForumThread, id)
+        end
+        @@cache[id.to_s] = ForumThread.new(row)
+      end
+      @@cache[id.to_s]
+    end
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:id].to_i
+      @title = dbrow[:title]
+    end
+
+    def self.query_by_forum_id(forum_id)
+      DB.connect[:mfr_topic_t].where(:of_surrogatekey => forum_id)
+    end
+
+    def self.count_by_forum_id(forum_id)
+      ForumThread.query_by_forum_id(forum_id).count
+    end
+
+    def self.find_by_forum_id(forum_id)
+      ForumThread.query_by_forum_id(forum_id).all.collect { |r| ForumThread.new(r) }
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+      }
+    end
   end
 
   class ForumPost < GenericMessage
