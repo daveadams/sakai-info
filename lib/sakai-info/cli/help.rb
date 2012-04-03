@@ -303,6 +303,19 @@ sakai-info forum
   Prints information about the forum ID specified. Additional options may be
   passed to include additional information:
 
+    --threads    Print summary of all threads
+    --mod        Print creation/modification info
+    --all        Print all possible details
+EOF
+
+        "forum-thread" => <<EOF,
+sakai-info forum-thread
+
+  Usage: sakai-info forum-thread <id> [<options>]
+
+  Prints information about the forum thread ID specified. Additional options
+  may be passed to include additional information:
+
     --mod        Print creation/modification info
     --all        Print all possible details
 EOF

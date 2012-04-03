@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-03-09 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -33,6 +33,7 @@ module SakaiInfo
       "assignment" => Assignment,
       "assignment-submission" => AssignmentSubmission,
       "forum" => Forum,
+      "forum-thread" => ForumThread,
     }
   end
 end
