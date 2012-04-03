@@ -2,10 +2,6 @@
 
 *Last updated 2012-04-02*
 
-### 0.3.5 ###
-
-* CLI access to forums
-
 ### 0.4.0 ###
 
 * CLI access to content

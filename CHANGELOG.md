@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+## 0.3.5 ##
+
+*Released 2012-04-02*
+
+* Basic Forum, ForumThread, and ForumPost support in CLI
+* Refactored Forum support in library
+* Fixed join_role serialization for Site
+
 ## 0.3.4 ##
 
 *Released 2012-03-09*
