@@ -34,6 +34,7 @@ module SakaiInfo
       "assignment-submission" => AssignmentSubmission,
       "forum" => Forum,
       "forum-thread" => ForumThread,
+      "forum-post" => ForumPost,
     }
   end
 end

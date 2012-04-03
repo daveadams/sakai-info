@@ -2,7 +2,7 @@
 #  - sakai-info command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-03-09 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -42,6 +42,8 @@ sakai-info #{VERSION}
                    Assignment submission information
 
     forum          Forum information
+    forum-thread   Forum Thread information
+    forum-post     Forum Post information
 
   Misc commands:
     test         Tests configured database connections
@@ -316,10 +318,22 @@ sakai-info forum-thread
   Prints information about the forum thread ID specified. Additional options
   may be passed to include additional information:
 
+    --posts      Print summary of all posts
     --mod        Print creation/modification info
     --all        Print all possible details
 EOF
 
+        "forum-post" => <<EOF,
+sakai-info forum-post
+
+  Usage: sakai-info forum-post <id> [<options>]
+
+  Prints information about the forum post ID specified. Additional options
+  may be passed to include additional information:
+
+    --mod        Print creation/modification info
+    --all        Print all possible details
+EOF
       }
 
       def self.help(topic = :default, io = STDOUT)
