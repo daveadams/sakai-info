@@ -1,38 +1,39 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-03-09*
+*Last updated 2012-04-02*
 
 ### 0.3.5 ###
 
 * CLI access to forums
 
-### 0.3.6 ###
+### 0.4.0 ###
 
-* CLI access to gradebook
+* CLI access to content
+* Content binary entity parsing
+* Command line tool name change to "sin"
 
-### 0.3.7 ###
+### 0.4.1 ###
 
 * CLI access to announcements
 
-### 0.3.8 ###
+### 0.4.2 ###
 
-* CLI access to content
+* CLI access to gradebook
 
-### 0.3.9 ###
+### 0.4.3 ###
 
 * CLI access to authz (realms, roles, functions)
 
-### 0.4 ###
+### 0.5.0 ###
 
 * Sqlite test infrastructure for a few basic objects
-* Command line tool name change to "sin"
 
-### 0.5 ###
+### 0.6.0 ###
 
 * Test fixtures and basic unit tests for all represented objects
 * RDoc coverage for every class
 
-### 0.6 ###
+### 0.7.0 ###
 
 * Basic OSP support
 
