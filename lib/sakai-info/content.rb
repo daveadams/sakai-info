@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -276,4 +276,209 @@ module SakaiInfo
       0
     end
   end
+
+  # TODO: merge binary_entity parsing code into content
+
+  # require 'stringio'
+
+  # def read_tiny_int(blob)
+  #   blob.read(1).unpack("C")[0]
+  # end
+
+  # def read_int(blob)
+  #   blob.read(2).unpack("n")[0]
+  # end
+
+  # def read_long_int(blob)
+  #   blob.read(4).unpack("N")[0]
+  # end
+
+  # def read_huge_int(blob)
+  #   part1 = blob.read(4).unpack("N")[0]
+  #   part2 = blob.read(4).unpack("N")[0]
+
+  #   return ((part1 << 32) + part2)
+  # end
+  # MAX_HUGE_INT=(2**64 - 1)
+
+  # def read_utf_string(blob)
+  #   # 'n' means big-endian 16-bit unsigned int
+  #   byte_length = read_int(blob)
+  #   if byte_length == 0
+  #     return ""
+  #   end
+  #   blob.read(byte_length).force_encoding(Encoding::UTF_8)
+  # end
+
+  # ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
+
+  # require 'oci8'
+  # db = OCI8.new("sakai", "ootfpitf", "SAKAI")
+
+  # resource_id = ARGV[0]
+  # blob = nil
+  # db.exec("select binary_entity from content_resource where resource_id=:id", resource_id) do |row|
+  #   blob = StringIO.new(row[0].read)
+  # end
+
+  # if blob.nil?
+  #   puts "No such resource"
+  #   exit 1
+  # end
+
+  # puts "Blob size: #{blob.size}"
+
+  # blob_id = blob.read(6)
+  # puts "Blob ID: #{blob_id}"
+
+  # serialization_type = read_long_int(blob)
+  # puts "Serialization type: #{serialization_type}"
+
+  # # don't ask me why the blocks are coded this way
+  # # BLOCK1 = general attributes
+  # BLOCK1 = 10
+  # # BLOCK2 = release and retract dates
+  # BLOCK2 = 12
+  # # BLOCK3 = groups
+  # BLOCK3 = 11
+  # # BLOCK4 = properties
+  # BLOCK4 = 13
+  # # BLOCK5 = file properties
+  # BLOCK5 = 14
+  # # BLOCK6 = byte[] storing file content if it's not in the filesystem
+  # BLOCK6 = 15
+  # # BLOCK_END
+  # BLOCK_END = 2
+
+  # # properties block types
+  # PROPS_BLOCK1 = 100
+  # PROPS_BLOCK2 = 101
+  # PROPS_BLOCK3 = 102
+
+  # while true
+  #   puts
+  #   puts "Starting new block"
+  #   puts "Current position: #{blob.pos}"
+
+  #   block_number = read_long_int(blob)
+  #   case(block_number)
+  #   when BLOCK1
+  #     puts "BLOCK1"
+
+  #     # read ID
+  #     id = read_utf_string(blob)
+  #     puts "Content ID: #{id}"
+
+  #     # read resource type
+  #     resource_type = read_utf_string(blob)
+  #     puts "Resource Type: #{resource_type}"
+
+  #     access_mode = read_utf_string(blob)
+  #     puts "Access Mode: #{access_mode}"
+
+  #     is_hidden = (read_tiny_int(blob) != 0)
+  #     puts "Hidden?: #{is_hidden}"
+
+  #   when BLOCK2
+  #     puts "BLOCK2"
+
+  #     releaseDate = read_huge_int(blob)
+  #     if releaseDate == MAX_HUGE_INT
+  #       puts "Release Date: n/a"
+  #     else
+  #       puts "Release Date: #{releaseDate}"
+  #     end
+
+  #     retractDate = read_huge_int(blob)
+  #     if retractDate == MAX_HUGE_INT
+  #       puts "Retract Date: n/a"
+  #     else
+  #       puts "Retract Date: #{retractDate}"
+  #     end
+
+  #   when BLOCK3
+  #     puts "BLOCK3"
+
+  #     group_count = read_long_int(blob)
+  #     puts "Group count: #{group_count}"
+  #     if group_count > 0
+  #       puts "Groups:"
+  #       groups = []
+  #       group_count.times do
+  #         groups << read_utf_string(blob)
+  #       end
+  #       groups.each do |g|
+  #         puts "  - #{g}"
+  #       end
+  #     end
+
+  #   when BLOCK4
+  #     puts "BLOCK4"
+
+  #     # properties
+  #     props_serialization_type = read_long_int(blob)
+  #     puts "Properties Serialization Type: #{props_serialization_type}"
+
+  #     props_block_number = read_long_int(blob)
+  #     if props_block_number == PROPS_BLOCK1
+  #       #puts "PROPS_BLOCK1"
+  #       props_count = read_long_int(blob)
+  #       puts "Property Count: #{props_count}"
+  #     else
+  #       puts "Failed to parse Property Block"
+  #       exit 1
+  #     end
+
+  #     props_count.times do
+  #       props_block_number = read_long_int(blob)
+  #       case props_block_number
+  #       when PROPS_BLOCK2
+  #         #puts "PROPS_BLOCK2 -- key-value pair"
+  #         key = read_utf_string(blob)
+  #         value = read_utf_string(blob)
+  #         puts "#{key}: #{value}"
+  #       when PROPS_BLOCK3
+  #         #puts "PROPS_BLOCK3 -- key-list pair"
+  #         key = read_utf_string(blob)
+  #         puts "#{key}:"
+  #         value_count = read_long_int(blob)
+  #         value_count.times do
+  #           value = read_utf_string(blob)
+  #           puts "  - #{value}"
+  #         end
+  #       else
+  #         puts "PROPS_UNKNOWN_BLOCK"
+  #         exit 1
+  #       end
+  #     end
+
+  #   when BLOCK5
+  #     puts "BLOCK5"
+
+  #     content_type = read_utf_string(blob)
+  #     puts "Content Type: #{content_type}"
+
+  #     content_length = read_huge_int(blob)
+  #     puts "Content Length: #{content_length}"
+
+  #     file_path = read_utf_string(blob)
+  #     puts "File Path: #{file_path}"
+
+  #   when BLOCK6
+  #     puts "BLOCK6"
+  #     body_size = read_long_int(blob)
+  #     if body_size > 0
+  #       puts "Body exists in DB record!"
+  #       exit 1
+  #     end
+
+  #   when BLOCK_END
+  #     puts "BLOCK_END: #{blob.pos}"
+  #     exit
+  #   else
+  #     puts "UNKNOWN BLOCK: '#{block_number}'!"
+  #     exit
+  #   end
+  # end
+
 end
