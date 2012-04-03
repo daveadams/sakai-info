@@ -2,7 +2,7 @@
 #   Gem definition file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-04-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/daveadams/sakai-info"
   spec.license = "Public Domain"
 
-  spec.files = Dir["lib/**/*.rb"] + ["bin/sakai-info"] + %w(README.md LICENSE CHANGELOG.md ROADMAP.md)
+  spec.files = Dir["lib/**/*.rb"] + ["bin/sin"] + %w(README.md LICENSE CHANGELOG.md ROADMAP.md)
   spec.bindir = "bin"
-  spec.executables = ["sakai-info"]
+  spec.executables = ["sin"]
 
   spec.add_dependency('sequel')
 
