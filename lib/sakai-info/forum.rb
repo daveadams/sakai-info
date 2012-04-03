@@ -145,6 +145,14 @@ module SakaiInfo
       @title = dbrow[:title]
     end
 
+    def post_count
+      @post_count ||= ForumPost.count_by_thread_id(self.id)
+    end
+
+    def posts
+      @posts ||= ForumPost.find_by_thread_id(self.id)
+    end
+
     def self.query_by_forum_id(forum_id)
       DB.connect[:mfr_topic_t].where(:of_surrogatekey => forum_id)
     end
@@ -161,6 +169,86 @@ module SakaiInfo
       {
         "id" => self.id,
         "title" => self.title,
+        "post_count" => self.post_count,
+      }
+    end
+
+    def posts_serialization
+      if self.post_count > 0
+        {
+          "posts" => self.posts.collect { |p| p.serialize(:summary) }
+        }
+      else
+        { }
+      end
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+      }
+    end
+
+    def self.all_serializations
+      [ :default, :posts ]
+    end
+  end
+
+  class ForumPost < GenericMessage
+    attr_reader :id, :title, :dbrow
+
+    include ModProps
+    created_by_key :created_by
+    created_at_key :created
+    modified_by_key :modified_by
+    modified_at_key :modified
+
+    @@cache = {}
+    def self.find(id)
+      if @@cache[id.to_s].nil?
+        row = DB.connect[:mfr_message_t].where(:id => id, :message_dtype => "ME").first
+        if row.nil?
+          raise ObjectNotFoundException.new(ForumPost, id)
+        end
+        @@cache[id.to_s] = ForumPost.new(row)
+      end
+      @@cache[id.to_s]
+    end
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:id].to_i
+      @title = dbrow[:title]
+    end
+
+    def author
+      @author ||= User.find(@dbrow[:author])
+    end
+
+    def thread
+      @thread ||= ForumThread.find(@dbrow[:surrogatekey])
+    end
+
+    def self.query_by_thread_id(thread_id)
+      DB.connect[:mfr_message_t].where(:surrogatekey => thread_id)
+    end
+
+    def self.count_by_thread_id(thread_id)
+      ForumPost.query_by_thread_id(thread_id).count
+    end
+
+    def self.find_by_thread_id(thread_id)
+      ForumPost.query_by_thread_id(thread_id).all.collect { |r| ForumPost.new(r) }
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "title" => self.title,
+        "author" => self.author.serialize(:summary),
+        "thread" => self.thread.serialize(:summary),
       }
     end
 
@@ -170,9 +258,6 @@ module SakaiInfo
         "title" => self.title,
       }
     end
-  end
-
-  class ForumPost < GenericMessage
   end
 end
 
