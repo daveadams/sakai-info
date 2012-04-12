@@ -159,7 +159,7 @@ module SakaiInfo
 
     # yaml/json serialization
     def default_serialization
-      {
+      result = {
         "id" => self.id,
         "name" => self.name,
         "eid" => self.eid,
@@ -169,6 +169,10 @@ module SakaiInfo
         "site_count" => self.site_count,
         "question_pool_count" => self.question_pool_count
       }
+      if result["user_properties"] == {}
+        result.delete("user_properties")
+      end
+      result
     end
 
     def summary_serialization
