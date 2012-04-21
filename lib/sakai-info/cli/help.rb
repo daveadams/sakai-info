@@ -20,7 +20,7 @@ sin #{VERSION}
   Object commands:
     user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
     quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
-    assignment-submission, forum, forum-thread, forum-post
+    assignment-submission, forum, forum-thread, forum-post, content
 
   Misc commands:
     test             Tests configured database connections
@@ -311,6 +311,20 @@ sin forum-post
   Prints information about the forum post ID specified. Additional options
   may be passed to include additional information:
 
+    --mod        Print creation/modification info
+    --all        Print all possible details
+EOF
+
+        "content" => <<EOF,
+sin content
+
+  Usage: sin content <id> [<options>]
+
+  Prints information about the content resource or collection ID specified.
+  Additional options may be passed to include additional information:
+
+    --properties Print all properties
+    --children   Recursively print collection children
     --mod        Print creation/modification info
     --all        Print all possible details
 EOF

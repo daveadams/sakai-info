@@ -35,6 +35,7 @@ module SakaiInfo
       "forum" => Forum,
       "forum-thread" => ForumThread,
       "forum-post" => ForumPost,
+      "content" => Content,
     }
   end
 end
