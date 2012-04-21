@@ -13,6 +13,12 @@ module SakaiInfo
   class Content < SakaiObject
     attr_reader :parent_id
 
+    include ModProps
+    created_by_key :_binary_entity_created_by
+    created_at_key :_binary_entity_created_at
+    modified_by_key :_binary_entity_modified_by
+    modified_at_key :_binary_entity_modified_at
+
     def self.find(id)
       begin
         ContentResource.find(id)
@@ -42,7 +48,18 @@ module SakaiInfo
     end
 
     def binary_entity
-      @binary_entity ||= ContentBinaryEntity.new(@dbrow[:binary_entity])
+      if @binary_entity.nil?
+        @binary_entity = ContentBinaryEntity.new(@dbrow[:binary_entity])
+
+        @dbrow[:_binary_entity_created_by] = @binary_entity["CHEF:creator"]
+        @dbrow[:_binary_entity_modified_by] = @binary_entity["CHEF:modifiedby"]
+        @dbrow[:_binary_entity_created_at] =
+          Util.format_entity_date(@binary_entity["DAV:creationdate"])
+        @dbrow[:_binary_entity_modified_at] =
+          Util.format_entity_date(@binary_entity["DAV:getlastmodified"])
+      end
+
+      @binary_entity
     end
 
     def default_serialization
@@ -108,6 +125,20 @@ module SakaiInfo
       {
         "properties" => result
       }
+    end
+
+    # ensure @binary_entity has been parsed before returning mod info
+    alias :original_mod_serialization :mod_serialization
+    alias :original_mod_details_serialization :mod_details_serialization
+
+    def mod_serialization
+      self.binary_entity
+      self.original_mod_serialization
+    end
+
+    def mod_details_serialization
+      self.binary_entity
+      self.original_mod_details_serialization
     end
   end
 
