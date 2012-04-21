@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.4.0 ###
+
+*Released 2012-04-21*
+
+* CLI access to content
+* Content binary entity parsing
+* Command line tool name change to "sin"
+
 ## 0.3.5 ##
 
 *Released 2012-04-02*

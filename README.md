@@ -1,6 +1,6 @@
 # sakai-info #
 
-last updated: 2012-04-02  
+last updated: 2012-04-21  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 

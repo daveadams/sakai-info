@@ -1,12 +1,6 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-04-02*
-
-### 0.4.0 ###
-
-* CLI access to content
-* Content binary entity parsing
-* Command line tool name change to "sin"
+*Last updated 2012-04-21*
 
 ### 0.4.1 ###
 
