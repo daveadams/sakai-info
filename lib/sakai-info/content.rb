@@ -391,8 +391,8 @@ module SakaiInfo
       @properties
     end
 
-    # content block IDs
-    # don't ask me why the blocks are coded this way
+    # content resource block IDs
+    # yes, block 2 = 12 and block 3 = 11
     # BLOCK1 = general attributes
     CR_BLOCK1 = 10
     # BLOCK2 = release and retract dates
@@ -408,72 +408,21 @@ module SakaiInfo
     # BLOCK_END
     CR_BLOCK_END = 2
 
-    # properties block types
-    CR_PROPS_BLOCK1 = 100
-    CR_PROPS_BLOCK2 = 101
-    CR_PROPS_BLOCK3 = 102
-
     def parse_for_content_resource(blob)
       while true
         block_number = read_long_int(blob)
         case(block_number)
         when CR_BLOCK1
-          @properties["id"] = read_utf_string(blob)
-          @properties["resource_type"] = read_utf_string(blob)
-          @properties["access_mode"] = read_utf_string(blob)
-          @properties["is_hidden"] = (read_tiny_int(blob) != 0)
+          parse_block1(blob)
 
         when CR_BLOCK2
-          @properties["release_date"] = read_huge_int(blob)
-          if @properties["release_date"] == MAX_HUGE_INT
-            @properties["release_date"] = nil
-          end
-
-          @properties["retract_date"] = read_huge_int(blob)
-          if @properties["retract_date"] == MAX_HUGE_INT
-            @properties["retract_date"] = nil
-          end
+          parse_block2(blob)
 
         when CR_BLOCK3
-          group_count = read_long_int(blob)
-          @properties["groups"] = []
-          if group_count > 0
-            group_count.times do
-              @properties["groups"] << read_utf_string(blob)
-            end
-          end
+          parse_block3(blob)
 
         when CR_BLOCK4
-          props_serialization_type = read_long_int(blob)
-          if props_serialization_type != 1
-            raise UnknownBinaryEntityFormat.new("Unrecognized properties serialization type #{properties_serialization_type}")
-          end
-
-          props_block_number = read_long_int(blob)
-          if props_block_number == CR_PROPS_BLOCK1
-            props_count = read_long_int(blob)
-          else
-            raise UnknownBinaryEntityFormat.new("Unable to parse properties block")
-          end
-
-          props_count.times do
-            props_block_number = read_long_int(blob)
-            case props_block_number
-            when CR_PROPS_BLOCK2
-              key = read_utf_string(blob)
-              value = read_utf_string(blob)
-              @properties[key] = value
-            when CR_PROPS_BLOCK3
-              key = read_utf_string(blob)
-              @properties[key] = []
-              value_count = read_long_int(blob)
-              value_count.times do
-                @properties[key] << read_utf_string(blob)
-              end
-            else
-              raise UnknownBinaryEntityFormat.new("Unknown Property Block ID: '#{block_number}'")
-            end
-          end
+          parse_block4(blob)
 
         when CR_BLOCK5
           @properties["content_type"] = read_utf_string(blob)
@@ -495,7 +444,108 @@ module SakaiInfo
       end
     end
 
+    # content collection block IDs
+    # BLOCK1 = general attributes
+    CC_BLOCK1 = 10
+    # BLOCK2 = release and retract dates
+    CC_BLOCK2 = 11
+    # BLOCK3 = groups
+    CC_BLOCK3 = 12
+    # BLOCK4 = properties
+    CC_BLOCK4 = 13
+    # BLOCK_END
+    CC_BLOCK_END = 2
+
     def parse_for_content_collection(blob)
+      while true
+        block_number = read_long_int(blob)
+        case(block_number)
+        when CC_BLOCK1
+          parse_block1(blob)
+
+        when CC_BLOCK2
+          parse_block2(blob)
+
+        when CC_BLOCK3
+          parse_block3(blob)
+
+        when CC_BLOCK4
+          parse_block4(blob)
+
+        when CC_BLOCK_END
+          break
+
+        else
+          raise UnknownBinaryEntityFormat.new("Unknown Block ID: '#{block_number}'")
+        end
+      end
+    end
+
+    def parse_block1(blob)
+      @properties["id"] = read_utf_string(blob)
+      @properties["resource_type"] = read_utf_string(blob)
+      @properties["access_mode"] = read_utf_string(blob)
+      @properties["is_hidden"] = (read_tiny_int(blob) != 0)
+    end
+
+    def parse_block2(blob)
+      @properties["release_date"] = read_huge_int(blob)
+      if @properties["release_date"] == MAX_HUGE_INT
+        @properties["release_date"] = nil
+      end
+
+      @properties["retract_date"] = read_huge_int(blob)
+      if @properties["retract_date"] == MAX_HUGE_INT
+        @properties["retract_date"] = nil
+      end
+    end
+
+    def parse_block3(blob)
+      group_count = read_long_int(blob)
+      @properties["groups"] = []
+      if group_count > 0
+        group_count.times do
+          @properties["groups"] << read_utf_string(blob)
+        end
+      end
+    end
+
+    # properties block types
+    PROPS_BLOCK1 = 100
+    PROPS_BLOCK2 = 101
+    PROPS_BLOCK3 = 102
+
+    def parse_block4(blob)
+      type = read_long_int(blob)
+      if type != 1
+        raise UnknownBinaryEntityFormat.new("Unknown properties serialization type #{type}")
+      end
+
+      props_block_number = read_long_int(blob)
+      if props_block_number == PROPS_BLOCK1
+        props_count = read_long_int(blob)
+      else
+        raise UnknownBinaryEntityFormat.new("Unable to parse properties block")
+      end
+
+      props_count.times do
+        props_block_number = read_long_int(blob)
+        case props_block_number
+        when PROPS_BLOCK2
+          key = read_utf_string(blob)
+          value = read_utf_string(blob)
+          @properties[key] = value
+        when PROPS_BLOCK3
+          key = read_utf_string(blob)
+          @properties[key] = []
+          value_count = read_long_int(blob)
+          value_count.times do
+            @properties[key] << read_utf_string(blob)
+          end
+        else
+          raise UnknownBinaryEntityFormat.new("Unknown Property Block ID: '#{block_number}'")
+        end
+      end
     end
   end
 end
