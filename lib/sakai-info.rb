@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-25 daveadams@gmail.com
+# Last updated 2012-04-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -57,6 +57,15 @@ module SakaiInfo
         "#{negative ? "-" : ""}#{size.to_i.to_s} #{FILESIZE_LABELS[label]}"
       else
         "#{negative ? "-" : ""}#{sprintf("%.1f", size)} #{FILESIZE_LABELS[label]}"
+      end
+    end
+
+    def self.format_entity_date(raw)
+      if raw =~ /^(....)(..)(..)(..)(..)(..).*$/
+        # I believe these are usually in UTC
+        Time.utc($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i).getlocal
+      else
+        raw
       end
     end
   end

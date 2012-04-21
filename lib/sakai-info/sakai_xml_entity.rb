@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiXMLEntity
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-04-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -77,15 +77,8 @@ module SakaiInfo
 
       @dbrow[:_xml_entity_created_by] = @properties["CHEF:creator"]
       @dbrow[:_xml_entity_modified_by] = @properties["CHEF:modifiedby"]
-      @dbrow[:_xml_entity_created_at] = format_entity_date(@properties["DAV:creationdate"])
-      @dbrow[:_xml_entity_modified_at] = format_entity_date(@properties["DAV:getlastmodified"])
-    end
-
-    def format_entity_date(raw)
-      if raw =~ /^(....)(..)(..)(..)(..)(..).*$/
-        # I believe these are usually in UTC
-        Time.utc($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i).getlocal
-      end
+      @dbrow[:_xml_entity_created_at] = Util.format_entity_date(@properties["DAV:creationdate"])
+      @dbrow[:_xml_entity_modified_at] = Util.format_entity_date(@properties["DAV:getlastmodified"])
     end
 
     # serialize all attributes
