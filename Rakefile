@@ -2,7 +2,7 @@
 #   rake definitions
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-27 daveadams@gmail.com
+# Last updated 2012-04-22 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -51,6 +51,7 @@ end
 
 # include external support tasks
 require File.expand_path(File.join(File.dirname(__FILE__), "rakelib", "support", "tasks"))
+require File.expand_path(File.join(File.dirname(__FILE__), "db", "tasks"))
 
 # standard unit tests
 require 'rake/testtask'
