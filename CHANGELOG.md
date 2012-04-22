@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.4.1 ###
+
+*Released 2012-04-22*
+
+* Improved MySQL support (from not working at all to mostly working)
+* Removed properties performance hack which was inapplicable to MySQL
+* Cleaned up site default serialization
+
 ### 0.4.0 ###
 
 *Released 2012-04-21*

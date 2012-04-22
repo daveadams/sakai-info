@@ -1,6 +1,6 @@
 # sakai-info #
 
-last updated: 2012-04-21  
+last updated: 2012-04-22  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
@@ -24,7 +24,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
 
 The resulting gem will be saved to the working directory as
-`sakai-info-0.4.0.gem`.
+`sakai-info-0.4.1.gem`.
 
 Cleanup built gems using:
 
@@ -47,6 +47,11 @@ gems must also be installed to support whatever database or databases you use.
 
 Oracle support requires the `ruby-oci8` gem, and MySQL support requires the
 `mysql` gem. Some unit tests make use of the `sqlite3` gem.
+
+## MySQL Support ##
+
+MySQL support is now working. Your MySQL server must have the setting
+`lower_case_table_names=1` or be running on a case-insensitive filesystem.
 
 ## Configuration ##
 
