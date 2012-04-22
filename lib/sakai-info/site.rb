@@ -405,17 +405,9 @@ module SakaiInfo
 
     def self.find_by_site_id(site_id)
       properties = {}
-      # HACK: reading blobs via OCI8 is really slow, make the db server do it!
-      #  This is multiple orders of magnitude faster.
-      #  But, this will break if the property value is > 4000chars and may not work
-      #  on mysql, so here's the original version:
-      # DB.connect[:sakai_site_property].where(:site_id => site_id).all.each do |row|
-      #   properties[row[:name]] = row[:value].read
-      # end
       DB.connect[:sakai_site_property].
-        select(:name, :to_char.sql_function(:value).as(:value)).
         where(:site_id => site_id).all.each do |row|
-        properties[row[:name]] = row[:value]
+        properties[row[:name]] = row[:value].read
       end
       return properties
     end

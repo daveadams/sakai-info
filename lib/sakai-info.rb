@@ -101,6 +101,15 @@ class Hash
   end
 end
 
+# alias .to_s on Blob class to match OCI8 blob class's read method
+module Sequel
+  module SQL
+    class Blob
+      alias :read :to_s
+    end
+  end
+end
+
 # baseline db connectivity
 require 'sakai-info/database'
 
