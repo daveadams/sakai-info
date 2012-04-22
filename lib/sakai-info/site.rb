@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-04-01 daveadams@gmail.com
+# Last updated 2012-04-22 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -255,11 +255,14 @@ module SakaiInfo
         "gradebook_item_count" => (self.gradebook.nil? ? 0 : self.gradebook.item_count),
         "forum_count" => self.forum_count
       }
-      if result["providers"].nil? or result["providers"] == ""
+      if result["providers"].nil? or result["providers"] == "" or result["providers"] == []
         result.delete("providers")
       end
       if result["is_joinable"] == false
         result.delete("join_role")
+      end
+      if result["site_properties"] == {}
+        result.delete("site_properties")
       end
       if self.gradebook.nil?
         result.delete("gradebook_item_count")
