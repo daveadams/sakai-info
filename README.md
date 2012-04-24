@@ -1,6 +1,6 @@
 # sakai-info #
 
-last updated: 2012-04-22  
+last updated: 2012-04-24  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
@@ -53,6 +53,9 @@ Oracle support requires the `ruby-oci8` gem, and MySQL support requires the
 MySQL support is now working. Your MySQL server must have the setting
 `lower_case_table_names=1` or be running on a case-insensitive filesystem.
 
+I recommend you use the `mysql2` gem, which is faster than the `mysql` or
+`ruby-mysql` gems and is also much better tested.
+
 ## Configuration ##
 
 To run, *sakai-info* needs to be able to connect to your Sakai database server.
@@ -63,7 +66,8 @@ In this release, *sakai-info* expects a to find the config in a file located at
 more Sakai database connection nicknames and connection strings, for example:
 
     prod: oracle://sakai:password@SAKAIPROD
-    test: mysql://test:password@mysql.host:3307/db_name
+    test: mysql2://test:password@mysql-host/db_name
+    local: mysql2://sakai:ironchef@localhost/db_name
 
 The first connection in the list is the default connection. Other connections
 may be specified using the corresponding YAML key, which functions as a
