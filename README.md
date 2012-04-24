@@ -109,3 +109,7 @@ See ROADMAP.md
 This work is dedicated to the public domain. No rights are reserved. See
 LICENSE for more information.
 
+## Acknowledgements ##
+
+Thanks so much to Will Humphries for his interest, feedback, and assistance in
+testing.
