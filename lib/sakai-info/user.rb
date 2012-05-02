@@ -30,9 +30,12 @@ module SakaiInfo
 
         row = DB.connect[:sakai_user].where(:user_id => user_id).first
         if row.nil?
-          raise ObjectNotFoundException.new(User, id)
+          #Has sakai_user_id_map record, but not sakai_user record. Provided account!
+          #raise ObjectNotFoundException.new(User, id)
+          @@cache[eid] = @@cache[user_id] = User.new(user_id,'Provided')
+        else
+          @@cache[eid] = @@cache[user_id] = User.new(row)
         end
-        @@cache[eid] = @@cache[user_id] = User.new(row)
       end
       @@cache[id]
     end
@@ -59,14 +62,24 @@ module SakaiInfo
       end
     end
 
-    def initialize(dbrow)
-      @dbrow = dbrow
-
-      @id = dbrow[:user_id]
-      @eid = User.get_eid(@id)
-      @email = dbrow[:email]
-      @name = ((dbrow[:first_name] || "") + " " + (dbrow[:last_name] || "")).strip
-      @type = dbrow[:type]
+    def initialize(*args)
+      case args.size
+      when 1
+        dbrow = args[0]
+        @dbrow = dbrow 
+        @id = dbrow[:user_id]
+        @eid = User.get_eid(@id)
+        @email = dbrow[:email]
+        @name = ((dbrow[:first_name] || "") + " " + (dbrow[:last_name] || "")).strip
+        @type = dbrow[:type]
+      when 2
+        user_id, placeholder_string = args
+        @id = user_id
+        @eid=User.get_eid(@id)
+        @email = @name = @type = placeholder_string
+      else
+        raise ArgumentError, "This method takes 1-2 arguments"
+      end
     end
 
     def properties
