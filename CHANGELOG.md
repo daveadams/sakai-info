@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.4.2 ###
+
+*Released ????-??-??*
+
+* Fixed issue in assignment-submission for formatting entity dates
+
 ### 0.4.1 ###
 
 *Released 2012-04-22*

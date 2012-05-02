@@ -2,7 +2,7 @@
 #   SakaiInfo::Assignment library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-05-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -137,7 +137,7 @@ module SakaiInfo
     end
 
     def submitted_at
-      @submitted_at ||= format_entity_date(@attributes["datesubmitted"])
+      @submitted_at ||= Util.format_entity_date(@attributes["datesubmitted"])
     end
 
     def self.query_by_assignment_id(assignment_id)
