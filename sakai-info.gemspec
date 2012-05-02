@@ -2,14 +2,14 @@
 #   Gem definition file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-04-02 daveadams@gmail.com
+# Last updated 2012-05-02 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
 # This software is public domain. See LICENSE for more information.
 #
 
-require 'lib/sakai-info/version'
+require File.expand_path(File.join(File.dirname(__FILE__), 'lib', 'sakai-info', 'version'))
 
 Gem::Specification.new do |spec|
   spec.name = "sakai-info"
