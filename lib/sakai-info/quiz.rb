@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-28 daveadams@gmail.com
+# Last updated 2012-05-03 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -93,6 +93,21 @@ module SakaiInfo
       nil
     end
 
+    # possible statuses
+    INACTIVE = 0
+    ACTIVE = 1
+    DELETED = 2 # aka 'DEAD' in the Scholar source
+    RETRACTED_FOR_EDITING = 3
+    def status
+      case @dbrow[:status].to_i
+      when INACTIVE then "inactive"
+      when ACTIVE then "active"
+      when DELETED then "deleted"
+      when RETRACTED_FOR_EDITING then "retracted for editing"
+      else "unknown status '#{@dbrow[:status].to_i}'"
+      end
+    end
+
     def section_count
       @section_count ||= QuizSection.count_by_quiz_id(@id)
     end
@@ -106,6 +121,7 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "site" => nil,
+        "status" => self.status,
         "type" => self.quiz_type,
         "section_count" => self.section_count,
         "attempt_count" => nil
@@ -126,6 +142,7 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "site_id" => nil,
+        "status" => self.status,
         "type" => self.quiz_type
       }
       if not self.site.nil?
@@ -137,7 +154,8 @@ module SakaiInfo
     def site_summary_serialization
       {
         "id" => self.id,
-        "title" => self.title
+        "title" => self.title,
+        "status" => self.status,
       }
     end
 
