@@ -17,6 +17,21 @@
 #   test: oracle://user:pass@sid/schema_name
 #   dev: mysql://user:pass@hostname/db_name
 #
+# For connections requiring options not well-supported by URI strings, 
+#   i.e. passwords with special characters, or non-default schemas, 
+#   all options can be specified one their own line, eg:
+#
+#   lmssbx:
+#     adapter: oracle
+#     user: user
+#     password: pas^w#?d
+#     host: db_name
+#     after_connect: ALTER SESSION SET CURRENT_SCHEMA=sakai
+#
+# Some connections may require a query be run immediately after connecting, i.e.
+#   to select a default schema. Sequel supports this through the after_connect
+#   option. To provide a query for after_connect, include it as shown above.
+#
 # The default connection is the first one in the file.
 # For more on Sequel connection strings, see:
 #   http://sequel.rubyforge.org/rdoc/files/doc/opening_databases_rdoc.html
@@ -42,6 +57,23 @@ module SakaiInfo
           # try to parse as a filename first
           if File.exist?(config)
             @@config = YAML::load_file(config)
+            # loop through each connection, symbolicize keys in options hashes
+            @@config.each do |name,connect_info|
+              if connect_info.is_a?(Hash)
+                conn = {}
+                connect_info.each do |option,value|
+                  osym=option.to_sym
+                  # If a query is needed after connection, store it in a procedure
+                  # See: http://sequel.rubyforge.org/rdoc/files/doc/release_notes/3_11_0_txt.html
+                  if option=="after_connect"
+                    conn[osym]=proc{|c| c.exec(value)}
+                  else
+                    conn[osym]=value
+                  end
+                end 
+                @@config[name]=conn
+              end
+            end
           end
         else
           # otherwise try to parse it generically
@@ -105,8 +137,8 @@ module SakaiInfo
   end
 
   class Database
-    def initialize(connection_string, logger = nil)
-      @connection_string = connection_string.to_s
+    def initialize(connect_info, logger = nil)
+      @connect_info=connect_info
       @logger = logger
     end
 
@@ -116,7 +148,7 @@ module SakaiInfo
       end
 
       begin
-        @connection = Sequel.connect(@connection_string)
+        @connection = Sequel.connect(@connect_info)
       rescue => e
         @connection = nil
         raise ConnectionFailureException.new("Could not connect: #{e}")

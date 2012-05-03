@@ -69,6 +69,21 @@ more Sakai database connection nicknames and connection strings, for example:
     test: mysql2://test:password@mysql-host/db_name
     local: mysql2://sakai:ironchef@localhost/db_name
 
+For connections requiring options not well-supported by URI strings,
+i.e. passwords with special characters, or non-default schemas, 
+all options can be specified one their own line, eg:
+
+    lmssbx:
+      adapter: oracle
+      user: user
+      password: pas^w#?d
+      host: db_name
+      after_connect: ALTER SESSION SET CURRENT_SCHEMA=sakai
+
+Some connections may require a query be run immediately after connecting, i.e.
+to select a default schema. Sequel supports this through the after_connect
+option. To provide a query for after_connect, include it as shown above.
+
 The first connection in the list is the default connection. Other connections
 may be specified using the corresponding YAML key, which functions as a
 nickname for the connection.
