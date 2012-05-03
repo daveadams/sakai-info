@@ -5,6 +5,7 @@
 *Released ????-??-??*
 
 * Fixed issue in assignment-submission for formatting entity dates
+* Added status property to quizzes along with interpretation of the value
 
 ### 0.4.1 ###
 
