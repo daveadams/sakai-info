@@ -2,7 +2,7 @@
 #   SakaiInfo::Database library
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-02-25 daveadams@gmail.com
+# Last updated 2012-05-04 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -17,8 +17,8 @@
 #   test: oracle://user:pass@sid/schema_name
 #   dev: mysql://user:pass@hostname/db_name
 #
-# For connections requiring options not well-supported by URI strings, 
-#   i.e. passwords with special characters, or non-default schemas, 
+# For connections requiring options not well-supported by URI strings,
+#   i.e. passwords with special characters, or non-default schemas,
 #   all options can be specified one their own line, eg:
 #
 #   lmssbx:
@@ -35,6 +35,12 @@
 # The default connection is the first one in the file.
 # For more on Sequel connection strings, see:
 #   http://sequel.rubyforge.org/rdoc/files/doc/opening_databases_rdoc.html
+#
+# As an alternative, may specify an alternate file name by putting an @ sign
+# followed by the filename to load the config from on the first line of
+# the config file specified, eg:
+#
+#   @/etc/sakai-info/shared.conf
 #
 
 # using the oci8 driver will complain if NLS_LANG is not set in the environment
@@ -55,6 +61,14 @@ module SakaiInfo
           @@config = config
         elsif config.is_a? String and File.exist?(config)
           # try to parse as a filename first
+          # first check to see if it points to a different config file
+          File.open(config) do |f|
+            first_line = f.readlines[0].chomp
+            if first_line =~ /^@(.+)$/
+              # use the rest of the line as an alternate filename
+              config = $1
+            end
+          end
           if File.exist?(config)
             @@config = YAML::load_file(config)
             # loop through each connection, symbolicize keys in options hashes
@@ -70,10 +84,12 @@ module SakaiInfo
                   else
                     conn[osym]=value
                   end
-                end 
+                end
                 @@config[name]=conn
               end
             end
+          else
+            raise "No such file '#{config}'"
           end
         else
           # otherwise try to parse it generically
