@@ -1,6 +1,6 @@
 # sakai-info #
 
-last updated: 2012-04-24  
+last updated: 2012-05-03  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
@@ -126,5 +126,5 @@ LICENSE for more information.
 
 ## Acknowledgements ##
 
-Thanks so much to Will Humphries for his interest, feedback, and assistance in
-testing.
+Thanks to Will Humphries for his interest, feedback, assistance in testing, and
+code submissions.
