@@ -2,11 +2,12 @@
 
 ### 0.4.2 ###
 
-*Released ????-??-??*
+*Released 2012-05-04*
 
 * Fixed issue in assignment-submission for formatting entity dates
 * Added status property to quizzes along with interpretation of the value
 * Added support for provided users to User object (submitted by Will Humphries)
+* Allowed .sakai-info file to point to another location for configuration
 
 ### 0.4.1 ###
 

@@ -1,16 +1,16 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-04-22*
-
-### 0.4.2 ###
-
-* CLI access to announcements
+*Last updated 2012-05-04*
 
 ### 0.4.3 ###
 
-* CLI access to gradebook
+* CLI access to announcements
 
 ### 0.4.4 ###
+
+* CLI access to gradebook
+
+### 0.4.5 ###
 
 * CLI access to authz (realms, roles, functions)
 

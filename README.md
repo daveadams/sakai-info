@@ -1,6 +1,6 @@
 # sakai-info #
 
-last updated: 2012-05-03  
+last updated: 2012-05-04  
 author: David Adams (daveadams@gmail.com)  
 github url: https://github.com/daveadams/sakai-info
 
@@ -24,7 +24,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
 
 The resulting gem will be saved to the working directory as
-`sakai-info-0.4.1.gem`.
+`sakai-info-0.4.2.gem`.
 
 Cleanup built gems using:
 
@@ -90,6 +90,12 @@ nickname for the connection.
 
 [More information on how to specify a Sequel connection string.](http://sequel.rubyforge.org/rdoc/files/doc/opening_databases_rdoc.html)
 
+As an alternative, may specify an alternate file name by putting an `@` sign
+followed by the filename to load the config from on the first line of
+the config file specified, eg:
+
+    @/etc/sakai-info/shared.conf
+
 ## Command Line Usage ##
 
 After installing the gem, the `sin` program should be found in your PATH. For
@@ -124,7 +130,9 @@ See ROADMAP.md
 This work is dedicated to the public domain. No rights are reserved. See
 LICENSE for more information.
 
-## Acknowledgements ##
+## Contributors ##
 
-Thanks to Will Humphries for his interest, feedback, assistance in testing, and
-code submissions.
+The following individuals have contributed code to this project:
+
+* David Adams <daveadams@gmail.com>
+* Will Humphries <will.d.humphries@gmail.com>
