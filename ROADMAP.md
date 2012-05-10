@@ -1,10 +1,6 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-05-04*
-
-### 0.4.3 ###
-
-* CLI access to announcements
+*Last updated 2012-05-10*
 
 ### 0.4.4 ###
 
@@ -25,11 +21,11 @@
 
 ### 0.7.0 ###
 
-* Basic OSP support
+* OSP support
 
 ------
 
-Other things on the wishlist for future releases:
+Ideas for future releases:
 
 * More complete object relationship support for full drilldown capability
   * Gradebook/assignment/quiz interaction
@@ -37,6 +33,7 @@ Other things on the wishlist for future releases:
   * Assignment submissions per-assignment and per-student
 * Support for more Sakai objects
   * OSP
+  * Evaluations
   * Forum topics and posts
   * Private messages
   * Events
@@ -52,4 +49,6 @@ Other things on the wishlist for future releases:
   * httpd log analysis helper
   * RPC client for Sakai-monitoring servlet
   * schema analysis and generators
+  * web UI
+  * CLI shell
 

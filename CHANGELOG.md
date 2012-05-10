@@ -2,10 +2,13 @@
 
 ### 0.4.3 ###
 
-*Released xxxx-xx-xx*
+*Released 2012-05-10*
 
 * Tweaked site summary serialization to display creator EID
 * Added attempted_at field to quiz attempt item serializations
+* Added CLI support for announcement and announcement-channel
+* Added clear_cache class method to all objects using caches
+* Added Cache.clear_all class and method to SakaiInfo module
 
 ### 0.4.2 ###
 
