@@ -2,7 +2,7 @@
 #   SakaiInfo::Announcement library
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,24 +10,29 @@
 #
 
 module SakaiInfo
-  class AnnouncementChannel < SakaiXMLEntity
-    attr_reader :next
+  class AnnouncementChannel < SakaiObject
+    attr_reader :dbrow
 
-    @@cache = {}
-    @@site_cache = {}
+    def self.clear_caches
+      @@cache = {}
+      @@site_cache = {}
+    end
+    clear_caches
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+      @id = dbrow[:channel_id]
+    end
 
     def self.find(id)
       if @@cache[id].nil?
         xml = ""
-        row = DB.connect[:announcement_channel].filter(:channel_id => id).first
+        row = DB.connect[:announcement_channel].where(:channel_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(AnnouncementChannel, id)
         end
-        nextid = row[:next_id].to_i
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        channel = AnnouncementChannel.new(id, nextid, xml)
-        @@cache[id] = channel
-        @@site_cache[channel.site_id] = channel
+        @@cache[id] = AnnouncementChannel.new(row)
+        @@site_cache[@@cache[id].site_id] = @@cache[id]
       end
       @@cache[id]
     end
@@ -41,32 +46,31 @@ module SakaiInfo
         end
     end
 
-    # raw data constructor
-    def initialize(id, nextid, xml)
-      @id = id
-      @next = nextid
-      @xml = xml
-      parse_xml
-    end
-
-    # properties
+    # lazy properties
     def announcements
       @announcements ||= Announcement.find_by_channel_id(@id)
     end
 
     def announcement_count
-      @announcement_count ||= self.announcements.length
+      @announcement_count ||= Announcement.count_by_channel_id(@id)
     end
 
     def site_id
       @site_id ||= @id.split("/")[3]
     end
 
+    def xml
+      if @xml.nil?
+        @xml = ""
+        REXML::Document.new(@dbrow[:xml].read).write(@xml, 2)
+      end
+      @xml
+    end
+
     # serialization
     def default_serialization
       {
         "id" => self.id,
-        "next" => self.next,
         "site_id" => self.site_id,
         "announcement_count" => self.announcement_count
       }
@@ -75,72 +79,86 @@ module SakaiInfo
     def summary_serialization
       {
         "id" => self.id,
-        "site_id" => self.site_id,
         "announcement_count" => self.announcement_count
       }
     end
+
+    def xml_serialization
+      {
+        "xml" => self.xml
+      }
+    end
+
+    def announcements_serialization
+      {
+        "announcements" => self.announcements.collect { |ann| ann.serialize(:summary) }
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
+       :xml,
+       :announcements,
+      ]
+    end
   end
 
-  class Announcement < SakaiXMLEntity
-    attr_reader :channel, :owner, :date
-    attr_reader :draft, :pubview
+  class Announcement < SakaiObject
+    attr_reader :channel_id, :owner, :date, :draft, :pubview, :dbrow
 
-    @@cache = {}
+    def self.clear_caches
+      @@cache = {}
+    end
+    clear_caches
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = @dbrow[:message_id]
+      @channel_id = @dbrow[:channel_id]
+      @draft = @dbrow[:draft]
+      @pubview = @dbrow[:pubview]
+      @owner = User.find(@dbrow[:owner])
+      @date = @dbrow[:message_date]
+    end
+
     def self.find(id)
       if @@cache[id].nil?
-        xml = ""
-        row = DB.connect.fetch("select channel_id, draft, pubview, owner, xml, " +
-                               "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as message_date " +
-                               "from announcement_message " +
-                               "where message_id = ?", id).first
+        row = DB.connect[:announcement_message].where(:message_id => id).first
         if row.nil?
           raise ObjectNotFoundException.new(Announcement, id)
         end
-
-        channel = AnnouncementChannel.find(row[:channel_id])
-        draft = row[:draft]
-        pubview = row[:pubview]
-        owner = User.find(row[:owner])
-        date = row[:message_date]
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
+        @@cache[id] = Announcement.new(row)
       end
       @@cache[id]
     end
 
-    # raw data constructor
-    def initialize(id, channel, draft, pubview, owner, date, xml)
-      @id = id
-      @channel = channel
-      @draft = draft
-      @pubview = pubview
-      @owner = owner
-      @date = date
-      @xml = xml
-      parse_xml
+    def self.query_by_channel_id(channel_id)
+      DB.connect[:announcement_message].where(:channel_id => channel_id)
     end
 
-    # helpers
+    def self.count_by_channel_id(channel_id)
+      Announcement.query_by_channel_id(channel_id).count
+    end
+
     def self.find_by_channel_id(channel_id)
-      announcements = []
-      channel = AnnouncementChannel.find(channel_id)
-
-      DB.connect.fetch("select message_id, draft, pubview, owner, xml, " +
-                       "to_char(message_date,'YYYY-MM-DD HH24:MI:SS') as message_date " +
-                       "from announcement_message " +
-                       "where channel_id = ?", channel_id) do |row|
-        xml = ""
-        id = row[:message_id]
-        draft = row[:draft]
-        pubview = row[:pubview]
-        owner = User.find(row[:owner])
-        REXML::Document.new(row[:xml].read).write(xml, 2)
-        date = row[:message_date]
-
-        @@cache[id] = Announcement.new(id, channel, draft, pubview, owner, date, xml)
-        announcements << @@cache[id]
+      Announcement.query_by_channel_id(channel_id).all.collect do |row|
+        @@cache[row[:message_id]] = Announcement.new(row)
       end
-      announcements
+    end
+
+    # lazy properties
+    def channel
+      @channel ||= AnnouncementChannel.find(self.channel_id)
+    end
+
+    def xml
+      if @xml.nil?
+        @xml = ""
+        REXML::Document.new(@dbrow[:xml].read).write(@xml, 2)
+      end
+      @xml
     end
 
     # serialization
@@ -151,7 +169,7 @@ module SakaiInfo
         "owner" => self.owner.serialize(:summary),
         "draft" => self.draft,
         "pubview" => self.pubview,
-        "channel" => self.channel.serialize(:summary)
+        "channel" => self.channel_id,
       }
     end
 
@@ -160,6 +178,19 @@ module SakaiInfo
         "id" => self.id,
         "date" => self.date
       }
+    end
+
+    def xml_serialization
+      {
+        "xml" => self.xml
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
+       :xml,
+      ]
     end
   end
 end
