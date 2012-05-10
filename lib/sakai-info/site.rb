@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-04-22 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -275,7 +275,7 @@ module SakaiInfo
         "id" => self.id,
         "title" => self.title,
         "type" => self.type,
-        "created_by" => self.created_by_id
+        "created_by" => self.created_by.eid
       }
     end
 
