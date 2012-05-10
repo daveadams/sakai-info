@@ -766,7 +766,8 @@ module SakaiInfo
         "attempt" => self.attempt.serialize(:summary),
         "item" => self.item.serialize(:summary),
         "answer" => self.answer,
-        "attachment_count" => self.attachments.length
+        "attachment_count" => self.attachments.length,
+        "submitted_at" => self.submitted_at,
       }
     end
 
@@ -775,14 +776,16 @@ module SakaiInfo
         "id" => self.id,
         "eid" => User.get_eid(self.user_id),
         "attempt_id" => self.attempt_id,
-        "item_id" => self.item_id
+        "item_id" => self.item_id,
+        "submitted_at" => self.submitted_at,
       }
     end
 
     def attempt_summary_serialization
       {
         "id" => self.id,
-        "item_id" => self.item_id
+        "item_id" => self.item_id,
+        "submitted_at" => self.submitted_at,
       }
     end
 
