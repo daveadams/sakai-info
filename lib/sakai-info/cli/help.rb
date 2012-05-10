@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-04-02 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -20,7 +20,8 @@ sin #{VERSION}
   Object commands:
     user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
     quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
-    assignment-submission, forum, forum-thread, forum-post, content
+    assignment-submission, forum, forum-thread, forum-post, content,
+    announcement, announcement-channel
 
   Misc commands:
     test             Tests configured database connections
@@ -327,6 +328,29 @@ sin content
     --children   Recursively print collection children
     --mod        Print creation/modification info
     --all        Print all possible details
+EOF
+        "announcement" => <<EOF,
+sin announcement
+
+  Usage: sin announcement <id> [<options>]
+
+  Prints information about the announcement specified. Additional options may
+  be passed to include additional information:
+
+    --xml        Print raw XML content
+    --all        Print all possible details
+EOF
+        "announcement-channel" => <<EOF,
+sin content
+
+  Usage: sin announcement-channel <id> [<options>]
+
+  Prints information about the announcement channel specified. Additional
+  options may be passed to include additional information:
+
+    --announcements  Print a summary of all announcements in this channel
+    --xml            Print raw XML content
+    --all            Print all possible details
 EOF
       }
 

@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-04-02 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -36,6 +36,8 @@ module SakaiInfo
       "forum-thread" => ForumThread,
       "forum-post" => ForumPost,
       "content" => Content,
+      "announcement" => Announcement,
+      "announcement-channel" => AnnouncementChannel,
     }
   end
 end
