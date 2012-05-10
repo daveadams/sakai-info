@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-04-22 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -67,6 +67,17 @@ module SakaiInfo
       else
         raw
       end
+    end
+  end
+
+  # cache control
+  class Cache
+    def self.clear_all
+      SakaiObject.descendants.select { |klass|
+        klass.methods.include? :clear_cache
+      }.each { |klass|
+        klass.clear_cache
+      }
     end
   end
 end
