@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -75,6 +75,11 @@ module SakaiInfo
     # should be reimplemented in all object classes
     def self.all_serializations
       [:default]
+    end
+
+    # keep track of descendants
+    def self.descendants
+      ObjectSpace.each_object(Class).select { |klass| klass < self }
     end
   end
 end
