@@ -2,7 +2,7 @@
 #   SakaiInfo::Gradebook library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -13,6 +13,12 @@ module SakaiInfo
   class Gradebook < SakaiObject
     attr_reader :version, :site, :name
 
+    def self.clear_cache
+      @@cache = {}
+      @@cache_by_site_id = {}
+    end
+    clear_cache
+
     def initialize(id, version, site, name)
       @id = id
       @version = version
@@ -20,8 +26,6 @@ module SakaiInfo
       @name = name
     end
 
-    @@cache = {}
-    @@cache_by_site_id = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect.fetch("select version, gradebook_uid, name " +
@@ -72,6 +76,12 @@ module SakaiInfo
     attr_reader :id, :gradebook, :object_type, :version, :name
     attr_reader :points_possible, :due_date, :weight
 
+    def self.clear_cache
+      @@cache = {}
+      @@cache_by_gradebook_id = {}
+    end
+    clear_cache
+
     def initialize(id, gradebook, object_type, version, name,
                    points_possible, due_date, weight)
       @id = id
@@ -84,7 +94,6 @@ module SakaiInfo
       @weight = weight
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect.fetch("select gradebook_id, object_type_id, version, " +
@@ -112,7 +121,6 @@ module SakaiInfo
       @@cache[id]
     end
 
-    @@cache_by_gradebook_id = {}
     def self.find_by_gradebook_id(gradebook_id)
       if @@cache_by_gradebook_id[gradebook_id].nil?
         objects = []

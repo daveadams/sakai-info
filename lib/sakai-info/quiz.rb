@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-03 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -18,6 +18,11 @@ module SakaiInfo
     created_at_key :createddate
     modified_by_key :lastmodifiedby
     modified_at_key :lastmodifieddate
+
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
 
     # a note about quizzes:
     # they do not link directly back to sites
@@ -56,7 +61,6 @@ module SakaiInfo
       end
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -171,7 +175,11 @@ module SakaiInfo
   end
 
   class PendingQuiz < Quiz
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -212,7 +220,11 @@ module SakaiInfo
   end
 
   class PublishedQuiz < Quiz
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -280,6 +292,11 @@ module SakaiInfo
     modified_by_key :lastmodifiedby
     modified_at_key :lastmodifieddate
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -292,7 +309,6 @@ module SakaiInfo
       @status = dbrow[:status]
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -387,7 +403,11 @@ module SakaiInfo
   end
 
   class PendingQuizSection < QuizSection
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -407,7 +427,11 @@ module SakaiInfo
   end
 
   class PublishedQuizSection < QuizSection
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -435,6 +459,11 @@ module SakaiInfo
     modified_by_key :lastmodifiedby
     modified_at_key :lastmodifieddate
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -445,7 +474,6 @@ module SakaiInfo
       @typeid = dbrow[:typeid]
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -540,7 +568,11 @@ module SakaiInfo
   end
 
   class PendingQuizItem < QuizItem
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -560,7 +592,11 @@ module SakaiInfo
   end
 
   class PublishedQuizItem < QuizItem
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -592,6 +628,11 @@ module SakaiInfo
     attr_reader :dbrow, :submitted_at, :total_auto_score, :status, :attempted_at
     attr_reader :time_elapsed, :comments, :user_id, :quiz_id
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -608,7 +649,6 @@ module SakaiInfo
       @comments = dbrow[:comments]
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -704,6 +744,11 @@ module SakaiInfo
   class QuizAttemptItem < SakaiObject
     attr_reader :dbrow, :submitted_at, :answer, :user_id, :item_id, :attempt_id
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -727,7 +772,6 @@ module SakaiInfo
       @item ||= PublishedQuizItem.find(@item_id)
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -810,6 +854,11 @@ module SakaiInfo
     modified_by_key :lastmodifiedby
     modified_at_key :lastmodifieddate
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -832,7 +881,6 @@ module SakaiInfo
         all.collect { |row| QuizAttemptItemAttachment.new(row) }
     end
 
-    @@cache = {}
     def self.find(id)
       id = id.to_s
       if @@cache[id].nil?

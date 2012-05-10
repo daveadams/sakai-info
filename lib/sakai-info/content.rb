@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-04-21 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -145,6 +145,11 @@ module SakaiInfo
   class ContentResource < Content
     attr_reader :file_path, :uuid, :context, :resource_type_id, :dbrow
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -160,7 +165,6 @@ module SakaiInfo
       @id_column = "resource_id"
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:content_resource].where(:resource_id => id).first
@@ -219,6 +223,11 @@ module SakaiInfo
   class ContentCollection < Content
     attr_reader :dbrow
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -229,7 +238,6 @@ module SakaiInfo
       @id_column = "collection_id"
     end
 
-    @@cache = {}
     def self.find(id)
       if id !~ /\/$/
         id += "/"
@@ -348,7 +356,11 @@ module SakaiInfo
   end
 
   class MissingContentCollection < ContentCollection
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       @@cache[id] ||= MissingContentCollection.new(id, nil)
     end

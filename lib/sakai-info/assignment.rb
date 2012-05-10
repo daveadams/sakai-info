@@ -2,7 +2,7 @@
 #   SakaiInfo::Assignment library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-02 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -13,7 +13,11 @@ module SakaiInfo
   class Assignment < SakaiXMLEntity
     attr_reader :dbrow, :site_id
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id].nil?
         xml = ""
@@ -95,6 +99,11 @@ module SakaiInfo
   class AssignmentSubmission < SakaiXMLEntity
     attr_reader :dbrow, :assignment_id, :submitter_id
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -107,7 +116,6 @@ module SakaiInfo
       parse_xml
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:assignment_submission].where(:submission_id => id).first
@@ -204,6 +212,11 @@ module SakaiInfo
   class AssignmentContent < SakaiXMLEntity
     attr_reader :owner
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(id, owner, xml)
       @id = id
       @owner = owner
@@ -211,7 +224,6 @@ module SakaiInfo
       parse_xml
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:assignment_content].where(:content_id => id).first

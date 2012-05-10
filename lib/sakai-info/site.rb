@@ -19,7 +19,11 @@ module SakaiInfo
     modified_by_key :modifiedby
     modified_at_key :modifiedon
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:sakai_site].where(:site_id => id).first

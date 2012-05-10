@@ -2,7 +2,7 @@
 #   SakaiInfo::Page library
 #
 # Created 2012-03-08 daveadams@gmail.com
-# Last updated 2012-04-22 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -13,7 +13,11 @@ module SakaiInfo
   class Page < SakaiObject
     attr_reader :title, :order, :layout, :site_id, :dbrow
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:sakai_site_page].where(:page_id => id).first

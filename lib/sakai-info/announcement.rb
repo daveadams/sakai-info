@@ -13,11 +13,11 @@ module SakaiInfo
   class AnnouncementChannel < SakaiObject
     attr_reader :dbrow
 
-    def self.clear_caches
+    def self.clear_cache
       @@cache = {}
       @@site_cache = {}
     end
-    clear_caches
+    clear_cache
 
     def initialize(dbrow)
       @dbrow = dbrow
@@ -107,10 +107,10 @@ module SakaiInfo
   class Announcement < SakaiObject
     attr_reader :channel_id, :owner, :date, :draft, :pubview, :dbrow
 
-    def self.clear_caches
+    def self.clear_cache
       @@cache = {}
     end
-    clear_caches
+    clear_cache
 
     def initialize(dbrow)
       @dbrow = dbrow

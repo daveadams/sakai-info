@@ -2,7 +2,7 @@
 #   SakaiInfo::Group library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-04-22 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -12,6 +12,11 @@
 module SakaiInfo
   class Group < SakaiObject
     attr_reader :site_id, :title, :dbrow
+
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
 
     def initialize(dbrow)
       @dbrow = dbrow
@@ -25,7 +30,6 @@ module SakaiInfo
       @site ||= Site.find(@site_id)
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:sakai_site_group].filter(:group_id => id).first

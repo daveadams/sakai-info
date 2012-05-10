@@ -2,7 +2,7 @@
 #   SakaiInfo::Authz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-17 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -13,6 +13,11 @@ module SakaiInfo
   class AuthzRole < SakaiObject
     attr_reader :name
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(id, name)
       @id = id
       @name = name
@@ -22,7 +27,6 @@ module SakaiInfo
       name
     end
 
-    @@cache = {}
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -87,6 +91,11 @@ module SakaiInfo
   class AuthzFunction < SakaiObject
     attr_reader :name
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(id, name)
       @id = id
       @name = name
@@ -96,7 +105,6 @@ module SakaiInfo
       name
     end
 
-    @@cache = {}
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
@@ -164,6 +172,11 @@ module SakaiInfo
   class AuthzRealm < SakaiObject
     attr_reader :name, :providers, :maintain_role
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(id, name, providers, maintain_role)
       @id = id
       @name = name
@@ -191,7 +204,6 @@ module SakaiInfo
       @membership ||= AuthzRealmMembership.find_by_realm_id(@id)
     end
 
-    @@cache = {}
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?

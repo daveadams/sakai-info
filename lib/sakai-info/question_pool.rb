@@ -2,7 +2,7 @@
 #   SakaiInfo::QuestionPool library
 #
 # Created 2012-02-26 daveadams@gmail.com
-# Last updated 2012-02-26 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -19,6 +19,11 @@ module SakaiInfo
     modified_at_key :lastmodifieddate
     modified_by_key :lastmodifiedby
 
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def initialize(dbrow)
       @dbrow = dbrow
 
@@ -30,7 +35,6 @@ module SakaiInfo
       @parent_pool_id = nil if @parent_pool_id == 0
     end
 
-    @@cache = {}
     def self.find(id)
       if @@cache[id].nil?
         row = DB.connect[:sam_questionpool_t].filter(:questionpoolid => id).first

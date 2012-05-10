@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-04-22 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -19,7 +19,12 @@ module SakaiInfo
     modified_by_key :modifiedby
     modified_at_key :modifiedon
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+      @@id_cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id].nil?
         eid = User.get_eid(id)
@@ -30,8 +35,8 @@ module SakaiInfo
 
         row = DB.connect[:sakai_user].where(:user_id => user_id).first
         if row.nil?
-          #Has sakai_user_id_map record, but not sakai_user record. Provided account!
-          #raise ObjectNotFoundException.new(User, id)
+          # Has sakai_user_id_map record, but not sakai_user record. Provided account!
+          # TODO: replace with a ProvidedUser subclass
           @@cache[eid] = @@cache[user_id] = User.new(user_id,'Provided')
         else
           @@cache[eid] = @@cache[user_id] = User.new(row)
@@ -40,7 +45,6 @@ module SakaiInfo
       @@cache[id]
     end
 
-    @@id_cache = {}
     def self.get_ids(id)
       @@id_cache[id] ||=
         DB.connect[:sakai_user_id_map].where({:user_id => id, :eid => id}.sql_or).first
@@ -66,7 +70,7 @@ module SakaiInfo
       case args.size
       when 1
         dbrow = args[0]
-        @dbrow = dbrow 
+        @dbrow = dbrow
         @id = dbrow[:user_id]
         @eid = User.get_eid(@id)
         @email = dbrow[:email]

@@ -2,7 +2,7 @@
 #   SakaiInfo::Message library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-02-24 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -63,12 +63,16 @@ module SakaiInfo
   class Forum < SakaiObject
     attr_reader :id, :title
 
+    def self.clear_cache
+      @@cache = {}
+      @@cache_by_site_id = {}
+    end
+    clear_cache
+
     def initialize(id, title)
       @id = id.to_i
       @title = title
     end
-
-    @@cache = {}
 
     def self.count_by_site_id(site_id)
       DB.connect.fetch("select count(*) as count from mfr_open_forum_t " +
@@ -77,7 +81,6 @@ module SakaiInfo
                        MessageTypeUUID::FORUM_POST, site_id).first[:count].to_i
     end
 
-    @@cache_by_site_id = {}
     def self.find_by_site_id(site_id)
       if @@cache_by_site_id[site_id].nil?
         @@cache_by_site_id[site_id] = []

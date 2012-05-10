@@ -2,7 +2,7 @@
 #   SakaiInfo::Forum library
 #
 # Created 2012-04-01 daveadams@gmail.com
-# Last updated 2012-04-01 daveadams@gmail.com
+# Last updated 2012-05-10 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -11,7 +11,7 @@
 
 module SakaiInfo
   class Forum < SakaiObject
-    attr_reader :id, :title, :dbrow
+    attr_reader :title, :dbrow
 
     include ModProps
     created_by_key :created_by
@@ -19,7 +19,11 @@ module SakaiInfo
     modified_by_key :modified_by
     modified_at_key :modified
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id.to_s].nil?
         row = DB.connect[:mfr_open_forum_t].where(:id => id).first
@@ -118,7 +122,7 @@ module SakaiInfo
   end
 
   class ForumThread < GenericThread
-    attr_reader :id, :title, :dbrow
+    attr_reader :title, :dbrow
 
     include ModProps
     created_by_key :created_by
@@ -126,7 +130,11 @@ module SakaiInfo
     modified_by_key :modified_by
     modified_at_key :modified
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id.to_s].nil?
         row = DB.connect[:mfr_topic_t].where(:id => id, :topic_dtype => "DT").first
@@ -204,7 +212,11 @@ module SakaiInfo
     modified_by_key :modified_by
     modified_at_key :modified
 
-    @@cache = {}
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
     def self.find(id)
       if @@cache[id.to_s].nil?
         row = DB.connect[:mfr_message_t].where(:id => id, :message_dtype => "ME").first
