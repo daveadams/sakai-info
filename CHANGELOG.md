@@ -1,5 +1,12 @@
 # sakai-info Change History #
 
+### 0.4.3 ###
+
+*Released xxxx-xx-xx*
+
+* Tweaked site summary serialization to display creator EID
+* Added attempted_at field to quiz attempt item serializations
+
 ### 0.4.2 ###
 
 *Released 2012-05-04*
