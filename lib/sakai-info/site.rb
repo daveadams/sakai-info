@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-05-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -135,10 +135,7 @@ module SakaiInfo
 
     # gradebook properties
     def gradebook
-      @gradebook ||= Gradebook.find_by_site_id(@id)
-    rescue ObjectNotFoundException
-      # not all sites have a gradebook, don't panic
-      nil
+      @gradebook ||= Gradebook.find_by_site_id(@id).first
     end
 
     # forum properties
@@ -363,9 +360,9 @@ module SakaiInfo
     end
 
     def gradebook_serialization
-      if self.gradebook and self.gradebook.item_count > 0
+      if self.gradebook
         {
-          "gradebook_items" => self.gradebook.items.collect { |item| item.serialize(:summary) }
+          "gradebook" => self.gradebook.serialize(:site_summary, :items)
         }
       else
         {}
