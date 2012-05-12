@@ -21,7 +21,7 @@ sin #{VERSION}
     user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
     quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
     assignment-submission, forum, forum-thread, forum-post, content,
-    announcement, announcement-channel
+    announcement, announcement-channel, gradebook, gradebook-item
 
   Misc commands:
     test             Tests configured database connections
