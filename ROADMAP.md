@@ -6,18 +6,18 @@
 
 * CLI access to authz (realms, roles, functions)
 
-### 0.5.0 ###
+### 0.5.x ###
 
 * Sqlite test infrastructure for a few basic objects
 * Deeper query functionality and field specification
 * Simple web query interface - HTML, JSON, and YAML
 
-### 0.6.0 ###
+### 0.6.x ###
 
 * Test fixtures and basic unit tests for all represented objects
 * RDoc coverage for every class
 
-### 0.7.0 ###
+### 0.7.x ###
 
 * OSP support
 
