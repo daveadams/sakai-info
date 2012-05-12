@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-05-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -99,7 +99,6 @@ sin user
 
     --sites    Print site membership information
     --pools    Print list of owned question pools
-    --all      Print all possible details
 EOF
 
         "group" => <<EOF,
@@ -112,7 +111,6 @@ sin group
 
     --users    Print user membership information
     --realm    Print corresponding realm information
-    --all      Print all possible details
 EOF
 
         "site" => <<EOF,
@@ -133,7 +131,6 @@ sin site
     --realm        Print site realm details
     --forums       Print forum details
     --mod          Print creation/modification info
-    --all          Print all possible details
 EOF
 
         "page" => <<EOF,
@@ -164,7 +161,6 @@ sin quiz
     --sections   Print section summary list
     --attempts   Print summary of user quiz attempts
     --mod        Print creation/modification info
-    --all        Print all possible details
 
   Not yet implemented:
     --items      Print summary of items on the quiz
@@ -181,7 +177,6 @@ sin quiz-section
 
     --items      Print summary of items in the section
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "quiz-item" => <<EOF,
@@ -194,7 +189,6 @@ sin quiz-item
   passed to include additional information:
 
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "question-pool" => <<EOF,
@@ -211,7 +205,6 @@ sin question-pool
   Not yet implemented:
     --items    Print summary of items in the pool
     --quizzes  Print summary of quizzes that link to this pool
-    --all      Print all possible details
 EOF
 
         "quiz-attempt" => <<EOF,
@@ -223,7 +216,6 @@ sin quiz-attempt
   may be passed to include additional information:
 
     --items      Print list of attempted items
-    --all        Print all possible details
 EOF
 
 
@@ -236,7 +228,6 @@ sin quiz-attempt-item
   options may be passed to include additional information:
 
     --attachments  Print a list of file attachments, if any
-    --all          Print all possible details
 EOF
 
         "quiz-attempt-item-attachment" => <<EOF,
@@ -248,7 +239,6 @@ sin quiz-attempt-item-attachment
   Additional options may be passed to include additional information:
 
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "assignment" => <<EOF,
@@ -262,7 +252,6 @@ sin assignment
     --submissions  Print summary of all submissions
     --xml          Print the raw XML
     --mod          Print creation/modification info
-    --all          Print all possible details
 EOF
 
         "assignment-submission" => <<EOF,
@@ -275,7 +264,6 @@ sin assignment-submission
 
     --xml          Print the raw XML
     --mod          Print creation/modification info
-    --all          Print all possible details
 EOF
 
         "forum" => <<EOF,
@@ -288,7 +276,6 @@ sin forum
 
     --threads    Print summary of all threads
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "forum-thread" => <<EOF,
@@ -301,7 +288,6 @@ sin forum-thread
 
     --posts      Print summary of all posts
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "forum-post" => <<EOF,
@@ -313,7 +299,6 @@ sin forum-post
   may be passed to include additional information:
 
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
 
         "content" => <<EOF,
@@ -327,7 +312,6 @@ sin content
     --properties Print all properties
     --children   Recursively print collection children
     --mod        Print creation/modification info
-    --all        Print all possible details
 EOF
         "announcement" => <<EOF,
 sin announcement
@@ -338,10 +322,9 @@ sin announcement
   be passed to include additional information:
 
     --xml        Print raw XML content
-    --all        Print all possible details
 EOF
         "announcement-channel" => <<EOF,
-sin content
+sin announcement-channel
 
   Usage: sin announcement-channel <id> [<options>]
 
@@ -350,7 +333,23 @@ sin content
 
     --announcements  Print a summary of all announcements in this channel
     --xml            Print raw XML content
-    --all            Print all possible details
+EOF
+        "gradebook" => <<EOF,
+sin gradebook
+
+  Usage: sin gradebook <id> [<options>]
+
+  Prints information about the gradebook ID specified. Additional options may
+  be passed to include additional information:
+
+    --items    Print all gradebook items
+EOF
+        "gradebook-item" => <<EOF,
+sin gradebook-item
+
+  Usage: sin gradebook-item <id> [<options>]
+
+  Prints information about the gradebook item ID specified.
 EOF
       }
 
