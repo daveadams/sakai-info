@@ -1,10 +1,6 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-05-10*
-
-### 0.4.4 ###
-
-* CLI access to gradebook
+*Last updated 2012-05-12*
 
 ### 0.4.5 ###
 
@@ -13,6 +9,8 @@
 ### 0.5.0 ###
 
 * Sqlite test infrastructure for a few basic objects
+* Deeper query functionality and field specification
+* Simple web query interface - HTML, JSON, and YAML
 
 ### 0.6.0 ###
 

@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.4.4 ###
+
+*Released 2012-05-12*
+
+* Standardized gradebook and gradebook-item APIs
+* Renamed GradableObject class to GradebookItem
+* CLI access to gradebook and gradebook-item objects
+
 ### 0.4.3 ###
 
 *Released 2012-05-10*
