@@ -14,7 +14,7 @@ module SakaiInfo
     class Help
       STRINGS = {
         :default => <<EOF,
-sin #{VERSION}
+Sakai Info: sin #{VERSION}
   Usage: sin <command> [<id>] [<options>]
 
   Object commands:
@@ -33,7 +33,7 @@ sin #{VERSION}
 EOF
 
         "options" => <<EOF,
-sin #{VERSION}
+Sakai Info: sin #{VERSION}
   Options that apply globally:
     --database=<name>
         Connect to database instance <name> as defined in ~/.sakai-info instead
