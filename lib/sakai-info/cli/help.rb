@@ -122,16 +122,17 @@ sin site
   Prints information about the site ID specified. Additional options may be
   passed to include additional information:
 
-    --users        Print membership information
-    --pages        Print page list with tools
-    --groups       Print group information
-    --quizzes      Print information about quizzes
-    --disk         Print disk usage
-    --assignments  Print assignment info
-    --gradebook    Print gradebook item info
-    --realm        Print site realm details
-    --forums       Print forum details
-    --mod          Print creation/modification info
+    --users         Print membership information
+    --pages         Print page list with tools
+    --groups        Print group information
+    --quizzes       Print information about quizzes
+    --disk          Print disk usage
+    --assignments   Print assignment info
+    --announcements Print announcement info
+    --gradebook     Print gradebook item info
+    --realm         Print site realm details
+    --forums        Print forum details
+    --mod           Print creation/modification info
 EOF
 
         "page" => <<EOF,
