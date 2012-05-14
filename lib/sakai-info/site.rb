@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-12 daveadams@gmail.com
+# Last updated 2012-05-14 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -108,12 +108,28 @@ module SakaiInfo
     end
 
     # announcement properties
+    def announcement_channel
+      if @announcement_channel.nil?
+        begin
+          @announcement_channel = AnnouncementChannel.find_by_site_id(self.id)
+        rescue ObjectNotFoundException
+          @announcement_channel = -1
+          return nil
+        end
+      elsif @announcement_channel == -1
+        return nil
+      end
+      @announcement_channel
+    end
+
     def announcements
-      @announcements ||= AnnouncementChannel.find_by_site_id(@id).announcements
+      return nil if self.announcement_channel.nil?
+      @announcements ||= self.announcement_channel.announcements
     end
 
     def announcement_count
-      @announcement_count ||= AnnouncementChannel.find_by_site_id(@id).announcement_count
+      return 0 if self.announcement_channel.nil?
+      @announcement_count ||= self.announcement_channel.announcement_count
     end
 
     # samigo quiz properties
@@ -252,7 +268,7 @@ module SakaiInfo
         "pending_quiz_count" => self.pending_quiz_count,
         "published_quiz_count" => self.published_quiz_count,
         "assignment_count" => self.assignment_count,
-#        "announcement_count" => self.announcement_count,
+        "announcement_count" => self.announcement_count,
         "gradebook_item_count" => (self.gradebook.nil? ? 0 : self.gradebook.item_count),
         "forum_count" => self.forum_count
       }
@@ -387,8 +403,18 @@ module SakaiInfo
 
     def self.all_serializations
       [
-       :default, :users, :pages, :groups, :quizzes, :disk, :assignments,
-       :announcements, :gradebook, :realm, :forums
+       :default,
+       :users,
+       :pages,
+       :groups,
+       :quizzes,
+       :disk,
+       :assignments,
+       :announcements,
+       :gradebook,
+       :realm,
+       :forums,
+       :mod,
       ]
     end
   end
