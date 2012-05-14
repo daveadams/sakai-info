@@ -1,10 +1,6 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-05-12*
-
-### 0.4.5 ###
-
-* CLI access to authz (realms, roles, functions)
+*Last updated 2012-05-14*
 
 ### 0.5.x ###
 

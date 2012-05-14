@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.4.5 ###
+
+*Released 2012-05-14*
+
+* CLI support for authz roles, realms, and functions
+* Bugfix: fix syntax error using ContentCollection.find! on missing collections
+* Bugfix: gracefully handle missing AnnouncementChannel for Site serializations
+
 ### 0.4.4 ###
 
 *Released 2012-05-12*
