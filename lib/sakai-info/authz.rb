@@ -72,10 +72,18 @@ module SakaiInfo
       role
     end
 
-    def self.find_by_realm_id_and_function_id(realm_id, function_id)
+    def self.query_by_realm_id_and_function_id(realm_id, function_id)
       DB.connect[:sakai_realm_role].
         where(:role_key => DB.connect[:sakai_realm_rl_fn].select(:role_key).
-              where(:realm_key => realm_id, :function_key => function_id)).
+              where(:realm_key => realm_id, :function_key => function_id))
+    end
+
+    def self.count_by_realm_id_and_function_id(realm_id, function_id)
+      AuthzRole.query_by_realm_id_and_function_id(realm_id, function_id).count
+    end
+
+    def self.find_by_realm_id_and_function_id(realm_id, function_id)
+      AuthzRole.query_by_realm_id_and_function_id(realm_id, function_id).
         order(:role_name).all.collect { |row| AuthzRole.new(row) }
     end
 
@@ -149,10 +157,18 @@ module SakaiInfo
       function
     end
 
-    def self.find_by_realm_id_and_function_id(realm_id, function_id)
+    def self.query_by_realm_id_and_role_id(realm_id, role_id)
       DB.connect[:sakai_realm_function].
         where(:function_key => DB.connect[:sakai_realm_rl_fn].select(:function_key).
-              where(:realm_key => realm_id, :function_key => function_id)).
+              where(:realm_key => realm_id, :role_key => role_id))
+    end
+
+    def self.count_by_realm_id_and_role_id(realm_id, role_id)
+      AuthzFunction.query_by_realm_id_and_role_id(realm_id, role_id).count
+    end
+
+    def self.find_by_realm_id_and_role_id(realm_id, role_id)
+      AuthzFunction.query_by_realm_id_and_role_id(realm_id, role_id).
         order(:function_name).all.collect { |row| AuthzFunction.new(row) }
     end
 
@@ -167,24 +183,36 @@ module SakaiInfo
   class AuthzRealm < SakaiObject
     attr_reader :name, :providers, :maintain_role
 
+    include ModProps
+    created_at_key :createdon
+    created_by_key :createdby
+    modified_at_key :modifiedon
+    modified_by_key :modifiedby
+
     def self.clear_cache
       @@cache = {}
     end
     clear_cache
 
-    def initialize(id, name, providers, maintain_role)
-      @id = id
-      @name = name
-      if providers.nil?
+    def initialize(row)
+      @dbrow = row
+
+      @id = @dbrow[:realm_key].to_i
+      @name = @dbrow[:realm_id]
+      if @dbrow[:provider_id].nil?
         @providers = nil
       else
-        @providers = providers.split("+")
+        @providers = @dbrow[:provider_id].split("+")
       end
-      @maintain_role = maintain_role
+      if @dbrow[:maintain_role].nil? or @dbrow[:maintain_role] == ""
+        @maintain_role = nil
+      else
+        @maintain_role = AuthzRole.find_by_id(@dbrow[:maintain_role])
+      end
     end
 
     def realm_roles
-      @realm_roles ||= AuthzRealmRole.find_by_realm_id(@id)
+      @realm_roles ||= AuthzRealmRole.find_by_realm_id(self.id)
     end
 
     def to_s
@@ -192,56 +220,34 @@ module SakaiInfo
     end
 
     def user_count
-      @user_count ||= AuthzRealmMembership.count_by_realm_id(@id)
+      @user_count ||= AuthzRealmMembership.count_by_realm_id(self.id)
     end
 
-    def membership
-      @membership ||= AuthzRealmMembership.find_by_realm_id(@id)
+    def users
+      @users ||= AuthzRealmMembership.find_by_realm_id(self.id)
     end
 
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        row = DB.connect.fetch("select realm_id, provider_id, maintain_role " +
-                               "from sakai_realm " +
-                               "where realm_key = ?", id.to_i).first
+        row = DB.connect[:sakai_realm].where(:realm_key => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, id)
         end
-
-        name = row[:realm_id]
-        providers = row[:provider_id]
-        maintain_role = nil
-        if row[:maintain_role].nil? or row[:maintain_role] == ""
-          maintain_role = nil
-        else
-          maintain_role = AuthzRole.find_by_id(row[:maintain_role].to_i)
-        end
-        @@cache[id] = AuthzRealm.new(id, name, providers, maintain_role)
-        @@cache[name] = @@cache[id]
+        @@cache[id] = AuthzRealm.new(row)
+        @@cache[@@cache[id].name] = @@cache[id]
       end
       @@cache[id]
     end
 
     def self.find_by_name(name)
       if @@cache[name].nil?
-        row = DB.connect.fetch("select realm_key, provider_id, maintain_role " +
-                               "from sakai_realm " +
-                               "where realm_id = ?", name).first
+        row = DB.connect[:sakai_realm].where(:realm_id => name).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRealm, name)
         end
-
-        id = row[:realm_key].to_i.to_s
-        providers = row[:provider_id]
-        maintain_role = nil
-        if row[:maintain_role].nil? or row[:maintain_role] == ""
-          maintain_role = nil
-        else
-          maintain_role = AuthzRole.find_by_id(row[:maintain_role].to_i)
-        end
-        @@cache[name] = AuthzRealm.new(id, name, providers, maintain_role)
-        @@cache[id] = @@cache[name]
+        @@cache[name] = AuthzRealm.new(row)
+        @@cache[@@cache[name].id] = @@cache[name]
       end
       @@cache[name]
     end
@@ -268,6 +274,49 @@ module SakaiInfo
     def self.find_by_site_id_and_group_id(site_id, group_id)
       AuthzRealm.find_by_name("/site/#{site_id}/group/#{group_id}")
     end
+
+    def default_serialization
+      result = {
+        "id" => self.id,
+        "name" => self.name,
+        "user_count" => self.user_count,
+      }
+      if not self.providers.nil?
+        result["providers"] = self.providers
+      end
+      if not self.maintain_role.nil?
+        result["maintain_role"] = self.maintain_role.name
+      end
+      result
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+        "name" => self.name,
+      }
+    end
+
+    def roles_serialization
+      {
+        "roles" => self.realm_roles.collect { |rr| rr.serialize(:realm_summary) }
+      }
+    end
+
+    def users_serialization
+      {
+        "users" => self.users.collect { |u| u.serialize(:realm_summary) }
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
+       :mod,
+       :roles,
+       :users,
+      ]
+    end
   end
 
   class AuthzRealmRole < SakaiObject
@@ -279,19 +328,23 @@ module SakaiInfo
     end
 
     def function_count
-      @function_count ||= AuthzFunction.count_by_realm_id_and_role_id(@realm.id, @role.id)
+      @function_count ||=
+        AuthzFunction.count_by_realm_id_and_role_id(self.realm.id, self.role.id)
     end
 
     def functions
-      @functions ||= AuthzFunction.find_by_realm_id_and_role_id(@realm.id, @role.id)
+      @functions ||=
+        AuthzFunction.find_by_realm_id_and_role_id(self.realm.id, self.role.id)
     end
 
     def user_count
-      @user_count ||= User.count_by_realm_id_and_role_id(@realm.id, @role.id)
+      @user_count ||=
+        User.count_by_realm_id_and_role_id(self.realm.id, self.role.id)
     end
 
     def users
-      @users ||= User.find_by_realm_id_and_role_id(@realm.id, @role.id)
+      @users ||=
+        User.find_by_realm_id_and_role_id(self.realm.id, self.role.id)
     end
 
     def self.find_by_realm_id(realm_id)
@@ -314,15 +367,22 @@ module SakaiInfo
         "realm_name" => self.realm.name,
         "role_name" => self.role.name,
         "user_count" => self.user_count,
-        "function_count" => self.function_count
+        "function_count" => self.function_count,
       }
     end
 
     def summary_serialization
       {
-        "role_name" => self.role.name,
+        "realm" => self.realm.name,
+        "role" => self.role.name,
+      }
+    end
+
+    def realm_summary_serialization
+      {
+        "role" => self.role.name,
         "user_count" => self.user_count,
-        "function_count" => self.function_count
+        "function_count" => self.function_count,
       }
     end
   end
@@ -349,7 +409,7 @@ module SakaiInfo
     end
 
     def self.count_by_realm_id(realm_id)
-      DB.connect[:sakai_realm_rl_gr].filter(:realm_key => realm_id).count
+      DB.connect[:sakai_realm_rl_gr].where(:realm_key => realm_id).count
     end
 
     def self.find_by_user_id(user_id)
@@ -363,6 +423,29 @@ module SakaiInfo
         results << AuthzRealmMembership.new(row[:realm_id], user_id, row[:role_name])
       end
       results
+    end
+
+    def default_serialization
+      {
+        "realm" => self.realm.serialize(:summary),
+        "user" => self.user.serialize(:summary),
+        "role" => self.role.serialize(:summary),
+      }
+    end
+
+    def summary_serialization
+      {
+        "realm" => self.realm.name,
+        "user" => self.user.eid,
+        "role" => self.role.name,
+      }
+    end
+
+    def realm_summary_serialization
+      {
+        "user" => self.user.eid,
+        "role" => self.role.name,
+      }
     end
   end
 end
