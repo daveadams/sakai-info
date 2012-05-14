@@ -11,6 +11,7 @@
 * Sqlite test infrastructure for a few basic objects
 * Deeper query functionality and field specification
 * Simple web query interface - HTML, JSON, and YAML
+* Global cache instead of per-class
 
 ### 0.6.x ###
 
