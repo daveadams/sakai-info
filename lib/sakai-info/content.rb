@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-05-14 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -361,8 +361,12 @@ module SakaiInfo
     end
     clear_cache
 
+    def initialize(id)
+      @id = id
+    end
+
     def self.find(id)
-      @@cache[id] ||= MissingContentCollection.new(id, nil)
+      @@cache[id] ||= MissingContentCollection.new(id)
     end
 
     def size_on_disk
