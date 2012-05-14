@@ -2,7 +2,7 @@
 #   SakaiInfo::Authz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-05-14 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -18,9 +18,11 @@ module SakaiInfo
     end
     clear_cache
 
-    def initialize(id, name)
-      @id = id
-      @name = name
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = @dbrow[:role_key].to_i
+      @name = @dbrow[:role_name]
     end
 
     def to_s
@@ -30,13 +32,12 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        row = DB.connect.fetch("select role_name from sakai_realm_role " +
-                               "where role_key = ?", id.to_i).first
+        row = DB.connect[:sakai_realm_role].where(:role_key => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, id)
         end
-        @@cache[id] = AuthzRole.new(id, row[:role_name])
-        @@cache[name] = @@cache[id]
+        @@cache[id] = AuthzRole.new(row)
+        @@cache[@@cache[id].name] = @@cache[id]
       end
       @@cache[id]
     end
@@ -46,14 +47,12 @@ module SakaiInfo
         raise ObjectNotFoundException.new(AuthzRole, "")
       end
       if @@cache[name].nil?
-        row = DB.connect.fetch("select role_key from sakai_realm_role " +
-                               "where role_name = ?", name).first
+        row = DB.connect[:sakai_realm_role].where(:role_name => name).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzRole, name)
         end
-        id = row[:role_key].to_i.to_s
-        @@cache[name] = AuthzRole.new(id, name)
-        @@cache[id] = @@cache[name]
+        @@cache[name] = AuthzRole.new(row)
+        @@cache[@@cache[name].id] = @@cache[name]
       end
       @@cache[name]
     end
@@ -74,17 +73,17 @@ module SakaiInfo
     end
 
     def self.find_by_realm_id_and_function_id(realm_id, function_id)
-      roles = []
-      DB.connect.fetch("select role_key, role_name from " +
-                       "sakai_realm_role where role_key in " +
-                       "(select role_key from sakai_realm_rl_fn " +
-                       "where realm_key=? and function_key=?) " +
-                       "order by role_name", realm_id, function_id) do |row|
-        role_id = row[:role_key].to_i.to_s
-        role_name = row[:role_name]
-        roles << AuthzRole.new(role_id, role_name)
-      end
-      roles
+      DB.connect[:sakai_realm_role].
+        where(:role_key => DB.connect[:sakai_realm_rl_fn].select(:role_key).
+              where(:realm_key => realm_id, :function_key => function_id)).
+        order(:role_name).all.collect { |row| AuthzRole.new(row) }
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "name" => self.name,
+      }
     end
   end
 
@@ -96,9 +95,11 @@ module SakaiInfo
     end
     clear_cache
 
-    def initialize(id, name)
-      @id = id
-      @name = name
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = @dbrow[:function_key].to_i
+      @name = @dbrow[:function_name]
     end
 
     def to_s
@@ -108,28 +109,27 @@ module SakaiInfo
     def self.find_by_id(id)
       id = id.to_s
       if @@cache[id].nil?
-        row = DB.connect.fetch("select function_name from sakai_realm_function " +
-                               "where function_key = ?", id.to_i).first
+        row = DB.connect[:sakai_realm_function].where(:function_key => id.to_i).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzFunction, id)
         end
-        @@cache[id] = AuthzFunction.new(id, row[:function_name])
-        @@cache[row[:function_name]] = @@cache[id]
+        @@cache[id] = AuthzFunction.new(row)
+        @@cache[@@cache[id].name] = @@cache[id]
       end
       @@cache[id]
     end
 
     def self.find_by_name(name)
+      if name.nil?
+        raise ObjectNotFoundException.new(AuthzFunction, "")
+      end
       if @@cache[name].nil?
-        id = nil
-        row = DB.connect.fetch("select function_key from sakai_realm_function " +
-                               "where function_name = ?", name).first
+        row = DB.connect[:sakai_realm_function].where(:function_name => name).first
         if row.nil?
           raise ObjectNotFoundException.new(AuthzFunction, name)
         end
-        id = row[:function_key].to_i.to_s
-        @@cache[name] = AuthzFunction.new(id, name)
-        @@cache[id] = @@cache[name]
+        @@cache[name] = AuthzFunction.new(row)
+        @@cache[@@cache[name].id] = @@cache[name]
       end
       @@cache[name]
     end
@@ -149,23 +149,18 @@ module SakaiInfo
       function
     end
 
-    def self.count_by_realm_id_and_role_id(realm_id, role_id)
-      DB.connect[:sakai_realm_rl_fn].
-        filter(:realm_key => realm_id, :role_key => role_id).count
+    def self.find_by_realm_id_and_function_id(realm_id, function_id)
+      DB.connect[:sakai_realm_function].
+        where(:function_key => DB.connect[:sakai_realm_rl_fn].select(:function_key).
+              where(:realm_key => realm_id, :function_key => function_id)).
+        order(:function_name).all.collect { |row| AuthzFunction.new(row) }
     end
 
-    def self.find_by_realm_id_and_role_id(realm_id, role_id)
-      functions = []
-      DB.connect.fetch("select function_key, function_name from " +
-                       "sakai_realm_function where function_key in " +
-                       "(select function_key from sakai_realm_rl_fn " +
-                       "where realm_key=? and role_key=?) " +
-                       "order by function_name", realm_id, role_id) do |row|
-        function_id = row[:function_key].to_i.to_s
-        function_name = row[:function_name]
-        functions << AuthzFunction.new(function_id, function_name)
-      end
-      functions
+    def default_serialization
+      {
+        "id" => self.id,
+        "name" => self.name,
+      }
     end
   end
 
