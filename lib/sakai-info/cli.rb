@@ -42,6 +42,7 @@ module SakaiInfo
       "gradebook-item" => GradebookItem,
       "role" => AuthzRole,
       "function" => AuthzFunction,
+      "realm" => AuthzRealm,
     }
   end
 end

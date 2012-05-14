@@ -22,7 +22,7 @@ sin #{VERSION}
     quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
     assignment-submission, forum, forum-thread, forum-post, content,
     announcement, announcement-channel, gradebook, gradebook-item, role,
-    function
+    function, realm
 
   Misc commands:
     test             Tests configured database connections
@@ -365,6 +365,18 @@ sin function
   Usage: sin function <id> [<options>]
 
   Prints information about the authz function ID specified.
+EOF
+        "realm" => <<EOF,
+sin realm
+
+  Usage: sin realm <id> [<options>]
+
+  Prints information about the authz realm ID specified. Additional options may
+  be passed to include additional information:
+
+    --roles      List roles associated with this realm
+    --users      List users in this realm
+    --mod        Print creation/modification info
 EOF
       }
 
