@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-12 daveadams@gmail.com
+# Last updated 2012-05-14 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -21,7 +21,8 @@ sin #{VERSION}
     user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
     quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
     assignment-submission, forum, forum-thread, forum-post, content,
-    announcement, announcement-channel, gradebook, gradebook-item
+    announcement, announcement-channel, gradebook, gradebook-item, role,
+    function
 
   Misc commands:
     test             Tests configured database connections
@@ -350,6 +351,20 @@ sin gradebook-item
   Usage: sin gradebook-item <id> [<options>]
 
   Prints information about the gradebook item ID specified.
+EOF
+        "role" => <<EOF,
+sin role
+
+  Usage: sin role <id> [<options>]
+
+  Prints information about the authz role ID specified.
+EOF
+        "function" => <<EOF,
+sin function
+
+  Usage: sin function <id> [<options>]
+
+  Prints information about the authz function ID specified.
 EOF
       }
 

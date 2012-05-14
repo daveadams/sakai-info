@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-12 daveadams@gmail.com
+# Last updated 2012-05-14 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -40,6 +40,8 @@ module SakaiInfo
       "announcement-channel" => AnnouncementChannel,
       "gradebook" => Gradebook,
       "gradebook-item" => GradebookItem,
+      "role" => AuthzRole,
+      "function" => AuthzFunction,
     }
   end
 end
