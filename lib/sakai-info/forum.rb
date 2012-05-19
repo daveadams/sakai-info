@@ -255,6 +255,10 @@ module SakaiInfo
       ForumPost.query_by_thread_id(thread_id).all.collect { |r| ForumPost.new(r) }
     end
 
+    def self.count_by_date(d)
+      count_by_date_and_message_type(d, "ME")
+    end
+
     def default_serialization
       {
         "id" => self.id,
