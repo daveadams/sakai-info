@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.4.6 ###
+
+*Released 2012-05-19*
+
+* Reinstated stub PrivateMessage class
+* Removed defunct message.rb
+* Re-added `count_by_date` method to PrivateMessage and ForumPost classes
+
 ### 0.4.5 ###
 
 *Released 2012-05-14*
