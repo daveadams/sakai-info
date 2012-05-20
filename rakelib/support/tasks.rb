@@ -2,7 +2,7 @@
 #   task definitions for project support
 #
 # Created 2012-02-27 daveadams@gmail.com
-# Last updated 2012-05-30 daveadams@gmail.com
+# Last updated 2012-05-20 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -12,6 +12,7 @@
 require 'yaml'
 require File.join(File.dirname(__FILE__), 'schema_info')
 require File.join(File.dirname(__FILE__), 'doc_tasks')
+require File.join(File.dirname(__FILE__), 'raw_data')
 
 require 'sequel'
 require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'sakai-info', 'exceptions')
@@ -83,11 +84,6 @@ namespace :schema do
         db.instance_eval(f.read)
       end
       puts "OK"
-    end
-
-    puts "Loading test fixtures into database:"
-    Dir["#{Support::SchemaInfo::FixtureDir}/*.yml"].each do |filename|
-      # TODO: load fixtures into database
     end
   end
 end
