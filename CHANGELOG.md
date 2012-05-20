@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.5.0 ###
+
+*Released xxxx-xx-xx*
+
+* Added --full-children option for content
+
 ### 0.4.6 ###
 
 *Released 2012-05-19*
