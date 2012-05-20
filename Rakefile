@@ -51,7 +51,7 @@ end
 
 # include external support tasks
 require File.expand_path(File.join(File.dirname(__FILE__), "rakelib", "support", "tasks"))
-require File.expand_path(File.join(File.dirname(__FILE__), "db", "tasks"))
+require File.expand_path(File.join(File.dirname(__FILE__), "rakelib", "db", "tasks"))
 
 # standard unit tests
 require 'rake/testtask'
