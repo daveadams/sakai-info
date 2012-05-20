@@ -2,7 +2,7 @@
 #   task definitions for project support
 #
 # Created 2012-02-27 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-05-30 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -13,51 +13,14 @@ require 'yaml'
 require File.join(File.dirname(__FILE__), 'schema_info')
 require File.join(File.dirname(__FILE__), 'doc_tasks')
 
-# using the oci8 driver will complain if NLS_LANG is not set in the environment
-ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
+require 'sequel'
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'sakai-info', 'exceptions')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'sakai-info', 'hacks')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'sakai-info', 'database')
 
 def db_connect(connection_name = :default)
-  config_file = File.expand_path("~/.sakai-info")
-  config = nil
-  if File.exist? config_file
-    begin
-      config = YAML::load_file(config_file)
-    rescue
-    end
-  end
-
-  connection_string = if not config.nil?
-                        if connection_name == :default
-                          # none specified--use the first entry in the file
-                          config.values[0]
-                        else
-                          config[connection_name]
-                        end
-                      else
-                        # interpret the argument as a literal connection string
-                        args[:db]
-                      end
-
-  # now set up Sequel
-  require 'sequel'
-
-  # and try to connect
-  db = nil
-  begin
-    db = Sequel.connect(connection_string)
-  rescue => e
-    if connection_name == :default
-      STDERR.puts "Could not connect to default database"
-    else
-      STDERR.puts "Could not connect to database '#{connection_name}'"
-    end
-    STDERR.puts "  #{e}"
-    exit 1
-  end
-
-  return db
+  SakaiInfo::DB.connect(connection_name)
 end
-
 
 namespace :schema do
   task :create_schema_dir do
@@ -110,10 +73,9 @@ namespace :schema do
 
   desc "Create test DB"
   task :testdb => [:create_testdb_dir, :clean_testdb] do
-    require 'sequel'
     db = Sequel.sqlite(Support::SchemaInfo::TestDbFile)
 
-    puts "Initializing test database:"
+    puts "Initializing test database schema:"
     Dir["#{Support::SchemaInfo::DumpDir}/create_*.rb"].each do |filename|
       table = File.basename(filename, ".rb").sub(/^create_/,"")
       print "  Creating table #{table}... ";STDOUT.flush
@@ -121,6 +83,11 @@ namespace :schema do
         db.instance_eval(f.read)
       end
       puts "OK"
+    end
+
+    puts "Loading test fixtures into database:"
+    Dir["#{Support::SchemaInfo::FixtureDir}/*.yml"].each do |filename|
+      # TODO: load fixtures into database
     end
   end
 end

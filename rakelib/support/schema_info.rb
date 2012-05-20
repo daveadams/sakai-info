@@ -2,7 +2,7 @@
 #   Support::SchemaInfo class for rake task support
 #
 # Created 2012-02-27 daveadams@gmail.com
-# Last updated 2012-02-29 daveadams@gmail.com
+# Last updated 2012-05-20 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -14,6 +14,7 @@ module Support
     DumpDir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "tmp", "schema"))
     TestDbDir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "tmp", "db"))
     TestDbFile = File.join(TestDbDir, "test.db")
+    FixtureDir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "db", "fixtures"))
 
     Tables = {
       :user => [:sakai_user, :sakai_user_property, :sakai_user_id_map, :sakai_preferences],
