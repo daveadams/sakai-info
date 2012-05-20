@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-14 daveadams@gmail.com
+# Last updated 2012-05-20 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -140,6 +140,16 @@ module SakaiInfo
       self.binary_entity
       self.original_mod_details_serialization
     end
+
+    def self.all_serializations
+      [
+       :default,
+       :children,
+       :realm,
+       :properties,
+       :mod
+      ]
+    end
   end
 
   class ContentResource < Content
@@ -216,6 +226,14 @@ module SakaiInfo
       {
         "id" => self.id,
         "size" => self.size_on_disk,
+      }
+    end
+
+    def detailed_summary_serialization
+      {
+        "id" => self.id,
+        "size" => self.size_on_disk,
+        "file_path" => self.file_path,
       }
     end
   end
@@ -319,6 +337,13 @@ module SakaiInfo
       }
     end
 
+    def detailed_summary_serialization
+      {
+        "id" => self.id,
+        "size_on_disk" => self.size_on_disk,
+      }
+    end
+
     def children_serialization
       result = {
         "collections" => self.children["collections"].collect { |cc|
@@ -326,6 +351,24 @@ module SakaiInfo
         },
         "resources" => self.children["resources"].collect { |cr|
           cr.serialize(:child_summary)
+        }
+      }
+      if result["collections"] == []
+        result.delete("collections")
+      end
+      if result["resources"] == []
+        result.delete("resources")
+      end
+      result
+    end
+
+    def full_children_serialization
+      result = {
+        "collections" => self.children["collections"].collect { |cc|
+          cc.serialize(:detailed_summary, :full_children)
+        },
+        "resources" => self.children["resources"].collect { |cr|
+          cr.serialize(:detailed_summary)
         }
       }
       if result["collections"] == []

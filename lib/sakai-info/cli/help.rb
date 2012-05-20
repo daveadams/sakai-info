@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-14 daveadams@gmail.com
+# Last updated 2012-05-20 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -311,9 +311,10 @@ sin content
   Prints information about the content resource or collection ID specified.
   Additional options may be passed to include additional information:
 
-    --properties Print all properties
-    --children   Recursively print collection children
-    --mod        Print creation/modification info
+    --properties    Print all properties
+    --children      Recursively print collection children
+    --full-children Print children with full IDs and file paths
+    --mod           Print creation/modification info
 EOF
         "announcement" => <<EOF,
 sin announcement
