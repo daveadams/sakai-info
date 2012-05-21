@@ -4,7 +4,8 @@
 
 *Released xxxx-xx-xx*
 
-* Added --full-children option for content
+* Added --full-children and --all options for content
+* Refactored rake tasks into one directory
 
 ### 0.4.6 ###
 
