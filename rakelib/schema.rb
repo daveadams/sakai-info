@@ -110,7 +110,7 @@ namespace :schema do
     Sequel.extension(:schema_dumper)
 
     puts "Dumping schema creation files to disk:"
-    Support::SchemaInfo.tables.each do |table|
+    table_list.each do |table|
       print "  Dumping table #{table}... ";STDOUT.flush
       File.open(File.join(SCHEMADUMPDIR, "create_#{table}.rb"), "w") do |f|
         f.write(db.dump_table_schema(table).each_line.collect do |line|

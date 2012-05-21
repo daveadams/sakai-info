@@ -192,7 +192,7 @@ namespace :data do
         sakai_user_property << {
           :user_id => user_id,
           :name => "prop-#{rand(10000)}-#{rand(10000)}",
-          :value => Support.uuid,
+          :value => generate_uuid,
         }
       end
     end

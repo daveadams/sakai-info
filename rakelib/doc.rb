@@ -118,9 +118,9 @@ namespace :doc do
       db = db_connect
       relationships = YAML::load_file(TableRelationshipsFile)
 
-      Support::SchemaInfo::Tables.keys.each do |table_group|
+      Tables.keys.each do |table_group|
         tables = []
-        Support::SchemaInfo::Tables[table_group].each do |table|
+        Tables[table_group].each do |table|
           if not relationships[table.to_s].nil?
             tables << table.to_s
           end
@@ -132,7 +132,7 @@ namespace :doc do
       end
 
       write_graphviz_file("all",
-                          Support::SchemaInfo::Tables.values.flatten.collect{|t|t.to_s},
+                          Tables.values.flatten.collect{|t|t.to_s},
                           db, relationships)
     end
 
