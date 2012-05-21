@@ -78,3 +78,45 @@ def extra_table_list
   ExtraTables.values.flatten
 end
 
+def db_connect(connection_name = :default)
+  SakaiInfo::DB.connect(connection_name)
+end
+
+namespace :schema do
+  task :create_schema_dir do
+    print "Creating directory for schema creation files... "; STDOUT.flush
+    system "mkdir -p #{SCHEMADUMPDIR}"
+    puts "OK"
+  end
+
+  task :clean_schema do
+    print "Deleting any old schema creation files... ";STDOUT.flush
+    n = File.delete(*Dir[File.join(SCHEMADUMPDIR, "create_*.rb")])
+    puts "#{n} files deleted"
+  end
+
+  desc "Dump schema creation files"
+  task :dump, [:db] => [:create_schema_dir, :clean_schema] do |t, args|
+    args.with_defaults(:db => :default)
+
+    db = db_connect(args[:db])
+    Sequel.extension(:schema_dumper)
+
+    puts "Dumping schema creation files to disk:"
+    Support::SchemaInfo.tables.each do |table|
+      print "  Dumping table #{table}... ";STDOUT.flush
+      File.open(File.join(SCHEMADUMPDIR, "create_#{table}.rb"), "w") do |f|
+        f.write(db.dump_table_schema(table).each_line.collect do |line|
+                  line.chomp!
+                  if line =~ /^  primary_key / and line =~ /:type=>(String|BigDecimal)/
+                    line + ", :auto_increment=>false"
+                  else
+                    line
+                  end
+                end.join("\n"))
+      end
+      puts "OK"
+    end
+  end
+end
+
