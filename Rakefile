@@ -12,7 +12,6 @@
 BASEDIR = File.expand_path(File.dirname(__FILE__))
 LIBDIR = File.join(BASEDIR, 'lib')
 TMPDIR = File.join(BASEDIR, 'tmp')
-DOCDIR = File.join(BASEDIR, 'doc')
 BINDIR = File.join(BASEDIR, 'bin')
 RAKELIBDIR = File.join(BASEDIR, 'rakelib')
 
