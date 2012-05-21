@@ -15,3 +15,7 @@ Rake::TestTask.new do |t|
   t.libs << 'test'
 end
 
+# db-test related
+TESTDBDIR = File.join(TMPDIR, 'db')
+TESTDBFILE = File.join(TESTDBDIR, 'test.db')
+
