@@ -83,6 +83,13 @@ def db_connect(connection_name = :default)
 end
 
 namespace :schema do
+  desc "List database tables used in the code"
+  task :tables do
+    # TODO: find a non-linux way to make this list
+    system "grep -hroE 'DB.connect\[:[a-z_]+\]' lib/sakai-info " +
+      "|cut -d: -f2 |cut -d']' -f1 |sort -u"
+  end
+
   task :create_schema_dir do
     print "Creating directory for schema creation files... "; STDOUT.flush
     system "mkdir -p #{SCHEMADUMPDIR}"
