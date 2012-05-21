@@ -17,11 +17,13 @@ GEMSPEC = File.join(BASEDIR, "#{GEM_NAME}.gemspec")
 namespace :gem do
   desc "Build the gem file #{GEM_FILENAME}"
   task :build => :test do
+    # TODO: do this thru the gem API
     system "gem build #{GEMSPEC}"
   end
 
   desc "Upload built gem to RubyForge"
   task :release => :build do
+    # TODO: do this thru the gem API
     system "gem push #{GEM_FILENAME}"
   end
 end
