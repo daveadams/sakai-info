@@ -2,7 +2,7 @@
 #  - sakai-info command line tool support
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-14 daveadams@gmail.com
+# Last updated 2012-05-23 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -10,12 +10,14 @@
 #
 
 require 'sakai-info/cli/help'
+require 'sakai-info/cli/lookup'
+require 'sakai-info/cli/query'
 
 # it's faster to run single-threaded
 Sequel.single_threaded = true
 
 module SakaiInfo
-  class CLI
+  module CLI
     ObjectModes = {
       "site" => Site,
       "page" => Page,

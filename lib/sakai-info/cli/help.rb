@@ -10,26 +10,40 @@
 #
 
 module SakaiInfo
-  class CLI
+  module CLI
     class Help
       STRINGS = {
         :default => <<EOF,
-Sakai Info: sin #{VERSION}
-  Usage: sin <command> [<id>] [<options>]
+Sakai INfo: sin #{VERSION}
 
-  Object commands:
-    user, group, site, page, tool, quiz, quiz-section, quiz-item, quiz-attempt,
-    quiz-attempt-item, quiz-attempt-item-attachment, question-pool, assignment,
-    assignment-submission, forum, forum-thread, forum-post, content,
-    announcement, announcement-channel, gradebook, gradebook-item, role,
-    function, realm
+  LOOKUP MODE
+    Lookup details about a particular object and its child objects.
 
-  Misc commands:
-    test             Tests configured database connections
-    help             Prints general help
-    version          Prints version
-    help <command>   Prints help about a particular command
-    help options     Prints help about additional options
+    Usage: sin <object-type> [<id>] [<options>]
+
+    Supported object types:
+      user, group, site, page, tool, quiz, quiz-section, quiz-item,
+      quiz-attempt, quiz-attempt-item, quiz-attempt-item-attachment,
+      question-pool, assignment, assignment-submission, forum, forum-thread,
+      forum-post, content, announcement, announcement-channel, gradebook,
+      gradebook-item, role, function, realm
+
+  QUERY MODE
+    Query particular fields from certain objects given certain conditions.
+
+    Usage: sin query <object-type> [<options>]
+
+    Use "sin help query" for more details.
+
+  OTHER COMMANDS
+    Usage: sin <command>
+
+    Available commands:
+      test             Tests configured database connections
+      help             Prints general help
+      version          Prints version
+      help <command>   Prints help about a particular command
+      help options     Prints help about additional options
 EOF
 
         "options" => <<EOF,
@@ -379,6 +393,13 @@ sin realm
     --roles      List roles associated with this realm
     --users      List users in this realm
     --mod        Print creation/modification info
+EOF
+        "query" => <<EOF,
+sin query
+
+  Usage: sin query <object-type> [<options>]
+
+  TODO: add query mode help text
 EOF
       }
 

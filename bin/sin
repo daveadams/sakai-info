@@ -5,7 +5,7 @@
 #   sakai-info library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-04-02 daveadams@gmail.com
+# Last updated 2012-05-23 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -104,11 +104,13 @@ when "test" then
     exit
   end
 
+when "query" then
+  mode = args.shift
+
 else
   # test to see if it's an accepted object mode
   if CLI::ObjectModes.keys.include? args[0]
-    mode = args.shift
-    id = args.shift
+    mode = "lookup"
 
   else
     STDERR.puts "ERROR: Command '#{args[0]}' was not recognized."
@@ -136,18 +138,9 @@ if not db_name.nil?
   DB.default_database = db_name
 end
 
-if flags.include? "--all"
-  serials = CLI::ObjectModes[mode].all_serializations
-elsif
-  flags.include? "--dbrow-only"
-  serials = [:dbrow_only]
-else
-  serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').gsub("-","_").to_sym}
-end
-begin
-  puts CLI::ObjectModes[mode].find(id).to_yaml(serials)
-rescue ObjectNotFoundException
-  STDERR.puts "ERROR: Could not find #{mode} with an ID of '#{id}'"
-  exit 1
+if mode == "query"
+  CLI::Query.process(args, flags)
+elsif mode == "lookup"
+  CLI::Lookup.process(args, flags)
 end
 

@@ -202,16 +202,17 @@ module SakaiInfo
     end
 
     def self.find_by_site_id(site_id)
-      results = []
-      PendingQuiz.query_by_site_id(site_id).all.each do |row|
+      PendingQuiz.query_by_site_id(site_id).all.collect do |row|
         @@cache[row[:id]] = PendingQuiz.new(row, site_id)
-        results << @@cache[row[:id]]
       end
-      results
     end
 
     def self.count_by_site_id(site_id)
       PendingQuiz.query_by_site_id(site_id).count
+    end
+
+    def self.find_ids_by_site_id(site_id)
+      PendingQuiz.query_by_site_id(site_id).select(:id).all.collect { |row| row[:id] }
     end
 
     def quiz_type
@@ -248,16 +249,17 @@ module SakaiInfo
     end
 
     def self.find_by_site_id(site_id)
-      results = []
-      PublishedQuiz.query_by_site_id(site_id).all.each do |row|
+      PublishedQuiz.query_by_site_id(site_id).all.collect do |row|
         @@cache[row[:id]] = PublishedQuiz.new(row, site_id)
-        results << @@cache[row[:id]]
       end
-      results
     end
 
     def self.count_by_site_id(site_id)
       PublishedQuiz.query_by_site_id(site_id).count
+    end
+
+    def self.find_ids_by_site_id(site_id)
+      PublishedQuiz.query_by_site_id(site_id).select(:id).all.collect { |row| row[:id] }
     end
 
     def quiz_type
