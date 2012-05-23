@@ -6,6 +6,7 @@
 
 * Added --full-children and --all options for content
 * Refactored rake tasks into one directory
+* Added a barebones query mode
 
 ### 0.4.6 ###
 
