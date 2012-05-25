@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-05-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -545,6 +545,22 @@ module SakaiInfo
       nil
     end
 
+    def itemtext_table
+      nil
+    end
+
+    def texts
+      if self.itemtext_table.nil?
+        return []
+      end
+
+      DB.connect[self.itemtext_table].
+        select(:text).
+        where(:itemid => self.id).
+        order(:sequence).all.
+        collect { |row| row[:text].read }
+    end
+
     def default_serialization
       {
         "id" => self.id,
@@ -564,8 +580,14 @@ module SakaiInfo
       }
     end
 
+    def texts_serialization
+      {
+        "texts" => self.texts
+      }
+    end
+
     def self.all_serializations
-      [:default, :mod]
+      [:default, :mod, :texts]
     end
   end
 
@@ -591,6 +613,10 @@ module SakaiInfo
     def item_type
       "pending"
     end
+
+    def itemtext_table
+      :sam_itemtext_t
+    end
   end
 
   class PublishedQuizItem < QuizItem
@@ -614,6 +640,10 @@ module SakaiInfo
 
     def item_type
       "published"
+    end
+
+    def itemtext_table
+      :sam_publisheditemtext_t
     end
   end
 

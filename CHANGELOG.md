@@ -6,7 +6,8 @@
 
 * Added --full-children and --all options for content
 * Refactored rake tasks into one directory
-* Added a barebones query mode
+* Added a barebones proof-of-concept-only query mode
+* Added --texts record listing to quiz-item
 
 ### 0.4.6 ###
 

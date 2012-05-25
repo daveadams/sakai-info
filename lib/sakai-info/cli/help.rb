@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-20 daveadams@gmail.com
+# Last updated 2012-05-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -204,6 +204,7 @@ sin quiz-item
   a pending quiz item or a published quiz item. Additional options may be
   passed to include additional information:
 
+    --texts      List associated quiz-item-text records
     --mod        Print creation/modification info
 EOF
 
