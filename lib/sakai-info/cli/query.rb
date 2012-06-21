@@ -2,7 +2,7 @@
 #   class for handling "query" command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-05-23 daveadams@gmail.com
+# Last updated 2012-06-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -37,6 +37,17 @@ module SakaiInfo
           end
 
           puts PublishedQuiz.find_ids_by_site_id(site_id)
+
+        elsif object_type == "userid" or object_type == "user_id" or object_type == "uid"
+          id = args.shift
+          begin
+            user = User.find(id)
+            puts user.id
+          rescue ObjectNotFoundException => e
+            STDERR.puts "ERROR: #{e}"
+            exit 1
+          end
+
         else
           STDERR.puts "ERROR: Unrecognized object type"
           exit 1
