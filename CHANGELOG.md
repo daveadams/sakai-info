@@ -7,7 +7,15 @@
 * Added --full-children and --all options for content
 * Refactored rake tasks into one directory
 * Added a barebones proof-of-concept-only query mode
-* Added --texts record listing to quiz-item
+* Removed quiz, quiz-section, and quiz-item types due to ID overlap risk
+* Added new special modes to intercept calls for these removed object types
+* Added published-quiz and pending-quiz types
+* Added published-quiz-section and pending-quiz-section types
+* Added published-quiz-item and pending-quiz-item types
+* Added --texts record listing to published-quiz-item and pending-quiz-item
+* Added --items record listing to quiz
+* Better summaries for items in quiz-sections and quizzes
+* Added a number of command line object type shortcuts
 
 ### 0.4.6 ###
 
