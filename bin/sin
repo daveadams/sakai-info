@@ -108,9 +108,12 @@ when "query" then
   mode = args.shift
 
 else
-  # test to see if it's an accepted object mode
-  if CLI::ObjectModes.keys.include? args[0]
+  # test to see if it's an accepted lookup mode
+  if CLI::LookupModes.keys.include? args[0]
     mode = "lookup"
+
+  elsif CLI::SpecialModes.keys.include? args[0]
+    mode = "special"
 
   else
     STDERR.puts "ERROR: Command '#{args[0]}' was not recognized."
@@ -138,9 +141,15 @@ if not db_name.nil?
   DB.default_database = db_name
 end
 
-if mode == "query"
+case mode
+when "query"
   CLI::Query.process(args, flags)
-elsif mode == "lookup"
+
+when "lookup"
   CLI::Lookup.process(args, flags)
+
+when "special"
+  CLI::Special.process(args, flags)
+
 end
 
