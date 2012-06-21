@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-25 daveadams@gmail.com
+# Last updated 2012-06-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -22,11 +22,13 @@ Sakai INfo: sin #{VERSION}
     Usage: sin <object-type> [<id>] [<options>]
 
     Supported object types:
-      user, group, site, page, tool, quiz, quiz-section, quiz-item,
-      quiz-attempt, quiz-attempt-item, quiz-attempt-item-attachment,
-      question-pool, assignment, assignment-submission, forum, forum-thread,
-      forum-post, content, announcement, announcement-channel, gradebook,
-      gradebook-item, role, function, realm
+      user, group, site, page, tool, pending-quiz, published-quiz,
+      pending-quiz-section, published-quiz-section, pending-quiz-item,
+      published-quiz-item, quiz-attempt, quiz-attempt-item,
+      quiz-attempt-item-attachment, question-pool, assignment,
+      assignment-submission, forum, forum-thread, forum-post, content,
+      announcement, announcement-channel, gradebook, gradebook-item,
+      role, function, realm
 
   QUERY MODE
     Query particular fields from certain objects given certain conditions.
@@ -165,44 +167,76 @@ sin tool
   Prints information about the tool ID specified.
 EOF
 
-        "quiz" => <<EOF,
-sin quiz
+        "pending-quiz" => <<EOF,
+sin pending-quiz
 
-  Usage: sin quiz <id> [<options>]
+  Usage: sin pending-quiz <id> [<options>]
 
-  Prints information about the quiz ID specified. The quiz ID may represent
-  a pending quiz or a published quiz. Additional options may be passed to
-  include additional information:
+  Prints information about the pending quiz ID specified. Additional options
+  may be passed to include additional information:
 
     --sections   Print section summary list
-    --attempts   Print summary of user quiz attempts
-    --mod        Print creation/modification info
-
-  Not yet implemented:
     --items      Print summary of items on the quiz
+    --mod        Print creation/modification info
 EOF
 
-        "quiz-section" => <<EOF,
-sin quiz-section
+        "published-quiz" => <<EOF,
+sin published-quiz
 
-  Usage: sin quiz-section <id> [<options>]
+  Usage: sin published-quiz <id> [<options>]
 
-  Prints information about the quiz section ID specified. The ID may represent
-  a pending quiz section or a published quiz section. Additional options may be
-  passed to include additional information:
+  Prints information about the published quiz ID specified. Additional options
+  may be passed to include additional information:
+
+    --sections   Print section summary list
+    --items      Print summary of items on the quiz
+    --attempts   Print summary of user quiz attempts
+    --mod        Print creation/modification info
+EOF
+
+        "pending-quiz-section" => <<EOF,
+sin pending-quiz-section
+
+  Usage: sin pending-quiz-section <id> [<options>]
+
+  Prints information about the pending quiz section ID specified. Additional
+  options may be passed to include additional information:
 
     --items      Print summary of items in the section
     --mod        Print creation/modification info
 EOF
 
-        "quiz-item" => <<EOF,
-sin quiz-item
+        "published-quiz-section" => <<EOF,
+sin published-quiz-section
 
-  Usage: sin quiz-item <id> [<options>]
+  Usage: sin published-quiz-section <id> [<options>]
 
-  Prints information about the quiz item ID specified. The ID may represent
-  a pending quiz item or a published quiz item. Additional options may be
-  passed to include additional information:
+  Prints information about the published quiz section ID specified. Additional
+  options may be passed to include additional information:
+
+    --items      Print summary of items in the section
+    --mod        Print creation/modification info
+EOF
+
+        "pending-quiz-item" => <<EOF,
+sin pending-quiz-item
+
+  Usage: sin pending-quiz-item <id> [<options>]
+
+  Prints information about the pending quiz item ID specified. Additional
+  options may be passed to include additional information:
+
+    --texts      List associated pending-quiz-item-text records
+    --mod        Print creation/modification info
+EOF
+
+        "published-quiz-item" => <<EOF,
+sin published-quiz-item
+
+  Usage: sin published-quiz-item <id> [<options>]
+
+  Prints information about the published quiz item ID specified. Additional
+  options may be passed to include additional information:
 
     --texts      List associated quiz-item-text records
     --mod        Print creation/modification info
@@ -400,7 +434,7 @@ sin query
 
   Usage: sin query <object-type> [<options>]
 
-  TODO: add query mode help text
+  Query mode is only being tested at present.
 EOF
       }
 
