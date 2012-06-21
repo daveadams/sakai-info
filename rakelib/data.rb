@@ -2,11 +2,11 @@
 #   task definitions for generating test data
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-05-21 daveadams@gmail.com
+# Last updated 2012-06-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
-# This software is public domain.
+# This software is public domain. See LICENSE.
 #
 
 require 'net/http'
@@ -51,8 +51,8 @@ def fetch_first_names
 
   print "Fetching first names... "; STDOUT.flush
   first_names = []
-  ["http://www.census.gov/genealogy/names/dist.female.first",
-   "http://www.census.gov/genealogy/names/dist.male.first"].each do |url|
+  ["http://www.census.gov/genealogy/www/data/1990surnames/dist.female.first",
+   "http://www.census.gov/genealogy/www/data/1990surnames/dist.male.first"].each do |url|
     content = Net::HTTP.get(URI(url))
     content.each_line do |line|
       first_names << line.split(/ /)[0].downcase.capitalize
@@ -74,7 +74,7 @@ def fetch_last_names
 
   print "Fetching last names... "; STDOUT.flush
   last_names = []
-  ["http://www.census.gov/genealogy/names/dist.all.last"].each do |url|
+  ["http://www.census.gov/genealogy/www/data/1990surnames/dist.all.last"].each do |url|
     content = Net::HTTP.get(URI(url))
     content.each_line do |line|
       last_names << line.split(/ /)[0].downcase.capitalize
