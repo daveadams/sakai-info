@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-25 daveadams@gmail.com
+# Last updated 2012-06-21 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -113,11 +113,19 @@ module SakaiInfo
     end
 
     def section_count
-      @section_count ||= QuizSection.count_by_quiz_id(@id)
+      @section_count ||= self.section_class.count_by_quiz_id(@id)
     end
 
     def sections
-      @sections ||= QuizSection.find_by_quiz_id(@id)
+      @sections ||= self.section_class.find_by_quiz_id(@id)
+    end
+
+    def item_count
+      @item_count ||= self.item_class.count_by_quiz_id(self.id)
+    end
+
+    def items
+      @items ||= self.item_class.find_by_quiz_id(self.id)
     end
 
     def default_serialization
@@ -128,6 +136,7 @@ module SakaiInfo
         "status" => self.status,
         "type" => self.quiz_type,
         "section_count" => self.section_count,
+        "item_count" => self.item_count,
         "attempt_count" => nil
       }
       if not self.site.nil?
@@ -169,8 +178,18 @@ module SakaiInfo
       }
     end
 
+    def items_serialization
+      {
+        "items" => self.items.collect { |i| i.serialize(:quiz_summary) }
+      }
+    end
+
     def self.all_serializations
-      [:default, :sections]
+      [
+       :default,
+       :sections,
+       :items,
+      ]
     end
   end
 
@@ -217,6 +236,14 @@ module SakaiInfo
 
     def quiz_type
       "pending"
+    end
+
+    def section_class
+      PendingQuizSection
+    end
+
+    def item_class
+      PendingQuizItem
     end
   end
 
@@ -266,6 +293,14 @@ module SakaiInfo
       "published"
     end
 
+    def section_class
+      PublishedQuizSection
+    end
+
+    def item_class
+      PublishedQuizItem
+    end
+
     def attempt_count
       @attempt_count ||= QuizAttempt.count_by_quiz_id(self.id)
     end
@@ -281,7 +316,12 @@ module SakaiInfo
     end
 
     def self.all_serializations
-      [:default, :sections, :attempts]
+      [
+       :default,
+       :sections,
+       :items,
+       :attempts,
+      ]
     end
   end
 
@@ -337,12 +377,7 @@ module SakaiInfo
     end
 
     def self.find_by_quiz_id(quiz_id)
-      section_class = if Quiz.find(quiz_id).quiz_type == "pending"
-                        PendingQuizSection
-                      else
-                        PublishedQuizSection
-                      end
-
+      section_class = Quiz.find(quiz_id).section_class
       QuizSection.query_by_quiz_id(quiz_id).all.collect do |row|
         section_class.new(row)
       end
@@ -357,11 +392,11 @@ module SakaiInfo
     end
 
     def item_count
-      @item_count ||= QuizItem.count_by_section_id(@id)
+      @item_count ||= QuizItem.count_by_section_id(self.id)
     end
 
     def items
-      @items ||= QuizItem.find_by_section_id(@id)
+      @items ||= QuizItem.find_by_section_id(self.id)
     end
 
     def default_serialization
@@ -395,7 +430,7 @@ module SakaiInfo
 
     def items_serialization
       {
-        "items" => self.items.collect{|i|i.serialize(:summary)}
+        "items" => self.items.collect{|i|i.serialize(:section_summary)}
       }
     end
 
@@ -536,9 +571,13 @@ module SakaiInfo
 
     def self.find_by_quiz_id(quiz_id)
       item_class = QuizItem.class_for_type(Quiz.find(quiz_id).quiz_type)
-      QuizItem.query_by_quiz_id(quiz_id).all.collect do |row|
+      QuizItem.query_by_quiz_id(quiz_id).order(:sequence).all.collect do |row|
         item_class.new(row)
-      end
+      end.sort { |a,b| if a.section.sequence == b.section.sequence
+                         a.sequence <=> b.sequence
+                       else
+                         a.section.sequence <=> b.section.sequence
+                       end }
     end
 
     def item_type
@@ -580,6 +619,21 @@ module SakaiInfo
       }
     end
 
+    def quiz_summary_serialization
+      {
+        "id" => self.id,
+        "section" => self.section.sequence,
+        "sequence" => self.sequence,
+      }
+    end
+
+    def section_summary_serialization
+      {
+        "id" => self.id,
+        "sequence" => self.sequence,
+      }
+    end
+
     def texts_serialization
       {
         "texts" => self.texts
@@ -587,7 +641,11 @@ module SakaiInfo
     end
 
     def self.all_serializations
-      [:default, :mod, :texts]
+      [
+       :default,
+       :mod,
+       :texts
+      ]
     end
   end
 
