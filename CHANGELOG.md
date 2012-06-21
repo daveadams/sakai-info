@@ -2,7 +2,7 @@
 
 ### 0.5.0 ###
 
-*Released xxxx-xx-xx*
+*Released 2012-06-21*
 
 * Added --full-children and --all options for content
 * Refactored rake tasks into one directory
@@ -16,6 +16,7 @@
 * Added --items record listing to quiz
 * Better summaries for items in quiz-sections and quizzes
 * Added a number of command line object type shortcuts
+* Added random test fixture generation for user objects
 
 ### 0.4.6 ###
 

@@ -1,18 +1,43 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-05-14*
+*Last updated 2012-06-21*
 
-### 0.5.x ###
+### 0.5.1 ###
 
-* Sqlite test infrastructure for a few basic objects
-* Deeper query functionality and field specification
-* Simple web query interface - HTML, JSON, and YAML
+* Test fixture generation for sites
+* Text fixture loading into sqlite for sites and users
+* Field restrictions for lookups
+* Simple queries by name/title for user/site
+* More details for quizzes including access control data
+
+### 0.5.2 ###
+
+* Test fixture generation for quizzes
+* Better date formatting all around
+* More query functionality
+* Proof-of-concept sin shell
+* Chat channel/message support
+
+### 0.5.3 ###
+
+* RDS schema creation and data loading for MySQL and Oracle testing
+* More query and shell functionality
+
+### 0.5.4 ###
+
+* Barebones web interface - HTML, JSON, and YAML
+* More query and shell functionality
+
+### 0.5.5 ###
+
 * Global cache instead of per-class
+* More query, web, and shell functionality
 
 ### 0.6.x ###
 
 * Test fixtures and basic unit tests for all represented objects
 * RDoc coverage for every class
+* More focus on other library usage besides ad hoc CLI/web queries
 
 ### 0.7.x ###
 
