@@ -1,5 +1,13 @@
 # sakai-info Change History #
 
+### 0.5.1 ###
+
+*Released 2012-??-??*
+
+* Added new PrivateMessage/private-message type
+* Adjusted to new use of the 'author' field in PrivateMessage/ForumPost table
+* Now including post body with forum-post
+
 ### 0.5.0 ###
 
 *Released 2012-06-21*
