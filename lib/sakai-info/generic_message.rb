@@ -62,12 +62,6 @@ module SakaiInfo
       GenericThread.types.keys.include?(mt)
     end
   end
-
-  class PrivateMessage < GenericMessage
-    def self.count_by_date(d)
-      count_by_date_and_message_type(d, "PM")
-    end
-  end
 end
 
 

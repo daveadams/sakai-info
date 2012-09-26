@@ -45,4 +45,5 @@ require 'sakai-info/quiz'
 require 'sakai-info/question_pool'
 require 'sakai-info/generic_message'
 require 'sakai-info/forum'
+require 'sakai-info/private_message'
 

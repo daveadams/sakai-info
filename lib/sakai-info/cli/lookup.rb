@@ -90,6 +90,8 @@ module SakaiInfo
       "func" => AuthzFunction,
       "function" => AuthzFunction,
       "realm" => AuthzRealm,
+      "private-message" => PrivateMessage,
+      "pm" => PrivateMessage,
     }
   end
 end

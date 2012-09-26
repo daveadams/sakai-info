@@ -28,7 +28,7 @@ Sakai INfo: sin #{VERSION}
       quiz-attempt-item-attachment, question-pool, assignment,
       assignment-submission, forum, forum-thread, forum-post, content,
       announcement, announcement-channel, gradebook, gradebook-item,
-      role, function, realm
+      role, function, realm, private-message
 
   QUERY MODE
     Query particular fields from certain objects given certain conditions.
@@ -427,6 +427,16 @@ sin realm
 
     --roles      List roles associated with this realm
     --users      List users in this realm
+    --mod        Print creation/modification info
+EOF
+        "private-message" => <<EOF,
+sin private-message
+
+  Usage: sin private-message <id> [<options>]
+
+  Prints information about the private message ID specified. Additional options
+  may be passed to include additional information:
+
     --mod        Print creation/modification info
 EOF
         "query" => <<EOF,
