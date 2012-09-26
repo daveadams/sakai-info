@@ -2,7 +2,7 @@
 #   SakaiInfo::Forum library
 #
 # Created 2012-04-01 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-09-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -231,16 +231,22 @@ module SakaiInfo
     def initialize(dbrow)
       @dbrow = dbrow
 
+      @dbrow[:body] = dbrow[:body].read
+
       @id = dbrow[:id].to_i
       @title = dbrow[:title]
     end
 
     def author
-      @author ||= User.find(@dbrow[:author])
+      @author ||= User.find(@dbrow[:created_by])
     end
 
     def thread
       @thread ||= ForumThread.find(@dbrow[:surrogatekey])
+    end
+
+    def body
+      @dbrow[:body]
     end
 
     def self.query_by_thread_id(thread_id)
@@ -265,6 +271,7 @@ module SakaiInfo
         "title" => self.title,
         "author" => self.author.serialize(:summary),
         "thread" => self.thread.serialize(:summary),
+        "body" => self.body,
       }
     end
 
