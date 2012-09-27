@@ -24,7 +24,8 @@ Sakai INfo: sin #{VERSION}
     Supported object types:
       user, group, site, page, tool, pending-quiz, published-quiz,
       pending-quiz-section, published-quiz-section, pending-quiz-item,
-      published-quiz-item, quiz-attempt, quiz-attempt-item,
+      published-quiz-item, pending-quiz-access-control,
+      published-quiz-access-control, quiz-attempt, quiz-attempt-item,
       quiz-attempt-item-attachment, question-pool, assignment,
       assignment-submission, forum, forum-thread, forum-post, content,
       announcement, announcement-channel, gradebook, gradebook-item,
@@ -240,6 +241,24 @@ sin published-quiz-item
 
     --texts      List associated quiz-item-text records
     --mod        Print creation/modification info
+EOF
+
+        "pending-quiz-access-control" => <<EOF,
+sin pending-quiz-access-control
+
+  Usage: sin pending-quiz-access-control <id> [<options>]
+
+  Prints information about the access control object attached to the
+  pending quiz ID specified.
+EOF
+
+        "published-quiz-access-control" => <<EOF,
+sin published-quiz-access-control
+
+  Usage: sin published-quiz-access-control <id> [<options>]
+
+  Prints information about the access control object attached to the
+  published quiz ID specified.
 EOF
 
         "question-pool" => <<EOF,
