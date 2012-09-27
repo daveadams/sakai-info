@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-06-21 daveadams@gmail.com
+# Last updated 2012-09-27 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -170,6 +170,12 @@ module SakaiInfo
         "title" => self.title,
         "status" => self.status,
       }
+    end
+
+    def access_control_summary_serialization
+      result = self.summary_serialization
+      result.delete("id")
+      result
     end
 
     def sections_serialization
@@ -1008,6 +1014,147 @@ module SakaiInfo
         "id" => self.id,
         "filename" => self.filename
       }
+    end
+  end
+
+  class QuizAccessControl < SakaiObject
+    attr_reader :id, :dbrow
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+      @id = dbrow[:assessmentid]
+    end
+
+    def unlimited_submissions?
+      @dbrow[:unlimitedsubmissions] == 1
+    end
+
+    def submissions_allowed
+      @dbrow[:submissionsallowed]
+    end
+
+    def submissions_saved
+      @dbrow[:submissionssaved]
+    end
+
+    def assessment_format
+      @dbrow[:assessmentformat]
+    end
+
+    def time_limit
+      @dbrow[:timelimit]
+    end
+
+    def timed?
+      @dbrow[:timelimit] > 0
+    end
+
+    def retry_allowed?
+      @dbrow[:retryallowed]
+    end
+
+    def start_date
+      if @dbrow[:startdate].nil?
+        nil
+      else
+        @dbrow[:startdate].strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
+    def due_date
+      if @dbrow[:duedate].nil?
+        nil
+      else
+        @dbrow[:duedate].strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
+    def retract_date
+      if @dbrow[:retractdate].nil?
+        nil
+      else
+        @dbrow[:retractdate].strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
+    def default_serialization
+      result = {
+        "id" => self.id,
+        "quiz" => self.quiz.serialize(:access_control_summary),
+        "unlimited_submissions" => self.unlimited_submissions?,
+        "submissions_allowed" => self.submissions_allowed,
+        "timed" => self.timed?,
+        "time_limit" => self.time_limit,
+        "start_date" => self.start_date,
+        "due_date" => self.due_date,
+      }
+      if not self.timed?
+        result.delete("time_limit")
+      end
+      if self.unlimited_submissions?
+        result.delete("submissions_allowed")
+      end
+      if self.start_date.nil?
+        result.delete("start_date")
+      end
+      if self.due_date.nil?
+        result.delete("due_date")
+      end
+      result
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+      }
+    end
+  end
+
+  class PendingQuizAccessControl < QuizAccessControl
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_assessaccesscontrol_t].where(:assessmentid => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PendingQuizAccessControl, id)
+        end
+
+        @@cache[id] = PendingQuizAccessControl.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PendingQuiz.find(self.id)
+    end
+  end
+
+  class PublishedQuizAccessControl < QuizAccessControl
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_publishedaccesscontrol_t].where(:assessmentid => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PublishedQuizAccessControl, id)
+        end
+
+        @@cache[id] = PublishedQuizAccessControl.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PublishedQuiz.find(self.id)
     end
   end
 end
