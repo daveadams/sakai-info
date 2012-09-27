@@ -4,9 +4,10 @@
 
 *Released 2012-??-??*
 
-* Added new PrivateMessage/private-message type
+* Added new private-message lookup type
 * Adjusted to new use of the 'author' field in PrivateMessage/ForumPost table
 * Now including post body with forum-post
+* Added new pending-quiz-access-control and published-quiz-access-control types
 
 ### 0.5.0 ###
 
