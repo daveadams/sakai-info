@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-09-27 daveadams@gmail.com
+# Last updated 2012-09-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -128,6 +128,10 @@ module SakaiInfo
       @items ||= self.item_class.find_by_quiz_id(self.id)
     end
 
+    def access_control
+      @access_control ||= self.access_control_class.find(self.id)
+    end
+
     def default_serialization
       result = {
         "id" => self.id,
@@ -137,7 +141,8 @@ module SakaiInfo
         "type" => self.quiz_type,
         "section_count" => self.section_count,
         "item_count" => self.item_count,
-        "attempt_count" => nil
+        "attempt_count" => nil,
+        "access_control" => self.access_control.serialize(:quiz_summary)
       }
       if not self.site.nil?
         result["site"] = self.site.serialize(:summary)
@@ -251,6 +256,10 @@ module SakaiInfo
     def item_class
       PendingQuizItem
     end
+
+    def access_control_class
+      PendingQuizAccessControl
+    end
   end
 
   class PublishedQuiz < Quiz
@@ -305,6 +314,10 @@ module SakaiInfo
 
     def item_class
       PublishedQuizItem
+    end
+
+    def access_control_class
+      PublishedQuizAccessControl
     end
 
     def attempt_count
@@ -1034,11 +1047,81 @@ module SakaiInfo
     end
 
     def submissions_saved
-      @dbrow[:submissionssaved]
+      @dbrow[:submissionssaved] == 1
     end
 
-    def assessment_format
-      @dbrow[:assessmentformat]
+    def question_layout
+      case @dbrow[:assessmentformat]
+      when 1
+        "One question per page"
+      when 2
+        "One part per page"
+      when 3
+        "Single page quiz"
+      else
+        @dbrow[:assessmentformat]
+      end
+    end
+
+    def late_handling
+      case @dbrow[:latehandling]
+      when 1
+        "Late submissions accepted"
+      when 2
+        "Late submissions NOT accepted"
+      else
+        @dbrow[:latehandling]
+      end
+    end
+
+    def item_navigation
+      case @dbrow[:itemnavigation]
+      when 1
+        "Linear"
+      when 2
+        "Random"
+      else
+        @dbrow[:itemnavigation]
+      end
+    end
+
+    def item_numbering
+      case @dbrow[:itemnumbering]
+      when 1
+        "Continuous through parts"
+      when 2
+        "Restart numbering at each part"
+      else
+        @dbrow[:itemnumbering]
+      end
+    end
+
+    def submission_message
+      @dbrow[:submissionmessage]
+    end
+
+    def release_to
+      @dbrow[:releaseto]
+    end
+
+    def username
+      @dbrow[:username]
+    end
+
+    def password
+      @dbrow[:password]
+    end
+
+    def final_page_url
+      @dbrow[:finalpageurl]
+    end
+
+    def mark_for_review_allowed?
+      @dbrow[:markforreview] == 1
+    end
+
+    def authenticated?
+      not (self.username.nil? and self.password.nil?)
     end
 
     def time_limit
@@ -1049,8 +1132,8 @@ module SakaiInfo
       @dbrow[:timelimit] > 0
     end
 
-    def retry_allowed?
-      @dbrow[:retryallowed]
+    def automatic_submission?
+      @dbrow[:autosubmit] == 1
     end
 
     def start_date
@@ -1077,6 +1160,22 @@ module SakaiInfo
       end
     end
 
+    def feedback_date
+      if @dbrow[:feedbackdate].nil?
+        nil
+      else
+        @dbrow[:feedbackdate].strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
+    def score_date
+      if @dbrow[:scoredate].nil?
+        nil
+      else
+        @dbrow[:scoredate].strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
     def default_serialization
       result = {
         "id" => self.id,
@@ -1085,8 +1184,14 @@ module SakaiInfo
         "submissions_allowed" => self.submissions_allowed,
         "timed" => self.timed?,
         "time_limit" => self.time_limit,
-        "start_date" => self.start_date,
-        "due_date" => self.due_date,
+        "question_layout" => self.question_layout,
+        "late_handling" => self.late_handling,
+        "item_navigation" => self.item_navigation,
+        "item_numbering" => self.item_numbering,
+        "release_to" => self.release_to,
+        "authenticated" => self.authenticated?,
+        "automatic_submission" => self.automatic_submission?,
+        "mark_for_review_allowed" => self.mark_for_review_allowed?,
       }
       if not self.timed?
         result.delete("time_limit")
@@ -1094,12 +1199,19 @@ module SakaiInfo
       if self.unlimited_submissions?
         result.delete("submissions_allowed")
       end
-      if self.start_date.nil?
-        result.delete("start_date")
+      %w(username start_date due_date score_date retract_date feedback_date submission_message final_page_url).each do |field_name|
+        value = self.method(field_name.to_sym).call
+        if not value.nil?
+          result[field_name] = value
+        end
       end
-      if self.due_date.nil?
-        result.delete("due_date")
-      end
+      result
+    end
+
+    def quiz_summary_serialization
+      result = default_serialization
+      result.delete("quiz")
+      result.delete("id")
       result
     end
 

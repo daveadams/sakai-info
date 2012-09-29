@@ -8,6 +8,7 @@
 * Adjusted to new use of the 'author' field in PrivateMessage/ForumPost table
 * Now including post body with forum-post
 * Added new pending-quiz-access-control and published-quiz-access-control types
+* Integrated access control objects with quiz object output
 
 ### 0.5.0 ###
 

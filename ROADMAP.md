@@ -7,7 +7,6 @@
 * Text fixture loading into sqlite for sites and users
 * Field restrictions for lookups
 * Simple queries by name/title for user/site
-* More details for quizzes including access control data
 
 ### 0.5.2 ###
 
