@@ -219,6 +219,9 @@ module SakaiInfo
       if result["uuid"].nil?
         result.delete("uuid")
       end
+      if result["context"].nil?
+        result.delete("context")
+      end
       result
     end
 
@@ -235,6 +238,60 @@ module SakaiInfo
         "size" => self.size_on_disk,
         "file_path" => self.file_path,
       }
+    end
+  end
+
+  class DeletedContentResource < ContentResource
+    attr_reader :file_path, :uuid, :context, :resource_type_id, :deleted_at, :dbrow
+
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def initialize(dbrow)
+      super(dbrow)
+      @table_name = "content_resource_delete"
+      @deleted_at = @dbrow[:delete_date].strftime("%Y-%m-%d %H:%M:%S")
+    end
+
+    def self.find(id)
+      if @@cache[id].nil?
+        row = DB.connect[:content_resource_delete].where(:resource_id => id).first
+        if row.nil?
+          raise ObjectNotFoundException.new(DeletedContentResource, id)
+        end
+        @@cache[id] = DeletedContentResource.new(row)
+      end
+      @@cache[id]
+    end
+
+    def deleted_by
+      @deleted_by ||= User.find(@dbrow[:delete_userid])
+    end
+
+    def self.query_by_parent(parent_id)
+      DB.connect[:content_resource_delete].where(:in_collection => parent_id)
+    end
+
+    def self.find_by_parent(parent_id)
+      resources = []
+      DeletedContentResource.query_by_parent(parent_id).all.each do |row|
+        @@cache[row[:resource_id]] = DeletedContentResource.new(row)
+        resources << @@cache[row[:resource_id]]
+      end
+      resources
+    end
+
+    def self.count_by_parent(parent_id)
+      DeletedContentResource.query_by_parent(parent_id).count
+    end
+
+    def default_serialization
+      result = super
+      result["deleted_at"] = self.deleted_at
+      result["deleted_by"] = self.deleted_by.serialize(:summary)
+      result
     end
   end
 

@@ -9,6 +9,7 @@
 * Now including post body with forum-post
 * Added new pending-quiz-access-control and published-quiz-access-control types
 * Integrated access control objects with quiz object output
+* New deleted-content-resource type
 
 ### 0.5.0 ###
 

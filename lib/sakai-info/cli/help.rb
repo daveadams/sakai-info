@@ -384,6 +384,17 @@ sin content
     --full-children Print children with full IDs and file paths
     --mod           Print creation/modification info
 EOF
+        "deleted-content-resource" => <<EOF,
+sin content
+
+  Usage: sin deleted-content-resource <id> [<options>]
+
+  Prints information about the deleted content resource ID specified.
+  Additional options may be passed to include additional information:
+
+    --properties    Print all properties
+    --mod           Print creation/modification info
+EOF
         "announcement" => <<EOF,
 sin announcement
 
