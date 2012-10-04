@@ -270,6 +270,15 @@ module SakaiInfo
       @deleted_by ||= User.find(@dbrow[:delete_userid])
     end
 
+    def self.find_by_delete_userid(user_id)
+      resources = []
+      DB.connect[:content_resource_delete].where(:delete_userid => user_id).all.each do |row|
+        @@cache[row[:resource_id]] = DeletedContentResource.new(row)
+        resources << @@cache[row[:resource_id]]
+      end
+      resources
+    end
+
     def self.query_by_parent(parent_id)
       DB.connect[:content_resource_delete].where(:in_collection => parent_id)
     end

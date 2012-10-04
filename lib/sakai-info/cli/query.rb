@@ -48,6 +48,30 @@ module SakaiInfo
             exit 1
           end
 
+        elsif object_type == "deleted-content"
+          userid = nil
+          while flags.length > 0
+            flag = flags.shift
+            if flag =~ /^--by=/
+              userid = flag.split('=')[1]
+            end
+          end
+
+          if userid.nil?
+            STDERR.puts "ERROR: you must specify --by=<userid>"
+            exit 1
+          end
+
+          begin
+            user = User.find(userid)
+            deleted_resources = DeletedContentResource.find_by_delete_userid(user.id)
+            deleted_resources.each do |dr|
+              puts dr.id
+            end
+          rescue ObjectNotFoundException => e
+            STDERR.puts "ERROR: #{e}"
+            exit 1
+          end
         else
           STDERR.puts "ERROR: Unrecognized object type"
           exit 1
