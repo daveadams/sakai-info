@@ -2,7 +2,7 @@
 #   Hacks necessary to work around problems in external libraries
 #
 # Created 2012-05-20 daveadams@gmail.com
-# Last updated 2012-05-20 daveadams@gmail.com
+# Last updated 2012-10-05 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -45,5 +45,12 @@ module Sequel
     class Blob
       alias :read :to_s
     end
+  end
+end
+
+# hack to get clobs in sqlite to work correctly
+class String
+  def read
+    self
   end
 end
