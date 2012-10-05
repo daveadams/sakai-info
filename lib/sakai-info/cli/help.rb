@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-06-21 daveadams@gmail.com
+# Last updated 2012-10-03 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #

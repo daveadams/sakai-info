@@ -10,6 +10,7 @@
 * Added new pending-quiz-access-control and published-quiz-access-control types
 * Integrated access control objects with quiz object output
 * New deleted-content-resource type
+* Added another use case to POC query mode
 
 ### 0.5.0 ###
 

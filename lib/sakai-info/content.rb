@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-20 daveadams@gmail.com
+# Last updated 2012-10-04 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #

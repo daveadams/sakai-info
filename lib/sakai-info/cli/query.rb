@@ -2,7 +2,7 @@
 #   class for handling "query" command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-06-21 daveadams@gmail.com
+# Last updated 2012-10-04 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
