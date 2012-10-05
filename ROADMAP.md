@@ -4,7 +4,6 @@
 
 ### 0.5.1 ###
 
-* Text fixture loading into sqlite for sites and users
 * Field restrictions for lookups
 * Simple queries by name/title for user/site
 

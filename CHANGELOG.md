@@ -11,6 +11,7 @@
 * Integrated access control objects with quiz object output
 * New deleted-content-resource type
 * Added another use case to POC query mode
+* New rake task to load test fixtures into database
 
 ### 0.5.0 ###
 
