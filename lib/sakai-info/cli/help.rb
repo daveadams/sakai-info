@@ -79,6 +79,9 @@ Sakai Info: sin #{VERSION}
 
     --all
         Print all possible information (other than dbrow)
+
+    --fields=f1[,f2[,...]]
+        Include in output only those first-level hash keys given
 EOF
 
         "help" => <<EOF,
