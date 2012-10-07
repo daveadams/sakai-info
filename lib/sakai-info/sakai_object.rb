@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-10-06 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -68,6 +68,16 @@ module SakaiInfo
 
     def to_json(*q)
       serialize(q).to_json
+    end
+
+    def to_csv(*fields)
+      values = []
+      fields.each do |field|
+        m = self.method(field.to_sym)
+        next if m.nil?
+        values << m.call.to_s
+      end
+      values.collect{|v|"\"#{v}\""}.join(",")
     end
 
     # support for CLI -- returns an array of symbols that can be
