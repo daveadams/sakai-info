@@ -15,20 +15,41 @@ module SakaiInfo
       def self.process(args, flags)
         object_type = args.shift
         id = args.shift
+        fields = nil
+
+        flags.each do |flag|
+          if flag =~ /^--fields=(.+)$/
+            fields = $1.downcase.split(',')
+            flags.delete(flag)
+          end
+        end
 
         if flags.include? "--all"
           serials = CLI::LookupModes[object_type].all_serializations
-        elsif
-          flags.include? "--dbrow-only"
+        elsif flags.include? "--dbrow-only"
           serials = [:dbrow_only]
         else
           serials = [:default] + flags.collect{|flag|flag.gsub(/^--/,'').gsub("-","_").to_sym}
         end
+
+        object = nil
         begin
-          puts CLI::LookupModes[object_type].find(id).to_yaml(serials)
-        rescue ObjectNotFoundException
-          STDERR.puts "ERROR: Could not find #{object_type} with an ID of '#{id}'"
+          object = CLI::LookupModes[object_type].find(id)
+        rescue ObjectNotFoundException => e
+          STDERR.puts "ERROR: Could not find #{object_type} with an ID of '#{id}':"
+          STDERR.puts "       #{e}"
           exit 1
+        end
+
+        if fields.nil? or fields.empty?
+          puts object.to_yaml(serials)
+        else
+          object_hash = object.serialize(serials).delete_if{|k,v| not fields.include? k.to_s}
+          if object_hash.empty?
+            STDERR.puts "ERROR: no requested fields were found"
+            exit 1
+          end
+          puts object_hash.to_yaml
         end
       end
     end
