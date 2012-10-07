@@ -13,10 +13,35 @@ module SakaiInfo
   module CLI
     class Shell
       def self.process(args, flags)
-        print "sin> ";STDOUT.flush
-        command = gets
-        STDERR.puts "ERROR: sin shell not implemented"
-        exit 1
+        Shell.new.run
+      end
+
+      def initialize
+        @prompt = "sin>"
+      end
+
+      def prompt
+        print "#{@prompt} ";STDOUT.flush
+        gets
+      end
+
+      def run
+        loop {
+          input = prompt
+
+          # a ctrl-D sends nil
+          break if input.nil?
+          argv = input.chomp.split(/ +/)
+          command = argv.shift
+          case command.downcase
+          when "quit"
+            break
+          when "exit"
+            break
+          else
+            STDERR.puts "ERROR: unknown command '#{command}'"
+          end
+        }
       end
     end
   end
