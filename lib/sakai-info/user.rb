@@ -231,7 +231,12 @@ module SakaiInfo
     end
 
     def self.all_serializations
-      [:default, :sites, :pools]
+      [
+       :default,
+       :sites,
+       :pools,
+       :mod,
+      ]
     end
   end
 
