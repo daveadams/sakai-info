@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-10 daveadams@gmail.com
+# Last updated 2012-10-06 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -172,6 +172,19 @@ module SakaiInfo
       # end
       # users
       nil
+    end
+
+    # by_name: uses like
+    def self.query_by_name(name)
+      DB.connect[:sakai_user].where("upper(first_name) like ? or upper(last_name) like ? or upper(first_name)||\' \'||upper(last_name) like ?", "%#{name.upcase}%", "%#{name.upcase}%", "%#{name.upcase}%")
+    end
+
+    def self.find_by_name(name)
+      User.query_by_name(name).all.collect{|row| @@cache[row[:user_id]] = User.new(row)}
+    end
+
+    def self.find_ids_by_name(name)
+      User.query_by_name(name).select(:user_id).all.collect{|row|row[:user_id]}
     end
 
     # yaml/json serialization
