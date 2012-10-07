@@ -2,7 +2,7 @@
 #   class for handling "query" command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-10-04 daveadams@gmail.com
+# Last updated 2012-10-06 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -72,6 +72,21 @@ module SakaiInfo
             STDERR.puts "ERROR: #{e}"
             exit 1
           end
+
+        elsif object_type == "site"
+          title = args.shift
+
+          Site.find_by_title(title).each do |site|
+            puts site.to_csv(:id, :title)
+          end
+
+        elsif object_type == "user"
+          name = args.shift
+
+          User.find_by_name(name).each do |user|
+            puts user.to_csv(:eid, :name)
+          end
+
         else
           STDERR.puts "ERROR: Unrecognized object type"
           exit 1
