@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-14 daveadams@gmail.com
+# Last updated 2012-10-06 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -235,6 +235,19 @@ module SakaiInfo
     def self.find_ids_by_type(type)
       DB.connect[:sakai_site].select(:site_id).
         where(:type => type).all.collect{|r| r[:site_id]}
+    end
+
+    # by_title: uses like
+    def self.query_by_title(title)
+      DB.connect[:sakai_site].where("upper(title) like ?", "%#{title.upcase}%")
+    end
+
+    def self.find_by_title(title)
+      Site.query_by_title(title).all.collect{|row| @@cache[row[:site_id]] = Site.new(row)}
+    end
+
+    def self.find_ids_by_title(title)
+      Site.query_by_title(title).select(:site_id).all.collect{|row|row[:site_id]}
     end
 
     # by_type queries
