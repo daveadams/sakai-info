@@ -4,7 +4,6 @@
 
 ### 0.5.2 ###
 
-* JSON output support
 * Ability to specify alternate config file at the command line
 * Better date formatting and proper time zone understanding
 * More query functionality

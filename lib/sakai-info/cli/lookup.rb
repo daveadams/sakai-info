@@ -16,10 +16,14 @@ module SakaiInfo
         object_type = args.shift
         id = args.shift
         fields = nil
+        output = :yaml
 
         flags.each do |flag|
           if flag =~ /^--fields=(.+)$/
             fields = $1.downcase.split(',')
+            flags.delete(flag)
+          elsif flag == "--json"
+            output = :json
             flags.delete(flag)
           end
         end
@@ -42,14 +46,23 @@ module SakaiInfo
         end
 
         if fields.nil? or fields.empty?
-          puts object.to_yaml(serials)
+          if output == :json
+            puts object.to_json(serials)
+          else
+            puts object.to_yaml(serials)
+          end
+
         else
           object_hash = object.serialize(serials).delete_if{|k,v| not fields.include? k.to_s}
           if object_hash.empty?
             STDERR.puts "ERROR: no requested fields were found"
             exit 1
           end
-          puts object_hash.to_yaml
+          if output == :json
+            puts object_hash.to_json
+          else
+            puts object_hash.to_yaml
+          end
         end
       end
     end

@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.5.2 ###
+
+*Released 2012-??-??*
+
+* Added JSON output option for lookups
+
 ### 0.5.1 ###
 
 *Released 2012-10-07*
