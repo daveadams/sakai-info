@@ -2,7 +2,7 @@
 
 ### 0.5.1 ###
 
-*Released 2012-??-??*
+*Released 2012-10-07*
 
 * Added new private-message lookup type
 * Adjusted to new use of the 'author' field in PrivateMessage/ForumPost table
@@ -10,8 +10,10 @@
 * Added new pending-quiz-access-control and published-quiz-access-control types
 * Integrated access control objects with quiz object output
 * New deleted-content-resource type
-* Added another use case to POC query mode
 * New rake task to load test fixtures into database
+* Added to_csv method with field selection to SakaiObject
+* Added more use cases to POC query mode
+* Added field selection to lookup via --fields=x,y,z
 
 ### 0.5.0 ###
 

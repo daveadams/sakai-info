@@ -1,24 +1,23 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-06-21*
-
-### 0.5.1 ###
-
-* Field restrictions for lookups
-* Simple queries by name/title for user/site
+*Last updated 2012-10-07*
 
 ### 0.5.2 ###
 
-* Test fixture generation for quizzes
-* Better date formatting all around
+* JSON output support
+* Ability to specify alternate config file at the command line
+* Better date formatting and proper time zone understanding
 * More query functionality
 * Proof-of-concept sin shell
 * Chat channel/message support
+* Alias support
+* Add simple tests against user/site fixture data
 
 ### 0.5.3 ###
 
 * RDS schema creation and data loading for MySQL and Oracle testing
 * More query and shell functionality
+* Test fixture generation for quizzes
 
 ### 0.5.4 ###
 
