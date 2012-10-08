@@ -2,7 +2,7 @@
 #   rake task support
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-05-21 daveadams@gmail.com
+# Last updated 2012-10-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -21,21 +21,21 @@ Tables = {
              :sakai_realm_role, :sakai_realm_function],
   :assignment => [:assignment_assignment, :assignment_submission, :assignment_content],
   :announcement => [:announcement_channel, :announcement_message],
-  :content => [:content_resource, :content_collection],
+  :content => [:content_resource, :content_collection, :content_resource_delete],
   :gradebook => [:gb_gradebook_t, :gb_gradable_object_t],
-  :message => [:mfr_message_t, :mfr_open_forum_t, :mfr_area_t],
+  :message => [:mfr_message_t, :mfr_open_forum_t, :mfr_area_t, :mfr_topic_t],
   :question_pool => [:sam_questionpool_t, :sam_questionpoolitem_t],
   :quiz => [:sam_authzdata_t, :sam_assessmentbase_t, :sam_publishedassessment_t,
             :sam_section_t, :sam_publishedsection_t, :sam_item_t, :sam_publisheditem_t,
-            :sam_assessmentgrading_t, :sam_itemgrading_t, :sam_media_t]
+            :sam_assessmentgrading_t, :sam_itemgrading_t, :sam_media_t,
+            :sam_assessaccesscontrol_t, :sam_publishedaccesscontrol_t]
 }
 
 ExtraTables = {
   :authz => [:sakai_realm_role_desc, :sakai_realm_provider, :sakai_realm_property],
   :assignment => [:asn_ap_item_access_t, :asn_ap_item_t, :asn_ma_item_t,
                   :asn_note_item_t, :asn_sup_attach_t, :asn_sup_item_t],
-  :content => [:content_resource_delete, :content_resource_lock, :content_type_registry,
-               :content_dropbox_changes],
+  :content => [:content_resource_lock, :content_type_registry, :content_dropbox_changes],
   :gradebook => [:gb_action_record_t, :gb_action_record_property_t, :gb_category_t,
                  :gb_comment_t, :gb_grade_map_t, :gb_grade_record_t, :gb_property_t,
                  :gb_grade_to_percent_mapping_t, :gb_grading_event_t,
@@ -50,15 +50,14 @@ ExtraTables = {
                :mfr_label_t, :mfr_membership_item_t,
                :mfr_message_forums_user_t, :mfr_message_permissions_t,
                :mfr_permission_level_t, :mfr_private_forum_t,
-               :mfr_pvt_msg_usr_t, :mfr_synoptic_item,
-               :mfr_topic_t, :mfr_unread_status_t],
+               :mfr_pvt_msg_usr_t, :mfr_synoptic_item, :mfr_unread_status_t],
   :question_pool => [:sam_questionpoolaccess_t],
-  :quiz => [:sam_answer_t, :sam_answerfeedback_t, :sam_assessaccesscontrol_t,
+  :quiz => [:sam_answer_t, :sam_answerfeedback_t,
             :sam_assessevaluation_t, :sam_assessfeedback_t,
             :sam_assessmetadata_t, :sam_attachment_t, :sam_functiondata_t,
             :sam_gradingattachment_t, :sam_gradingsummary_t, :sam_itemfeedback_t,
             :sam_itemmetadata_t, :sam_itemtext_t,
-            :sam_publishedaccesscontrol_t, :sam_publishedanswerfeedback_t,
+            :sam_publishedanswerfeedback_t,
             :sam_publishedanswer_t, :sam_publishedassessment_t,
             :sam_publishedevaluation_t, :sam_publishedfeedback_t,
             :sam_publisheditemfeedback_t, :sam_publisheditemmetadata_t,
@@ -87,7 +86,7 @@ namespace :schema do
   task :tables do
     # TODO: find a non-linux way to make this list
     system "grep -hroE 'DB.connect\[:[a-z_]+\]' lib/sakai-info " +
-      "|cut -d: -f2 |cut -d']' -f1 |sort -u"
+      "|cut -d: -f2 |cut -d']' -f1 |grep -vF 'DB.connect[' |sort -u"
   end
 
   task :create_schema_dir do
