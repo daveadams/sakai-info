@@ -2,7 +2,7 @@
 #   SakaiInfo::SakaiObject
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-10-06 daveadams@gmail.com
+# Last updated 2012-10-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -60,6 +60,14 @@ module SakaiInfo
 
     def default_serialization
       object_type_serialization
+    end
+
+    def summary_serialization
+      default_serialization
+    end
+
+    def shell_serialization
+      summary_serialization
     end
 
     def to_yaml(*q)
