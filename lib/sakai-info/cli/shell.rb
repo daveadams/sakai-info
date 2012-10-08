@@ -54,6 +54,18 @@ module SakaiInfo
       end
 
       alias_method :_shell_command_exit, :_shell_command_quit
+
+      def _shell_command_count(argv)
+        case argv[0].downcase
+        when /^users?$/
+          puts User.count
+        when /^sites?$/
+          puts Site.count
+        else
+          STDERR.puts("ERROR: unrecognized object type")
+        end
+      end
+
     end
   end
 end
