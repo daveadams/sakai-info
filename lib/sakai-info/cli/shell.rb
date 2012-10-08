@@ -78,6 +78,21 @@ module SakaiInfo
         end
       end
 
+      def _shell_command_user(argv)
+        user = nil
+        begin
+          user = User.find(argv[0])
+        rescue ObjectNotFoundException => e
+          STDERR.puts "ERROR: could not find user '#{argv[0]}'"
+          STDERR.puts "       #{e}"
+          return
+        end
+
+        return if user.nil?
+
+        puts user.to_yaml(:shell)
+      end
+
     end
   end
 end
