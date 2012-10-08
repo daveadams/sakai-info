@@ -18,6 +18,9 @@ module SakaiInfo
 
       def initialize
         @prompt = "sin>"
+        @context = nil
+        @context_history = []
+        @running = true
       end
 
       def prompt
@@ -26,23 +29,31 @@ module SakaiInfo
       end
 
       def run
-        loop {
+        while @running do
           input = prompt
 
           # a ctrl-D sends nil
           break if input.nil?
+
           argv = input.chomp.split(/ +/)
-          command = argv.shift
-          case command.downcase
-          when "quit"
-            break
-          when "exit"
-            break
+          command = argv.shift.downcase
+          method_name = ("_shell_command_#{command}").to_sym
+
+          if Shell.method_defined? method_name
+            self.method(method_name).call(argv)
           else
             STDERR.puts "ERROR: unknown command '#{command}'"
           end
-        }
+        end
+
+        # TODO: any additional cleanup here
       end
+
+      def _shell_command_quit(argv)
+        @running = false
+      end
+
+      alias_method :_shell_command_exit, :_shell_command_quit
     end
   end
 end
