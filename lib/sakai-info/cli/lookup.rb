@@ -2,7 +2,7 @@
 #   class for handling the default command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-06-21 daveadams@gmail.com
+# Last updated 2012-10-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -18,14 +18,19 @@ module SakaiInfo
         fields = nil
         output = :yaml
 
+        flags_to_delete = []
         flags.each do |flag|
           if flag =~ /^--fields=(.+)$/
             fields = $1.downcase.split(',')
-            flags.delete(flag)
+            flags_to_delete << flag
           elsif flag == "--json"
             output = :json
-            flags.delete(flag)
+            flags_to_delete << flag
           end
+        end
+
+        flags_to_delete.each do |flag|
+          flags.delete(flag)
         end
 
         if flags.include? "--all"
