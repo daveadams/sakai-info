@@ -17,14 +17,23 @@ module SakaiInfo
       end
 
       def initialize
-        @prompt = "sin>"
         @context = nil
         @context_history = []
         @running = true
       end
 
+      def context_prompt
+        if @context.nil?
+          "[-]"
+        else
+          # TODO: implement ShellContext object
+          #@context.brief_name
+          "[!]"
+        end
+      end
+
       def prompt
-        print "#{@prompt} ";STDOUT.flush
+        print "sin#{context_prompt}> ";STDOUT.flush
         gets
       end
 
@@ -33,7 +42,10 @@ module SakaiInfo
           input = prompt
 
           # a ctrl-D sends nil
-          break if input.nil?
+          if input.nil?
+            puts "exit"
+            break
+          end
 
           argv = input.chomp.split(/ +/)
           command = argv.shift.downcase
