@@ -2,7 +2,7 @@
 #   Gem definition file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-05-02 daveadams@gmail.com
+# Last updated 2012-10-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -28,5 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('sequel')
 
   spec.add_development_dependency('sqlite3')
+  spec.add_development_dependency('marky_markov')
 end
 
