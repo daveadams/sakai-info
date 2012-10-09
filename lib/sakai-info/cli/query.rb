@@ -2,7 +2,7 @@
 #   class for handling "query" command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-10-06 daveadams@gmail.com
+# Last updated 2012-10-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -85,6 +85,34 @@ module SakaiInfo
 
           User.find_by_name(name).each do |user|
             puts user.to_csv(:eid, :name)
+          end
+
+        elsif object_type == "quiz-attempt"
+          eid = args.shift
+          quiz_id = args.shift
+          user = nil
+          quiz = nil
+
+          begin
+            user = User.find(eid)
+            quiz = PublishedQuiz.find(quiz_id)
+          rescue ObjectNotFoundException => e
+            STDERR.puts "ERROR: #{e}"
+            exit 1
+          end
+
+          if user.nil? or quiz.nil?
+            STDERR.puts "ERROR: could not find user or quiz object"
+            exit 1
+          end
+
+          attempts = quiz.user_attempts(user.id)
+          if attempts.nil? or attempts.empty?
+            STDERR.puts "ERROR: no attempts found"
+          end
+
+          attempts.each do |att|
+            puts att.to_yaml
           end
 
         else

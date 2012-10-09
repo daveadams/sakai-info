@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-09-29 daveadams@gmail.com
+# Last updated 2012-10-09 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -302,6 +302,10 @@ module SakaiInfo
 
     def self.find_ids_by_site_id(site_id)
       PublishedQuiz.query_by_site_id(site_id).select(:id).all.collect { |row| row[:id] }
+    end
+
+    def user_attempts(user_id)
+      QuizAttempt.find_by_user_id_and_quiz_id(user_id, self.id)
     end
 
     def quiz_type
@@ -781,6 +785,15 @@ module SakaiInfo
 
     def self.find_by_quiz_id(quiz_id)
       QuizAttempt.query_by_quiz_id(quiz_id).
+        all.collect { |row| QuizAttempt.new(row) }
+    end
+
+    def self.query_by_user_id_and_quiz_id(user_id, quiz_id)
+      DB.connect[:sam_assessmentgrading_t].where(:publishedassessmentid => quiz_id, :agentid => user_id)
+    end
+
+    def self.find_by_user_id_and_quiz_id(user_id, quiz_id)
+      QuizAttempt.query_by_user_id_and_quiz_id(user_id, quiz_id).
         all.collect { |row| QuizAttempt.new(row) }
     end
 
