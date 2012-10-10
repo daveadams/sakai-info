@@ -7,7 +7,6 @@
 * Ability to specify alternate config file at the command line
 * Better date formatting and proper time zone understanding
 * More query functionality
-* Proof-of-concept sin shell
 * Chat channel/message support
 * Alias support
 * Add simple tests against user/site fixture data

@@ -5,6 +5,7 @@
 *Released 2012-??-??*
 
 * Added JSON output option for lookups
+* Proof-of-concept sin shell
 
 ### 0.5.1 ###
 
