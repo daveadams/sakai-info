@@ -2,7 +2,7 @@
 #   rake task support
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-10-08 daveadams@gmail.com
+# Last updated 2012-10-11 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -28,7 +28,8 @@ Tables = {
   :quiz => [:sam_authzdata_t, :sam_assessmentbase_t, :sam_publishedassessment_t,
             :sam_section_t, :sam_publishedsection_t, :sam_item_t, :sam_publisheditem_t,
             :sam_assessmentgrading_t, :sam_itemgrading_t, :sam_media_t,
-            :sam_assessaccesscontrol_t, :sam_publishedaccesscontrol_t]
+            :sam_assessaccesscontrol_t, :sam_publishedaccesscontrol_t],
+  :alias => [:sakai_alias, :sakai_alias_property],
 }
 
 ExtraTables = {
