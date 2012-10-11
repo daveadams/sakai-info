@@ -314,3 +314,16 @@ sam_media_t:
   - field: lastmodifiedby
     table: sakai_user
 
+sakai_alias:
+  description: Site Alias
+  pk: alias_id
+  - field: createdby
+    table: sakai_user
+  - field: modifiedby
+    table: sakai_user
+sakai_alias_property:
+  description: Site Alias Property
+  fk:
+  - field: alias_id
+    table: sakai_alias
+
