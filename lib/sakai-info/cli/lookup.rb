@@ -45,8 +45,7 @@ module SakaiInfo
         begin
           object = CLI::LookupModes[object_type].find(id)
         rescue ObjectNotFoundException => e
-          STDERR.puts "ERROR: Could not find #{object_type} with an ID of '#{id}':"
-          STDERR.puts "       #{e}"
+          STDERR.puts "ERROR: #{e}"
           exit 1
         end
 
