@@ -2,7 +2,7 @@
 #   Tests for SakaiInfo::SakaiObject
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-18 daveadams@gmail.com
+# Last updated 2012-10-11 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -39,6 +39,7 @@ class SakaiObjectTest < Test::Unit::TestCase
     assert_nothing_raised do
       # many ways of asking for the same thing
       # the default and object_type serializations should include the object classname
+      # shell and summary serializations default to the default serialization
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.default_serialization)
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize)
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:default))
@@ -48,34 +49,43 @@ class SakaiObjectTest < Test::Unit::TestCase
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:object_type))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize("object_type"))
 
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.summary_serialization)
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:summary))
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize("summary"))
+
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.shell_serialization)
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize(:shell))
+      assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject}, so.serialize("shell"))
+
       # requesting any other serializations without :default should result in empty hashes
       # since no other serializations are defined at the base level
-      assert_equal({}, so.serialize(:summary))
+      assert_equal({}, so.serialize(:xyz))
       assert_equal({}, so.serialize(:Default))
-      assert_equal({}, so.serialize("summary", "bakery"))
+      assert_equal({}, so.serialize("maybe", "bakery"))
       assert_equal({}, so.serialize(:non_existent_serialization, :and_another, :onemore))
 
       # combining :default with anything else should bring us back to just
       # the result for :default
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize(:default, :summary))
+                   so.serialize(:default, :xyz))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize(:summary, :default))
+                   so.serialize(:xyz, :default))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize("default", "summary"))
+                   so.serialize("default", "xyz"))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
                    so.serialize(:one, :two, :three, :default, :eight, :four, :two))
 
-      # asking for :default multiple times should produce only one copy of the data
+      # asking for :default (or equivalent) multiple times should produce only one
+      # copy of the data
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
                    so.serialize(:default, :default))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize(:default, :summary, :default))
+                   so.serialize(:default, :xyz, :default))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize(:summary, :default, :summary, :default, :summary))
+                   so.serialize(:xyz, :default, :xyz, :default, :xyz, :summary, :xyz))
       assert_equal({"sakai_object_type" => SakaiInfo::SakaiObject},
-                   so.serialize(:default, :one, :default, :two, :default,
-                                :three, :default, :four, :default))
+                   so.serialize(:default, :one, :shell, :two, :default,
+                                :three, :summary, :four, :default))
     end
   end
 
