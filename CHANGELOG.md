@@ -2,10 +2,11 @@
 
 ### 0.5.2 ###
 
-*Released 2012-??-??*
+*Released 2012-10-11*
 
 * Added JSON output option for lookups
 * Proof-of-concept sin shell
+* Alias support
 
 ### 0.5.1 ###
 

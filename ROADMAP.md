@@ -1,41 +1,37 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-10-07*
+*Last updated 2012-10-11*
 
-### 0.5.2 ###
+### 0.5.3 ###
 
 * Ability to specify alternate config file at the command line
 * Better date formatting and proper time zone understanding
 * More query functionality
-* Chat channel/message support
-* Alias support
+* OSP presentation/metaobj support
 * Add simple tests against user/site fixture data
+* More query and shell functionality
 
-### 0.5.3 ###
+### 0.5.4 ###
 
 * RDS schema creation and data loading for MySQL and Oracle testing
 * More query and shell functionality
 * Test fixture generation for quizzes
-
-### 0.5.4 ###
-
-* Barebones web interface - HTML, JSON, and YAML
-* More query and shell functionality
+* Chat channel/message support
+* More OSP support
 
 ### 0.5.5 ###
 
-* Global cache instead of per-class
-* More query, web, and shell functionality
+* Barebones web interface - HTML, JSON, and YAML
+* More query and shell functionality
+* Complete OSP support
 
 ### 0.6.x ###
 
+* Global cache instead of per-class
+* More query, web, and shell functionality
 * Test fixtures and basic unit tests for all represented objects
 * RDoc coverage for every class
-* More focus on other library usage besides ad hoc CLI/web queries
-
-### 0.7.x ###
-
-* OSP support
+* Grow support for other library usage besides ad hoc queries
 
 ------
 
