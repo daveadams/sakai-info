@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-10-03 daveadams@gmail.com
+# Last updated 2012-10-11 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -29,7 +29,7 @@ Sakai INfo: sin #{VERSION}
       quiz-attempt-item-attachment, question-pool, assignment,
       assignment-submission, forum, forum-thread, forum-post, content,
       announcement, announcement-channel, gradebook, gradebook-item,
-      role, function, realm, private-message
+      role, function, realm, private-message, alias
 
   QUERY MODE
     Query particular fields from certain objects given certain conditions.
@@ -469,6 +469,16 @@ sin private-message
 
   Prints information about the private message ID specified. Additional options
   may be passed to include additional information:
+
+    --mod        Print creation/modification info
+EOF
+        "alias" => <<EOF,
+sin alias
+
+  Usage: sin alias <id> [<options>]
+
+  Prints information about the alias ID specified. Additional options may be
+  passed to include additional information:
 
     --mod        Print creation/modification info
 EOF
