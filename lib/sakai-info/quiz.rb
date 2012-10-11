@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-09 daveadams@gmail.com
+# Last updated 2012-10-11 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -1142,7 +1142,11 @@ module SakaiInfo
     end
 
     def timed?
-      @dbrow[:timelimit] > 0
+      if time_limit.nil?
+        false
+      else
+        time_limit > 0
+      end
     end
 
     def automatic_submission?
