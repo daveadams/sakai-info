@@ -2,20 +2,21 @@
 #   Direct tests for bin/sakai-info
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-04-02 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
 # This software is public domain.
 #
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'sakai-info/version'
+require 'sakai-info/cli/help'
 
 # open3 library is used to capture stdout, stderr, and the exit value
 require 'open3'
 
-class BinTest < Test::Unit::TestCase
+class BinTest < MiniTest::Unit::TestCase
   CLI_ENV = { "RUBYLIB" => "lib" }
   COMMAND = "bin/sin"
 

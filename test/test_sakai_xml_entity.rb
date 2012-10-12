@@ -2,14 +2,14 @@
 #   Tests for SakaiInfo::SakaiXMLEntity
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-02-16 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
 # This software is public domain.
 #
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'sakai-info'
 
 module SakaiInfo
@@ -32,7 +32,7 @@ class Util
 end
 
 
-class SakaiXMLEntityTest < Test::Unit::TestCase
+class SakaiXMLEntityTest < MiniTest::Unit::TestCase
   # define some raw data
   BasicData = {
     "id" => "id1",

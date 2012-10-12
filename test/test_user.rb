@@ -9,10 +9,10 @@
 # This software is public domain.
 #
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'sakai-info'
 
-class UserTest < Test::Unit::TestCase
+class UserTest < MiniTest::Unit::TestCase
   # test that object construction works
   def test_construction
     # u = nil
