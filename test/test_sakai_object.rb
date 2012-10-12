@@ -2,7 +2,7 @@
 #   Tests for SakaiInfo::SakaiObject
 #
 # Created 2012-02-16 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -14,7 +14,45 @@ require 'sakai-info'
 
 module SakaiInfo
   class TestSakaiObjectSubclass < SakaiObject
-    # TODO: define other serializations to test combining across the inheritance tree
+    attr_reader :dbrow, :value
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+
+      @id = dbrow[:id]
+      @int = dbrow[:int]
+      @value = dbrow[:value]
+    end
+
+    def int
+      @int + 10
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "int" => self.int,
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => self.id,
+      }
+    end
+
+    def value_serialization
+      {
+        "value" => self.value,
+      }
+    end
+
+    def all_serializations
+      [
+       :default,
+       :value,
+      ]
+    end
   end
 end
 
@@ -89,8 +127,37 @@ class SakaiObjectTest < Test::Unit::TestCase
     end
   end
 
-  # TODO: test an extension class with multiple serializations
   def test_subclass
+    row = { :id => "abcd-efgh", :int => 5, :value => "veritas" }
+
+    obj = SakaiInfo::TestSakaiObjectSubclass.new(row)
+
+    # verify the object was constructed correctly
+    assert_equal(obj.id, row[:id])
+    assert_equal(obj.value, row[:value])
+    assert_equal(obj.int, (row[:int] + 10))
+
+    # verify expected serializations
+    expected_default_serialization = { "id" => row[:id], "int" => (row[:int] + 10) }
+    expected_summary_serialization = { "id" => row[:id] }
+    expected_value_serialization = { "value" => row[:value] }
+    expected_all_serialization =
+      { "id" => row[:id], "int" => (row[:int] + 10), "value" => row[:value] }
+    expected_dbrow_serialization =
+      { "id" => row[:id], "int" => (row[:int] + 10), "dbrow" => row }
+    expected_dbrow_only_serialization = row
+
+    assert_equal(obj.default_serialization, expected_default_serialization)
+    assert_equal(obj.summary_serialization, expected_summary_serialization)
+    assert_equal(obj.value_serialization, expected_value_serialization)
+
+    assert_equal(obj.serialize, expected_default_serialization)
+    assert_equal(obj.serialize(:summary), expected_summary_serialization)
+    assert_equal(obj.serialize(:value), expected_value_serialization)
+    assert_equal(obj.serialize(obj.all_serializations), expected_all_serialization)
+
+    assert_equal(obj.serialize(:default, :dbrow), expected_dbrow_serialization)
+    assert_equal(obj.serialize(:dbrow_only), expected_dbrow_only_serialization)
   end
 
   # TODO: test yaml and json output
