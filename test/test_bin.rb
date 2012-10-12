@@ -9,9 +9,8 @@
 # This software is public domain.
 #
 
-require 'minitest/autorun'
-require 'sakai-info/version'
-require 'sakai-info/cli/help'
+require_relative 'testlib/helper'
+require 'sakai-info/cli'
 
 # open3 library is used to capture stdout, stderr, and the exit value
 require 'open3'

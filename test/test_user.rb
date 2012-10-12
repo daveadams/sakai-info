@@ -9,8 +9,7 @@
 # This software is public domain.
 #
 
-require 'minitest/autorun'
-require 'sakai-info'
+require_relative 'testlib/helper'
 
 class UserTest < MiniTest::Unit::TestCase
   # test that object construction works
