@@ -2,7 +2,7 @@
 #   rake definitions
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-05-21 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -28,10 +28,10 @@ require File.join(RAKELIBDIR, 'test')
 require File.join(RAKELIBDIR, 'gem')
 require File.join(RAKELIBDIR, 'schema')
 require File.join(RAKELIBDIR, 'data')
+require File.join(RAKELIBDIR, 'db')
 require File.join(RAKELIBDIR, 'doc')
 require File.join(RAKELIBDIR, 'misc')
 
 # make the default task to run tests
-desc "By default, rake will run tests"
 task :default => :test
 

@@ -2,7 +2,7 @@
 #   rake task support
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -90,24 +90,22 @@ namespace :schema do
       "|cut -d: -f2 |cut -d']' -f1 |grep -vF 'DB.connect[' |sort -u"
   end
 
-  task :create_schema_dir do
-    print "Creating directory for schema creation files... "; STDOUT.flush
-    system "mkdir -p #{SCHEMADUMPDIR}"
-    puts "OK"
-  end
-
-  task :clean_schema do
-    print "Deleting any old schema creation files... ";STDOUT.flush
-    n = File.delete(*Dir[File.join(SCHEMADUMPDIR, "create_*.rb")])
-    puts "#{n} files deleted"
-  end
-
   desc "Dump schema creation files"
-  task :dump, [:db] => [:create_schema_dir, :clean_schema] do |t, args|
+  task :dump, [:db] do |t, args|
     args.with_defaults(:db => :default)
 
     db = db_connect(args[:db])
     Sequel.extension(:schema_dumper)
+
+    if not File.exist? SCHEMADUMPDIR
+      print "Creating directory for schema creation files... "; STDOUT.flush
+      system "mkdir -p #{SCHEMADUMPDIR}"
+      puts "OK"
+    end
+
+    print "Deleting any old schema creation files... ";STDOUT.flush
+    n = File.delete(*Dir[File.join(SCHEMADUMPDIR, "create_*.rb")])
+    puts "#{n} files deleted"
 
     puts "Dumping schema creation files to disk:"
     table_list.each do |table|
