@@ -2,7 +2,7 @@
 #   SakaiInfo::Database library
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-05-04 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -100,11 +100,11 @@ module SakaiInfo
       end
     end
 
-    def self.load_config
-      if File.readable? DEFAULT_CONFIG_FILE
-        DB.configure(DEFAULT_CONFIG_FILE)
+    def self.load_config(config_file = DEFAULT_CONFIG_FILE)
+      if File.readable? config_file
+        DB.configure(config_file)
       else
-        raise MissingConfigException.new("No config file found at #{DEFAULT_CONFIG_FILE}")
+        raise MissingConfigException.new("No config file found at #{config_file}")
       end
     end
 
