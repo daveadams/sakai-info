@@ -2,7 +2,7 @@
 #   task definitions for generating test data
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-06-22 daveadams@gmail.com
+# Last updated 2012-10-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -555,10 +555,24 @@ namespace :data do
 
   desc "Generate random fixture data for testing"
   task :generate => [:pull] do
-    create_fixture_dir
+    if not File.exist? FIXTUREDIR
+      create_fixture_dir
+    end
 
-    generate_users(500)
-    generate_sites(100)
+    if (not (File.exist?(File.join(FIXTUREDIR, "sakai_user_id_map.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_user.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_user_property.yml"))))
+      generate_users(50)
+    end
+
+    if (not (File.exist?(File.join(FIXTUREDIR, "sakai_site.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_site_property.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_site_page.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_site_page_property.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_site_tool.yml")) and
+             File.exist?(File.join(FIXTUREDIR, "sakai_site_tool_property.yml"))))
+      generate_sites(10)
+    end
   end
 
   desc "Clear raw data and fixture data"
