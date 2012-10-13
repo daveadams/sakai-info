@@ -5,7 +5,7 @@
 #   sakai-info library
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-10-09 daveadams@gmail.com
+# Last updated 2012-10-13 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -39,6 +39,10 @@ while arg = ARGV.shift
       logfile = arg.split("=")[1]
     elsif arg == "--trace"
       set_trace_func __trace
+    elsif arg == "-c"
+      DB.config_file = ARGV.shift
+    elsif arg =~ /^--config(-?file)?=/
+      DB.config_file = arg.split("=")[1]
     else
       flags << arg
     end
@@ -140,8 +144,13 @@ DB.logger = logger
 
 # load database config and set instance to the instance given on the command line
 DB.load_config
-if not db_name.nil?
-  DB.default_database = db_name
+begin
+  if not db_name.nil?
+    DB.default_database = db_name
+  end
+rescue MissingConfigException => e
+  STDERR.puts "ERROR: database '#{db_name}' is not configured in #{DB.config_file}"
+  exit 1
 end
 
 case mode

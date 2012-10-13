@@ -2,7 +2,7 @@
 #   SakaiInfo::Database library
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-10-12 daveadams@gmail.com
+# Last updated 2012-10-13 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -48,12 +48,22 @@ ENV["NLS_LANG"] ||= "AMERICAN_AMERICA.UTF8"
 
 module SakaiInfo
   class InvalidConfigException < SakaiException; end
+  class MissingConfigException < SakaiException; end
   class ConnectionFailureException < SakaiException; end
 
   class DB
     DEFAULT_CONFIG_FILE = File.expand_path("~/.sakai-info")
     @@default_database_name = nil
     @@config = nil
+    @@config_file = DEFAULT_CONFIG_FILE
+
+    def self.config_file=(newfile)
+      @@config_file = newfile
+    end
+
+    def self.config_file
+      @@config_file
+    end
 
     def self.configure(config)
       begin
@@ -100,7 +110,7 @@ module SakaiInfo
       end
     end
 
-    def self.load_config(config_file = DEFAULT_CONFIG_FILE)
+    def self.load_config(config_file = DB.config_file)
       if File.readable? config_file
         DB.configure(config_file)
       else
@@ -135,6 +145,9 @@ module SakaiInfo
 
     def self.default_database=(database_name)
       @@default_database_name = database_name
+      # spin it up so that we throw a missing config exception if it's invalid
+      DB.connect(@@default_database_name)
+      @@default_database_name
     end
 
     # set global logger
@@ -154,7 +167,10 @@ module SakaiInfo
 
   class Database
     def initialize(connect_info, logger = nil)
-      @connect_info=connect_info
+      if connect_info.nil?
+        raise MissingConfigException.new("No configuration was provided")
+      end
+      @connect_info = connect_info
       @logger = logger
     end
 
