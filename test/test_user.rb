@@ -12,7 +12,7 @@
 require_relative 'testlib/helper'
 
 class UserTest < MiniTest::Unit::TestCase
-  def fetch_random_user
+  def fetch_random_user_id
     user_count = @@db[:sakai_user].count
     assert(user_count > 0, "No users in SAKAI_USER table")
 
@@ -22,13 +22,18 @@ class UserTest < MiniTest::Unit::TestCase
     user_id = @@db[:sakai_user].select(:user_id).all[i][:user_id]
     assert((not user_id.nil?), "User ID is nil!")
 
-    User.find(user_id)
+    user_id
+  end
+
+  def fetch_random_user
+    User.find(fetch_random_user_id)
   end
 
   # this is run before each test
   def setup
     skip if not Helper.test_database_available?
     @@db = DB.connect
+    SakaiInfo::Cache.clear_all
   end
 
   # test that users exists in the database
@@ -91,12 +96,42 @@ class UserTest < MiniTest::Unit::TestCase
   end
 
   # test serializations
-  def test_serialization
-    u = fetch_random_user
-    assert_equal({"sakai_object_type" => SakaiInfo::User}, u.serialize(:object_type))
-    # # TODO: add real serialization tests for User
+  def test_summary_serialization
+    10.times do
+      u = fetch_random_user
+      expected_summary_serialization = {
+        "id" => u.id,
+        "eid" => u.eid,
+        "name" => u.name,
+        "type" => u.type,
+      }
+      assert_equal(expected_summary_serialization, u.serialize(:summary))
+    end
   end
 
-  # TODO: add lookup tests for User
+  # test lookup functionality
+  def test_lookup_by_user_id_and_eid
+    10.times do
+      user_id = fetch_random_user_id
+      eid = User.get_eid(user_id)
+      SakaiInfo::Cache.clear_all
+
+      u1 = User.find(user_id)
+      assert((not u1.nil?), "User could not be found by user_id")
+      SakaiInfo::Cache.clear_all
+
+      u2 = User.find(eid)
+      assert((not u2.nil?), "User could not be found by EID")
+      SakaiInfo::Cache.clear_all
+
+      assert_equal(u1.dbrow, u2.dbrow)
+      assert_equal(u1.id, u2.id)
+      assert_equal(u1.eid, u2.eid)
+      assert_equal(u1.site_count, u2.site_count)
+      assert_equal(u1.serialize(:summary), u2.serialize(:summary))
+      assert_equal(u1.serialize(:summary).to_yaml, u2.serialize(:summary).to_yaml)
+      assert_equal(u1.serialize(:summary).to_json, u2.serialize(:summary).to_json)
+    end
+  end
 end
 
