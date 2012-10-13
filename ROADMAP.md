@@ -4,11 +4,10 @@
 
 ### 0.5.3 ###
 
-* Ability to specify alternate config file at the command line
+* Add ability to specify Sequel connect string on command line
 * Better date formatting and proper time zone understanding
 * More query functionality
 * OSP presentation/metaobj support
-* Add simple tests against user/site fixture data
 * More query and shell functionality
 
 ### 0.5.4 ###

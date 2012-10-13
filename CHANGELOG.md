@@ -1,5 +1,14 @@
 # sakai-info Change History #
 
+### 0.5.3 ###
+
+*Released 2012-??-??*
+
+* Unit test cleanup, refactor, and migration to MiniTest
+* Added simple tests against user/site fixture data
+* Refactored and simplified rake tasks for initializing test database
+* Added ability to specify alternate config file at the command line
+
 ### 0.5.2 ###
 
 *Released 2012-10-11*
