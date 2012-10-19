@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-04 daveadams@gmail.com
+# Last updated 2012-10-19 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -157,6 +157,7 @@ module SakaiInfo
 
     def self.clear_cache
       @@cache = {}
+      @@uuid_cache = {}
     end
     clear_cache
 
@@ -182,8 +183,21 @@ module SakaiInfo
           raise ObjectNotFoundException.new(ContentResource, id)
         end
         @@cache[id] = ContentResource.new(row)
+        @@uuid_cache[row[:uuid]] = @@cache[id]
       end
       @@cache[id]
+    end
+
+    def self.find_by_uuid(uuid)
+      if @@uuid_cache[uuid].nil?
+        row = DB.connect[:content_resource].where(:resource_uuid => uuid).first
+        if row.nil?
+          raise ObjectNotFoundException.new(ContentResource, uuid)
+        end
+        @@uuid_cache[uuid] = ContentResource.new(row)
+        @@cache[row[:resource_id]] = @@uuid_cache[uuid]
+      end
+      @@uuid_cache[uuid]
     end
 
     def size_on_disk
