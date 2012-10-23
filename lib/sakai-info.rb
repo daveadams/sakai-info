@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2012-10-15 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -47,4 +47,5 @@ require 'sakai-info/generic_message'
 require 'sakai-info/forum'
 require 'sakai-info/private_message'
 require 'sakai-info/alias'
+require 'sakai-info/metaobj'
 

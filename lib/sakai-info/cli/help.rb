@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2012-10-19 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -481,6 +481,18 @@ sin alias
   passed to include additional information:
 
     --mod        Print creation/modification info
+EOF
+        "metaobj" => <<EOF,
+sin metaobj
+
+  Usage: sin metaobj <id> [<options>]
+
+  Prints information about the metaobj/form ID specified. Additional options
+  may be passed to include additional information:
+
+    --instructions  Include form instruction text
+    --schemadata    Include schemadata field
+    --mod           Print creation/modification info
 EOF
         "query" => <<EOF,
 sin query

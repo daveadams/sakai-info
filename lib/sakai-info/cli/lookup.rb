@@ -2,7 +2,7 @@
 #   class for handling the default command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2012-10-15 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -138,6 +138,8 @@ module SakaiInfo
       "private-message" => PrivateMessage,
       "pm" => PrivateMessage,
       "alias" => Alias,
+      "metaobj" => Metaobj,
+      "form" => Metaobj,
     }
   end
 end
