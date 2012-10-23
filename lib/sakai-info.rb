@@ -48,4 +48,5 @@ require 'sakai-info/forum'
 require 'sakai-info/private_message'
 require 'sakai-info/alias'
 require 'sakai-info/metaobj'
+require 'sakai-info/wiki'
 
