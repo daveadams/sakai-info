@@ -8,6 +8,9 @@
 * Added simple tests against user/site fixture data
 * Refactored and simplified rake tasks for initializing test database
 * Added ability to specify alternate config file at the command line
+* New method to find ContentResource by UUID
+* Metaobj support
+* Wiki support
 
 ### 0.5.2 ###
 
