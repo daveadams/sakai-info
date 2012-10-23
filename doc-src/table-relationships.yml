@@ -327,3 +327,18 @@ sakai_alias_property:
   - field: alias_id
     table: sakai_alias
 
+metaobj_form_def:
+  description: OSP Form Definition
+  pk: id
+  fk:
+  - field: owner
+    table: sakai_user
+  - field: siteid
+    table: sakai_site
+  - field: alternatecreatexslt
+    table: content_resource
+    alt_pk: resource_uuid
+  - field: alternateviewxslt
+    table: content_resource
+    alt_pk: resource_uuid
+

@@ -30,6 +30,7 @@ module SakaiInfo
       @id = dbrow[:id]
       @description = dbrow[:description]
       @external_type = dbrow[:externaltype]
+      @schema_hash = dbrow[:schema_hash]
     end
 
     def self.find(id)
@@ -129,8 +130,6 @@ module SakaiInfo
 
     # serialization
     def default_serialization
-      return { "schemadata" => self.schemadata }
-
       result = {
         "id" => self.id,
         "description" => self.description,

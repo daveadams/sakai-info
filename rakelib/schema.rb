@@ -2,7 +2,7 @@
 #   rake task support
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-10-12 daveadams@gmail.com
+# Last updated 2012-10-23 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -30,6 +30,7 @@ Tables = {
             :sam_assessmentgrading_t, :sam_itemgrading_t, :sam_media_t,
             :sam_assessaccesscontrol_t, :sam_publishedaccesscontrol_t],
   :alias => [:sakai_alias, :sakai_alias_property],
+  :metaobj => [:metaobj_form_def],
 }
 
 ExtraTables = {
