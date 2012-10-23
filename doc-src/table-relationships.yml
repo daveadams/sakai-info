@@ -342,3 +342,63 @@ metaobj_form_def:
     table: content_resource
     alt_pk: resource_uuid
 
+rwikiobject:
+  description: Rwiki Page
+  pk: id
+  fk:
+  - field: realm
+    table: sakai_realm
+    alt_pk: realm_id
+  - field: userid
+    table: sakai_user
+  - field: owner
+    table: sakai_user
+rwikicurrentcontent:
+  description: Rwiki Page Content
+  pk: id
+  fk:
+  - field: rwikiid
+    table: rwikiobject
+rwikihistory:
+  description: Rwiki Page History
+  pk: id
+  fk:
+  - field: realm
+    table: sakai_realm
+    alt_pk: realm_id
+  - field: userid
+    table: sakai_user
+  - field: owner
+    table: sakai_user
+  - field: rwikiobjectid
+    table: rwikiobject
+rwikihistorycontent:
+  description: Rwiki Page History Content
+  pk: id
+  fk:
+  - field: rwikiid
+    table: rwikihistory
+rwikipreference:
+  description: Rwiki User Preferences
+  pk: id
+  fk:
+  - field: userid
+    table: sakai_user
+  - field: prefcontext
+    table: sakai_realm
+    alt_pk: realm_id
+rwikipagepresence:
+  description: Rwiki Page Last-Visit Log
+  pk: id
+  fk:
+  - field: userid
+    table: sakai_user
+  - field: pagespace
+    table: sakai_realm
+    alt_pk: realm_id
+  - field: pagename
+    table: rwikiobject
+    alt_pk: name
+  # - field: sessionid
+  #   table: sakai_session
+

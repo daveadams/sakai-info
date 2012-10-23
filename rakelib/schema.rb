@@ -31,6 +31,8 @@ Tables = {
             :sam_assessaccesscontrol_t, :sam_publishedaccesscontrol_t],
   :alias => [:sakai_alias, :sakai_alias_property],
   :metaobj => [:metaobj_form_def],
+  :wiki => [:rwikiobject, :rwikicurrentcontent, :rwikihistory, :rwikihistorycontent,
+            :rwikipreference, :rwikipagepresence],
 }
 
 ExtraTables = {
