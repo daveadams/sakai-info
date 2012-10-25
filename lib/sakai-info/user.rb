@@ -2,7 +2,7 @@
 #   SakaiInfo::User library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-06 daveadams@gmail.com
+# Last updated 2012-10-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -43,6 +43,16 @@ module SakaiInfo
         end
       end
       @@cache[id]
+    end
+
+    def self.find!(id)
+      begin
+        user = User.find(id)
+      rescue ObjectNotFoundException => e
+        if e.classname == User.name
+          user = MissingUser.find(id)
+        end
+      end
     end
 
     def self.get_ids(id)
@@ -236,6 +246,42 @@ module SakaiInfo
        :sites,
        :pools,
        :mod,
+      ]
+    end
+  end
+
+  class MissingUser < User
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def initialize(id)
+      @dbrow = {}
+
+      @id = id
+      @eid = id
+    end
+
+    def self.find(id)
+      @@cache[id] ||= MissingUser.new(id)
+    end
+
+    def default_serialization
+      {
+        "id" => "MISSING USER: #{self.id}",
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => "MISSING USER: #{self.id}",
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
       ]
     end
   end

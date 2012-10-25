@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-06 daveadams@gmail.com
+# Last updated 2012-10-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -34,6 +34,17 @@ module SakaiInfo
         @@cache[id] = Site.new(row)
       end
       @@cache[id]
+    end
+
+    def self.find!(id)
+      begin
+        site = Site.find(id)
+      rescue ObjectNotFoundException => e
+        if e.classname == Site.name
+          site = MissingSite.find(id)
+        end
+      end
+      site
     end
 
     def initialize(dbrow)
@@ -428,6 +439,41 @@ module SakaiInfo
        :realm,
        :forums,
        :mod,
+      ]
+    end
+  end
+
+  class MissingSite < Site
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def initialize(id)
+      @dbrow = {}
+
+      @id = id
+    end
+
+    def self.find(id)
+      @@cache[id] ||= MissingSite.new(id)
+    end
+
+    def default_serialization
+      {
+        "id" => "MISSING SITE: #{self.id}",
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => "MISSING SITE: #{self.id}",
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
       ]
     end
   end

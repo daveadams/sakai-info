@@ -2,7 +2,7 @@
 #   SakaiInfo::Authz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-05-14 daveadams@gmail.com
+# Last updated 2012-10-25 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -267,6 +267,18 @@ module SakaiInfo
       realm
     end
 
+    def self.find!(id_or_name)
+      begin
+        realm = AuthzRealm.find(id_or_name)
+      rescue ObjectNotFoundException => e
+        if e.classname == AuthzRealm.name
+          realm = MissingAuthzRealm.find(id_or_name)
+        end
+      end
+      realm
+    end
+
+
     def self.find_by_site_id(site_id)
       AuthzRealm.find_by_name("/site/#{site_id}")
     end
@@ -315,6 +327,54 @@ module SakaiInfo
        :mod,
        :roles,
        :users,
+      ]
+    end
+  end
+
+  class MissingAuthzRealm < AuthzRealm
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def initialize(id)
+      @dbrow = {}
+
+      @dbrow = {}
+
+      @id = id
+      @name = id
+      @providers = nil
+      @maintain_role = nil
+    end
+
+    def self.find(id)
+      @@cache[id] ||= MissingAuthzRealm.new(id)
+    end
+
+    def realm_roles
+      []
+    end
+
+    def users
+      []
+    end
+
+    def default_serialization
+      {
+        "id" => "MISSING REALM: #{self.id}",
+      }
+    end
+
+    def summary_serialization
+      {
+        "id" => "MISSING REALM: #{self.id}",
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
       ]
     end
   end
