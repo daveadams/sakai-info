@@ -35,6 +35,14 @@ module SakaiInfo
       @@cache[id]
     end
 
+    def last_updated
+      @dbrow[:version]
+    end
+
+    def revision
+      @dbrow[:revision]
+    end
+
     def owner
       @owner ||= User.find!(@dbrow[:owner])
     end
@@ -123,15 +131,21 @@ module SakaiInfo
         "-"
     end
 
+    def content
+      @content ||= DB.connect[:rwikicurrentcontent].where(:rwikiid => self.id).first[:content].read
+    end
+
     # serialization
     def default_serialization
       result = {
         "id" => self.id,
         "page_name" => self.page_name,
+        "last_updated" => self.last_updated,
         "realm" => self.realm.serialize(:summary),
         "owner" => self.owner.serialize(:summary),
         "site" => self.site.serialize(:summary),
         "permissions" => self.permission_string,
+        "revision" => self.revision,
       }
       result
     end
@@ -166,10 +180,17 @@ module SakaiInfo
       }
     end
 
+    def content_serialization
+      {
+        "content" => self.content,
+      }
+    end
+
     def self.all_serializations
       [
        :default,
        :permissions,
+       :content,
       ]
     end
   end
