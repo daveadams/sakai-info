@@ -79,6 +79,50 @@ module SakaiInfo
                      end
     end
 
+    def owner_readable?
+      @dbrow[:ownerread] == 1
+    end
+
+    def owner_writable?
+      @dbrow[:ownerwrite] == 1
+    end
+
+    def owner_admin?
+      @dbrow[:owneradmin] == 1
+    end
+
+    def group_readable?
+      @dbrow[:groupread] == 1
+    end
+
+    def group_writable?
+      @dbrow[:groupwrite] == 1
+    end
+
+    def group_admin?
+      @dbrow[:groupadmin] == 1
+    end
+
+    def public_readable?
+      @dbrow[:publicread] == 1
+    end
+
+    def public_writable?
+      @dbrow[:publicwrite] == 1
+    end
+
+    def permission_string
+      (self.owner_readable? ? "r" : "-") +
+        (self.owner_writable? ? "w" : "-") +
+        (self.owner_admin? ? "A" : "-") +
+        (self.group_readable? ? "r" : "-") +
+        (self.group_writable? ? "w" : "-") +
+        (self.group_admin? ? "A" : "-") +
+        (self.public_readable? ? "r" : "-") +
+        (self.public_writable? ? "w" : "-") +
+        "-"
+    end
+
     # serialization
     def default_serialization
       result = {
@@ -87,6 +131,7 @@ module SakaiInfo
         "realm" => self.realm.serialize(:summary),
         "owner" => self.owner.serialize(:summary),
         "site" => self.site.serialize(:summary),
+        "permissions" => self.permission_string,
       }
       result
     end
@@ -100,9 +145,31 @@ module SakaiInfo
       }
     end
 
+    def permissions_serialization
+      {
+        "permissions" => {
+          "owner" => {
+            "read" => self.owner_readable?,
+            "write" => self.owner_writable?,
+            "admin" => self.owner_admin?,
+          },
+          "group" => {
+            "read" => self.group_readable?,
+            "write" => self.group_writable?,
+            "admin" => self.group_admin?,
+          },
+          "public" => {
+            "read" => self.public_readable?,
+            "write" => self.public_writable?,
+          }
+        }
+      }
+    end
+
     def self.all_serializations
       [
        :default,
+       :permissions,
       ]
     end
   end
