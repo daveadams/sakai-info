@@ -10,7 +10,7 @@
 * Added ability to specify alternate config file at the command line
 * New method to find ContentResource by UUID
 * Metaobj and Wiki support
-* More graceful failing for Users, Sites, and AuthzRealms not found
+* More graceful fails when Users, Sites, and AuthzRealms are not found
 
 ### 0.5.2 ###
 
