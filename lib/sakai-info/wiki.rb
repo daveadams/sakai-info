@@ -2,7 +2,7 @@
 #   SakaiInfo::Wiki library
 #
 # Created 2012-10-23 daveadams@gmail.com
-# Last updated 2012-10-25 daveadams@gmail.com
+# Last updated 2012-10-31 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -45,6 +45,10 @@ module SakaiInfo
 
     def owner
       @owner ||= User.find!(@dbrow[:owner])
+    end
+
+    def last_updated_by
+      @updated_by ||= User.find!(@dbrow[:userid])
     end
 
     def realm
@@ -135,14 +139,19 @@ module SakaiInfo
       @content ||= DB.connect[:rwikicurrentcontent].where(:rwikiid => self.id).first[:content].read
     end
 
+    def history
+      @history ||= WikiPageHistory.find_by_wiki_page_id(self.id)
+    end
+
     # serialization
     def default_serialization
       result = {
         "id" => self.id,
         "page_name" => self.page_name,
-        "last_updated" => self.last_updated,
         "realm" => self.realm.serialize(:summary),
-        "owner" => self.owner.serialize(:summary),
+        "owner" => self.owner.eid,
+        "last_updated_by" => self.last_updated_by.eid,
+        "last_updated" => self.last_updated,
         "site" => self.site.serialize(:summary),
         "permissions" => self.permission_string,
         "revision" => self.revision,
@@ -156,6 +165,14 @@ module SakaiInfo
         "name" => self.name,
         "owner" => self.owner.eid,
         "site_id" => self.site_id,
+      }
+    end
+
+    def history_summary_serialization
+      {
+        "id" => self.id,
+        "last_updated" => self.last_updated,
+        "last_updated_by" => self.last_updated_by.eid,
       }
     end
 
@@ -180,9 +197,83 @@ module SakaiInfo
       }
     end
 
+    def history_serialization
+      result = {
+        "history" => self.history.collect { |r| r.serialize(:history) },
+      }
+      if result["history"] == []
+        result = {}
+      end
+      result
+    end
+
     def content_serialization
       {
         "content" => self.content,
+      }
+    end
+
+    def self.all_serializations
+      [
+       :default,
+       :permissions,
+       :content,
+       :history,
+      ]
+    end
+  end
+
+  class WikiPageHistory < WikiPage
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      if @@cache[id].nil?
+        row = DB.connect[:rwikihistory].filter(:id => id).first
+        if row.nil?
+          raise ObjectNotFoundException.new(WikiPageHistory, id)
+        end
+        @@cache[id] = WikiPageHistory.new(row)
+      end
+      @@cache[id]
+    end
+
+    def content
+      @content ||= DB.connect[:rwikihistorycontent].where(:rwikiid => self.id).first[:content].read
+    end
+
+    def wiki_page_id
+      @dbrow[:rwikiobjectid]
+    end
+
+    def wiki_page
+      @wiki_page ||= WikiPage.find(self.wiki_page_id)
+    end
+
+    def self.find_by_wiki_page_id(id)
+      results = []
+      DB.connect[:rwikihistory].filter(:rwikiobjectid => id).
+        order(:revision).all.collect do |row|
+        @@cache[row[:id]] = WikiPageHistory.new(row)
+        results << @@cache[row[:id]]
+      end
+      results
+    end
+
+    def default_serialization
+      result = super
+      result["current_version"] = self.wiki_page.serialize(:history_summary)
+      result
+    end
+
+    def history_serialization
+      {
+        "id" => self.id,
+        "revision" => self.revision,
+        "last_updated" => self.last_updated,
+        "last_updated_by" => self.last_updated_by.eid,
       }
     end
 

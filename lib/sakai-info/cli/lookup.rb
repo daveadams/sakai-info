@@ -2,7 +2,7 @@
 #   class for handling the default command line mode
 #
 # Created 2012-05-23 daveadams@gmail.com
-# Last updated 2012-10-23 daveadams@gmail.com
+# Last updated 2012-10-31 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -142,6 +142,8 @@ module SakaiInfo
       "form" => Metaobj,
       "wiki-page" => WikiPage,
       "wiki" => WikiPage,
+      "wiki-page-history" => WikiPageHistory,
+      "wiki-history" => WikiPageHistory,
     }
   end
 end

@@ -2,7 +2,7 @@
 #  - sin command line help
 #
 # Created 2012-02-19 daveadams@gmail.com
-# Last updated 2012-10-19 daveadams@gmail.com
+# Last updated 2012-10-31 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -493,6 +493,29 @@ sin metaobj
     --instructions  Include form instruction text
     --schemadata    Include schemadata field
     --mod           Print creation/modification info
+EOF
+        "wiki-page" => <<EOF,
+sin wiki-page
+
+  Usage: sin wiki-page <id> [<options>]
+
+  Prints information about the wiki page ID specified. Additional options may
+  be passed to include additional information:
+
+    --content       Include content of the wiki page itself
+    --permissions   Break out permissions individually
+    --history       Summarize revision history
+EOF
+        "wiki-page-history" => <<EOF,
+sin wiki-page-history
+
+  Usage: sin wiki-page-history <id> [<options>]
+
+  Prints information about the wiki page history ID specified. Additional
+  options may be passed to include additional information:
+
+    --content       Include content of the wiki page itself
+    --permissions   Break out permissions individually
 EOF
         "query" => <<EOF,
 sin query
