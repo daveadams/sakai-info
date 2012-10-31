@@ -29,7 +29,8 @@ Sakai INfo: sin #{VERSION}
       quiz-attempt-item-attachment, question-pool, assignment,
       assignment-submission, forum, forum-thread, forum-post, content,
       announcement, announcement-channel, gradebook, gradebook-item,
-      role, function, realm, private-message, alias
+      role, function, realm, private-message, alias, metaobj,
+      wiki-page, wiki-page-history
 
   QUERY MODE
     Query particular fields from certain objects given certain conditions.
