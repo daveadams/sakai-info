@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.5.4 ###
+
+*Released 2013-06-28*
+
+* More Sequel 4.0 fixes for deprecated sql_function and Symbol#like
+
 ### 0.5.3 ###
 
 *Released 2013-06-28*

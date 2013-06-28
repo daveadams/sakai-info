@@ -24,7 +24,7 @@ Use `rake` to test and build the gem:
     $ rake gem:build
 
 The resulting gem will be saved to the working directory as
-`sakai-info-0.5.3.gem`.
+`sakai-info-0.5.4.gem`.
 
 Cleanup built gems using:
 
