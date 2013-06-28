@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-11 daveadams@gmail.com
+# Last updated 2013-06-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -46,7 +46,7 @@ module SakaiInfo
       if @site.nil?
         # published quizzes map to site_id via the OWN_PUBLISHED_ASSESSMENT function
         # pending quizzes map to site_id via the EDIT_ASSESSMENT function
-        DB.connect[:sam_authzdata_t].select(:distinct.sql_function(:agentid)).
+        DB.connect[:sam_authzdata_t].select(Sequel.function(:distinct, :agentid)).
           where(:qualifierid => @id).
           where(:functionid => ["OWN_PUBLISHED_ASSESSMENT","EDIT_ASSESSMENT"]).
           all.each do |row|

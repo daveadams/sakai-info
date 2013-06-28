@@ -2,7 +2,7 @@
 #   SakaiInfo::Content library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-19 daveadams@gmail.com
+# Last updated 2013-06-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -363,7 +363,7 @@ module SakaiInfo
     def self.find_portfolio_interaction_collections
       collections = []
       DB.connect[:content_collection].
-        where(:collection_id.like('%/portfolio-interaction/')) do |row|
+        where(Sequel.like(:collection_id, '%/portfolio-interaction/')) do |row|
         @@cache[row[:collection_id]] = ContentCollection.new(row)
         collections << @@cache[row[:collection_id]]
       end
@@ -372,8 +372,8 @@ module SakaiInfo
 
     def size_on_disk
       @size_on_disk ||=
-        DB.connect[:content_resource].select(:sum.sql_function(:file_size).as(:total_size)).
-        where(:resource_id.like("#{@id}%")).first[:total_size].to_i
+        DB.connect[:content_resource].select(Sequel.function(:sum, :file_size).as(:total_size)).
+        where(Sequel.like(:resource_id, "#{@id}%")).first[:total_size].to_i
     end
 
     def children

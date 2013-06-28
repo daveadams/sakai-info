@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2012-10-25 daveadams@gmail.com
+# Last updated 2013-06-28 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -218,7 +218,7 @@ module SakaiInfo
 
     def self.count_by_property(name, value)
       DB.connect[:sakai_site_property].
-        where(:name => name, :to_char.sql_function(:value) => value).count
+        where(:name => name, Sequel.function(:to_char, :value) => value).count
     end
 
     def self.find_ids_by_property(property_name, property_value)
@@ -235,12 +235,12 @@ module SakaiInfo
 
     def self.find_all_workspace_ids
       DB.connect[:sakai_site].select(:site_id).
-        where(:site_id.like("~%")).all.collect{|r| r[:site_id]}
+        where(Sequel.like(:site_id, "~%")).all.collect{|r| r[:site_id]}
     end
 
     def self.find_all_non_workspace_ids
       DB.connect[:sakai_site].select(:site_id).
-        where(~:site_id.like("~%")).all.collect{|r| r[:site_id]}
+        where(~Sequel.like(:site_id, "~%")).all.collect{|r| r[:site_id]}
     end
 
     def self.find_ids_by_type(type)
@@ -500,7 +500,7 @@ module SakaiInfo
 
     def self.find_site_ids_by_property(name, value)
       DB.connect[:sakai_site_property].
-        where(:name => name, :to_char.sql_function(:value) => value).
+        where(:name => name, Sequel.function(:to_char, :value) => value).
         all.collect{|r| r[:site_id]}
     end
   end
