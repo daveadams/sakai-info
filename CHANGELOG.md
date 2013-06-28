@@ -2,7 +2,7 @@
 
 ### 0.5.3 ###
 
-*Released 2012-??-??*
+*Released 2013-06-28*
 
 * Unit test cleanup, refactor, and migration to MiniTest
 * Added simple tests against user/site fixture data
@@ -11,6 +11,7 @@
 * New method to find ContentResource by UUID
 * Metaobj and Wiki support
 * More graceful fails when Users, Sites, and AuthzRealms are not found
+* Fixed Sequel 4.0 sql_or -> or support
 
 ### 0.5.2 ###
 
