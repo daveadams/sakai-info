@@ -57,7 +57,7 @@ module SakaiInfo
 
     def self.get_ids(id)
       @@id_cache[id] ||=
-        DB.connect[:sakai_user_id_map].where({:user_id => id, :eid => id}.sql_or).first
+        DB.connect[:sakai_user_id_map].where(:user_id => id).or(:eid => id).first
     end
 
     def self.get_eid(id)
