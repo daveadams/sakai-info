@@ -144,7 +144,8 @@ module SakaiInfo
       "wiki" => WikiPage,
       "wiki-page-history" => WikiPageHistory,
       "wiki-history" => WikiPageHistory,
+      "cal" => Calendar,
+      "calendar" => Calendar,
     }
   end
 end
-

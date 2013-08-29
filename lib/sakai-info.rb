@@ -2,7 +2,7 @@
 #   Base library file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-10-15 daveadams@gmail.com
+# Last updated 2013-08-29 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -37,6 +37,7 @@ require 'sakai-info/page'
 require 'sakai-info/tool'
 require 'sakai-info/announcement'
 require 'sakai-info/assignment'
+require 'sakai-info/calendar'
 require 'sakai-info/authz'
 require 'sakai-info/content'
 require 'sakai-info/gradebook'
@@ -49,4 +50,3 @@ require 'sakai-info/private_message'
 require 'sakai-info/alias'
 require 'sakai-info/metaobj'
 require 'sakai-info/wiki'
-
