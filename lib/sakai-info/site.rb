@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2013-06-28 daveadams@gmail.com
+# Last updated 2013-08-30 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -174,6 +174,15 @@ module SakaiInfo
       @forums ||= Forum.find_by_site_id(@id)
     end
 
+    # calendar
+    def calendar
+      @calendar ||= Calendar.find!(@id)
+    end
+
+    def calendar_event_count
+      @calendar_event_count ||= self.calendar.event_count
+    end
+
     # content properties
     def resource_storage
       resource_collection_id = "/group/#{@id}/"
@@ -294,7 +303,8 @@ module SakaiInfo
         "assignment_count" => self.assignment_count,
         "announcement_count" => self.announcement_count,
         "gradebook_item_count" => (self.gradebook.nil? ? 0 : self.gradebook.item_count),
-        "forum_count" => self.forum_count
+        "forum_count" => self.forum_count,
+        "calendar_event_count" => self.calendar_event_count,
       }
       if result["providers"].nil? or result["providers"] == "" or result["providers"] == []
         result.delete("providers")
@@ -425,6 +435,12 @@ module SakaiInfo
       end
     end
 
+    def calendar_events_serialization
+      {
+        "calendar_events" => self.calendar.events.collect { |e| e.serialize(:summary) }
+      }
+    end
+
     def self.all_serializations
       [
        :default,
@@ -438,6 +454,7 @@ module SakaiInfo
        :gradebook,
        :realm,
        :forums,
+       :calendar_events,
        :mod,
       ]
     end
