@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.5.5 ###
+
+*Released ????-??-??*
+
+* New object types: calendar and calendar-event
+
 ### 0.5.4 ###
 
 *Released 2013-06-28*
