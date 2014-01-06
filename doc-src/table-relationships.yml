@@ -317,6 +317,7 @@ sam_media_t:
 sakai_alias:
   description: Site Alias
   pk: alias_id
+  fk:
   - field: createdby
     table: sakai_user
   - field: modifiedby
@@ -401,4 +402,3 @@ rwikipagepresence:
     alt_pk: name
   # - field: sessionid
   #   table: sakai_session
-
