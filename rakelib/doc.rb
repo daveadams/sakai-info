@@ -2,7 +2,7 @@
 #   doc-generation rake tasks
 #
 # Created 2012-05-21 daveadams@gmail.com
-# Last updated 2012-05-21 daveadams@gmail.com
+# Last updated 2014-01-06 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -33,7 +33,7 @@ namespace :doc do
         exit 1
       else
         dot_version = `dot -V 2>&1`.chomp
-        if dot_version !~ /Graphviz version/
+        if dot_version !~ /Graphviz version/i
           STDERR.puts "ERROR: The 'dot' utility in your PATH does not appear to be Graphviz"
           exit 1
         end
@@ -155,4 +155,3 @@ namespace :doc do
     end
   end
 end
-
