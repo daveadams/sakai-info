@@ -2,7 +2,7 @@
 #   SakaiInfo::Site library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2013-08-30 daveadams@gmail.com
+# Last updated 2014-01-30 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -236,6 +236,10 @@ module SakaiInfo
 
     def self.find_ids_by_semester(term_eid)
       Site.find_ids_by_property("term_eid", term_eid)
+    end
+
+    def self.find_all
+      DB.connect[:sakai_site].select(:site_id).all.collect{|row| @@cache[row[:site_id]] = Site.new(row)}
     end
 
     def self.find_all_ids
