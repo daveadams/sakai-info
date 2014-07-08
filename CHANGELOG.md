@@ -2,7 +2,7 @@
 
 ### 0.5.5 ###
 
-*Released ????-??-??*
+*Released 2014-07-08*
 
 * New object types: calendar and calendar-event
 * Added Site.find_all
