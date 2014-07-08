@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2013-06-28 daveadams@gmail.com
+# Last updated 2014-07-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -820,6 +820,21 @@ module SakaiInfo
     def late?
       @is_late == 1
     end
+
+    # status definitions from samigo-api/src/java/org/sakaiproject/tool/assessment/data/ifc/grading/AssessmentGradingIfc.java
+    ATTEMPT_STATUS = {
+      "0" => "unsubmitted",
+      "1" => "submitted-ungraded",
+      "2" => "submitted-auto-graded",
+      "3" => "submitted-needs-human-attention",
+      "4" => "needs-resubmit",
+      "5" => "unsubmitted-but-graded",
+      "6" => "updated-in-progress",
+    }
+    def status
+      ATTEMPT_STATUS[@dbrow[:status].to_i.to_s] || "unknown status '#{@dbrow[:status].to_i}'"
+    end
+
 
     def default_serialization
       {

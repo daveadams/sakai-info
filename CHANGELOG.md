@@ -5,6 +5,8 @@
 *Released ????-??-??*
 
 * New object types: calendar and calendar-event
+* Added Site.find_all
+* Added mnemonic descriptions to quiz attempt status field
 
 ### 0.5.4 ###
 
