@@ -2,7 +2,7 @@
 #   Gem definition file
 #
 # Created 2012-02-15 daveadams@gmail.com
-# Last updated 2012-10-08 daveadams@gmail.com
+# Last updated 2014-07-08 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -25,9 +25,8 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.executables = ["sin"]
 
-  spec.add_dependency('sequel')
+  spec.add_dependency('sequel', '~> 4.12')
 
-  spec.add_development_dependency('sqlite3')
-  spec.add_development_dependency('marky_markov')
+  spec.add_development_dependency('sqlite3', '~> 1.3', '>= 1.3.9')
+  spec.add_development_dependency('marky_markov', '~> 0.3', '>= 0.3.5')
 end
-
