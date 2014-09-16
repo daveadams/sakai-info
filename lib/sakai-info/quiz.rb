@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2014-07-08 daveadams@gmail.com
+# Last updated 2014-09-16 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -738,8 +738,7 @@ module SakaiInfo
   # end
 
   class QuizAttempt < SakaiObject
-    attr_reader :dbrow, :submitted_at, :total_auto_score, :status, :attempted_at
-    attr_reader :time_elapsed, :comments, :user_id, :quiz_id
+    attr_reader :dbrow, :total_auto_score, :status, :time_elapsed, :comments, :user_id, :quiz_id
 
     def self.clear_cache
       @@cache = {}
@@ -755,7 +754,7 @@ module SakaiInfo
       @quiz_id = dbrow[:publishedassessmentid]
       @total_auto_score = dbrow[:totalautoscore]
       @status = dbrow[:status]
-      @attempted_at = dbrow[:attempted_at]
+      @attempted_at = dbrow[:attemptdate]
       @time_elapsed = dbrow[:timeelapsed]
       @is_auto_submitted = dbrow[:is_auto_submitted]
       @is_late = dbrow[:islate]
@@ -821,6 +820,22 @@ module SakaiInfo
       @is_late == 1
     end
 
+    def attempted_at
+      if @attempted_at.nil?
+        nil
+      else
+        @attempted_at.strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
+    def submitted_at
+      if @submitted_at.nil?
+        nil
+      else
+        @submitted_at.strftime("%Y-%m-%d %H:%M:%S")
+      end
+    end
+
     # status definitions from samigo-api/src/java/org/sakaiproject/tool/assessment/data/ifc/grading/AssessmentGradingIfc.java
     ATTEMPT_STATUS = {
       "0" => "unsubmitted",
@@ -842,7 +857,9 @@ module SakaiInfo
         "user" => self.user.serialize(:summary),
         "quiz" => self.quiz.serialize(:summary),
         "item_count" => self.item_count,
+        "attempted_at" => self.attempted_at,
         "submitted_at" => self.submitted_at,
+        "time_elapsed" => self.time_elapsed,
         "is_auto_submitted" => self.auto_submitted?,
         "is_late" => self.late?,
         "status" => self.status,
