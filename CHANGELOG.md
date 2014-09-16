@@ -1,5 +1,10 @@
 # sakai-info Change History #
 
+### 0.5.6 ###
+
+* Added submitted date and elapsed time to quiz attempt serialization
+* Added additional shortcut names for assignment and assignment-submission
+
 ### 0.5.5 ###
 
 *Released 2014-07-08*
