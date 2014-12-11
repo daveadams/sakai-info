@@ -2,8 +2,12 @@
 
 ### 0.5.6 ###
 
+*Released 2014-12-11*
+
 * Added submitted date and elapsed time to quiz attempt serialization
 * Added additional shortcut names for assignment and assignment-submission
+* New object types: pending-quiz-metadata, published-quiz-metadata
+* New object types: pending-quiz-authorization, published-quiz-authorization
 
 ### 0.5.5 ###
 

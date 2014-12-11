@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2014-09-16 daveadams@gmail.com
+# Last updated 2014-12-11 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -132,6 +132,14 @@ module SakaiInfo
       @access_control ||= self.access_control_class.find(self.id)
     end
 
+    def metadata
+      @metadata ||= self.metadata_class.find_by_quiz_id(self.id)
+    end
+
+    def authorizations
+      @authorizations ||= self.authorization_class.find_by_quiz_id(self.id)
+    end
+
     def default_serialization
       result = {
         "id" => self.id,
@@ -193,6 +201,22 @@ module SakaiInfo
       {
         "items" => self.items.collect { |i| i.serialize(:quiz_summary) }
       }
+    end
+
+    def metadata_serialization
+      {
+        "metadata" => self.metadata.collect { |m| [m.key, m.value] }.to_h
+      }
+    end
+
+    def authorizations_serialization
+      {
+        "authorizations" => self.authorizations.collect { |a| a.serialize(:quiz_summary) }
+      }
+    end
+
+    def auths_serialization
+      self.authorizations_serialization
     end
 
     def self.all_serializations
@@ -260,6 +284,14 @@ module SakaiInfo
     def access_control_class
       PendingQuizAccessControl
     end
+
+    def metadata_class
+      PendingQuizMetadata
+    end
+
+    def authorization_class
+      PendingQuizAuthorization
+    end
   end
 
   class PublishedQuiz < Quiz
@@ -322,6 +354,14 @@ module SakaiInfo
 
     def access_control_class
       PublishedQuizAccessControl
+    end
+
+    def metadata_class
+      PublishedQuizMetadata
+    end
+
+    def authorization_class
+      PublishedQuizAuthorization
     end
 
     def attempt_count
@@ -727,15 +767,6 @@ module SakaiInfo
       :sam_publisheditemtext_t
     end
   end
-
-  # class QuizItemAttachment < SakaiObject
-  # end
-
-  # class PendingQuizItemAttachment < QuizItemAttachment
-  # end
-
-  # class PublishedQuizItemAttachment < QuizItemAttachment
-  # end
 
   class QuizAttempt < SakaiObject
     attr_reader :dbrow, :total_auto_score, :status, :time_elapsed, :comments, :user_id, :quiz_id
@@ -1318,4 +1349,212 @@ module SakaiInfo
       @quiz ||= PublishedQuiz.find(self.id)
     end
   end
+
+  # metadata
+  class QuizMetadata < SakaiObject
+    attr_reader :id, :dbrow, :key, :value
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+      @id = dbrow[:assessmentmetadataid]
+      @quiz_id = dbrow[:assessmentid]
+      @key = dbrow[:label]
+      @value = dbrow[:entry]
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "quiz" => self.quiz.serialize(:summary),
+        "key" => self.key,
+        "value" => self.value,
+      }
+    end
+  end
+
+  class PendingQuizMetadata < QuizMetadata
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_assessmetadata_t].where(:assessmentmetadataid => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PendingQuizMetadata, id)
+        end
+
+        @@cache[id] = PendingQuizMetadata.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PendingQuiz.find(@quiz_id)
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      DB.connect[:sam_assessmetadata_t].where(:assessmentid => quiz_id)
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      PendingQuizMetadata.query_by_quiz_id(quiz_id).count
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      PendingQuizMetadata.query_by_quiz_id(quiz_id).
+        all.collect { |row| PendingQuizMetadata.new(row) }
+    end
+  end
+
+  class PublishedQuizMetadata < QuizMetadata
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_publishedmetadata_t].where(:assessmentmetadataid => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PublishedQuizMetadata, id)
+        end
+
+        @@cache[id] = PublishedQuizMetadata.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PublishedQuiz.find(@quiz_id)
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      DB.connect[:sam_publishedmetadata_t].where(:assessmentid => quiz_id)
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      PublishedQuizMetadata.query_by_quiz_id(quiz_id).count
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      PublishedQuizMetadata.query_by_quiz_id(quiz_id).
+        all.collect { |row| PublishedQuizMetadata.new(row) }
+    end
+  end
+
+  # authorization
+  class QuizAuthorization < SakaiObject
+    attr_reader :id, :dbrow, :name, :starts_at, :ends_at
+
+    include ModProps
+    created_by_key :lastmodifiedby
+    created_at_key :lastmodifieddate
+    modified_by_key :lastmodifiedby
+    modified_at_key :lastmodifieddate
+
+    def initialize(dbrow)
+      @dbrow = dbrow
+      @id = dbrow[:id]
+      @agent_id = dbrow[:agentid]
+      @name = dbrow[:functionid]
+      @quiz_id = dbrow[:qualifierid]
+      @starts_at = dbrow[:effectivedate]
+      @ends_at = dbrow[:expirationdate]
+    end
+
+    def default_serialization
+      {
+        "id" => self.id,
+        "quiz" => self.quiz.serialize(:summary),
+        "name" => self.name,
+        "agent" => @agent_id,
+      }
+    end
+
+    def quiz_summary_serialization
+      {
+        "name" => self.name,
+        "agent" => @agent_id,
+      }
+    end
+  end
+
+  class PendingQuizAuthorization < QuizAuthorization
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_authzdata_t].where(:id => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PendingQuizAuthorization, id)
+        end
+
+        @@cache[id] = PendingQuizAuthorization.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PendingQuiz.find(@quiz_id)
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      DB.connect[:sam_authzdata_t].where(:qualifierid => quiz_id).exclude(Sequel.like(:functionid, "%_PUBLISHED_ASSESSMENT%"))
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      PendingQuizAuthorization.query_by_quiz_id(quiz_id).count
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      PendingQuizAuthorization.query_by_quiz_id(quiz_id).
+        all.collect { |row| PendingQuizAuthorization.new(row) }
+    end
+  end
+
+  class PublishedQuizAuthorization < QuizAuthorization
+    def self.clear_cache
+      @@cache = {}
+    end
+    clear_cache
+
+    def self.find(id)
+      id = id.to_s
+      if @@cache[id].nil?
+        row = DB.connect[:sam_authzdata_t].where(:id => id.to_i).first
+        if row.nil?
+          raise ObjectNotFoundException.new(PublishedQuizAuthorization, id)
+        end
+
+        @@cache[id] = PublishedQuizAuthorization.new(row)
+      end
+      @@cache[id]
+    end
+
+    def quiz
+      @quiz ||= PublishedQuiz.find(@quiz_id)
+    end
+
+    def self.query_by_quiz_id(quiz_id)
+      DB.connect[:sam_authzdata_t].where(:qualifierid => quiz_id).where(Sequel.like(:functionid, "%_PUBLISHED_ASSESSMENT%"))
+    end
+
+    def self.count_by_quiz_id(quiz_id)
+      PublishedQuizAuthorization.query_by_quiz_id(quiz_id).count
+    end
+
+    def self.find_by_quiz_id(quiz_id)
+      PublishedQuizAuthorization.query_by_quiz_id(quiz_id).
+        all.collect { |row| PublishedQuizAuthorization.new(row) }
+    end
+  end
+
 end
