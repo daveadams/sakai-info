@@ -1,5 +1,11 @@
 # sakai-info Change History #
 
+### 0.5.7 ###
+
+*Released 2014-12-12*
+
+* bugfix for "is auto submitted" field on QuizAttempt
+
 ### 0.5.6 ###
 
 *Released 2014-12-11*

@@ -1,8 +1,8 @@
 # sakai-info Roadmap #
 
-*Last updated 2012-10-11*
+*Last updated 2014-12-12*
 
-### 0.5.3 ###
+### 0.6 ###
 
 * Add ability to specify Sequel connect string on command line
 * Better date formatting and proper time zone understanding
@@ -10,7 +10,7 @@
 * OSP presentation/metaobj support
 * More query and shell functionality
 
-### 0.5.4 ###
+### 0.7 ###
 
 * RDS schema creation and data loading for MySQL and Oracle testing
 * More query and shell functionality
@@ -18,13 +18,13 @@
 * Chat channel/message support
 * More OSP support
 
-### 0.5.5 ###
+### 0.8 ###
 
 * Barebones web interface - HTML, JSON, and YAML
 * More query and shell functionality
 * Complete OSP support
 
-### 0.6.x ###
+### 0.9+ ###
 
 * Global cache instead of per-class
 * More query, web, and shell functionality
