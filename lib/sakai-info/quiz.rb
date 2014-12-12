@@ -2,7 +2,7 @@
 #   SakaiInfo::Quiz library
 #
 # Created 2012-02-17 daveadams@gmail.com
-# Last updated 2014-12-11 daveadams@gmail.com
+# Last updated 2014-12-12 daveadams@gmail.com
 #
 # https://github.com/daveadams/sakai-info
 #
@@ -787,7 +787,7 @@ module SakaiInfo
       @status = dbrow[:status]
       @attempted_at = dbrow[:attemptdate]
       @time_elapsed = dbrow[:timeelapsed]
-      @is_auto_submitted = dbrow[:is_auto_submitted]
+      @is_auto_submitted = dbrow[:isautosubmitted]
       @is_late = dbrow[:islate]
       @comments = dbrow[:comments]
     end
